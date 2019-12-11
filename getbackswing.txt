@@ -1,0 +1,22 @@
+they are found in imagedatalocal, within files that end with 02.maanim
+the numbers are one below the numbers for unit csv
+while unit001.csv is basic cat, in imagedatalocal, basic cat is represented by 000
+prefix _f is for first form, _c is for second form, and _s is for true form
+rest is irrelevant in this case
+To determine the backswing, first we need to figure out how to read maanim
+First, ignore the first two lines. Irrelevant
+The third line specifies the amount of animation sets
+we'll use bahamut cat first form as an example
+the fourth line is an animation set. Animation sets have five numbers per line
+below an animation set is the amount of keyframes, represented by a single number
+each keyframe consists of four numbers per line
+next, you will want to record every first number that appears in each keyframe line
+rinse and repeat until all of the first numbers are recorded
+after that, find the highest number
+then add it by 1
+in bahamut's case, it's 150
+add it by 1 to make it 151
+and this is how long bahamut's attack animation is
+subtract it by his foreswing, which is 121
+and you get 30
+30 is bahamut cat's backswing
