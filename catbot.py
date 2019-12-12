@@ -110,14 +110,6 @@ async def on_message(message):
         channel_mod = client.get_channel(modchannelid)
         await channel_mod.send('Assignment done')
 
-    # elif message.content.startswith('!assigntome'):
-    #     if not isAMod(message.author):  # modonly command
-    #         return
-    #     channel_mod = client.get_channel(modchannelid)
-    #     modqueue.setassigned(int(message.content[11:message.content.find(
-    #         ',')]), message.author)
-    #     await channel_mod.send('Assignment done')
-
     elif message.content.startswith('!catstats'):
         if not isADM(message):
             if not isWorthy(message.author):  # isWorthy command, for now
@@ -151,6 +143,12 @@ async def on_message(message):
             embed.add_field(name="Assigned to", value=i[5], inline=True)
             await channel_mod.send(embed=embed)
 
+    elif message.content.startswith('!deletereport') or message.content.startswith('!removereport'):
+        if not isAMod(message.author):
+            return
+        channel_mod = client.get_channel(modchannelid)
+        modqueue.deletereportbyid(int(message.content[14:]))
+        await channel_mod.send('Report successfully removed.')
 
 def isAMod(member):  # is a mod, but only in the battlecats server
     try:
@@ -183,7 +181,7 @@ def isInServer(member):
     return False
 
 
-modqueue = Modtools('results.csv')
+modqueue = Modtools('results.csv', 'archives.tsv')
 catculator = catunits_catbot.Catunits()
 data = Data_catbot.defFromFile()
 client.run(data.auth_token)
