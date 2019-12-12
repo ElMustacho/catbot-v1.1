@@ -1,13 +1,9 @@
 # todo list
-# support identification for admin/mod/flaired/users accounts
-# differentiation for channels
-# search in database of requests #embed
-# assignment of requests
-# solve requests
-# give out cat units
+# give out cat units (to be finished)
 # give out enemy units
 # give out the previous two nicely
 # write/declare/init stuff only once
+# don't upload to git unwanted files
 
 import discord
 from datetime import datetime

@@ -7,7 +7,8 @@ dsd.log
 __pycache__/
 *.py[cod]
 *$py.class
-
+archives.tsv
+results.csv
 # C extensions
 *.so
 
