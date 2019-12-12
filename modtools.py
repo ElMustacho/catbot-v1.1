@@ -22,7 +22,7 @@ class Modtools:
         newrow = pd.DataFrame([[user, date, channel, reason, status, assigned, reportcode]],
                               columns=self._cols)
         self._data = pd.concat([self._data, newrow], ignore_index=True, sort=False)
-        self._data.to_csv(self._location, index=False, sep='\t')
+        self.savereportsusual()
 
     def savereportsusual(self):
         self._data.to_csv(self._location, index=False, sep='\t')
@@ -33,8 +33,13 @@ class Modtools:
 
     def setsolvedbyindex(self, indexloc):
         self._data.at[indexloc, 'status of this'] = 'solved'
+        self.savereportsusual()
         return
 
     def setassigned(self, indexloc, who):
         self._data.at[indexloc, 'assigned to'] = who
+        self.savereportsusual()
         return
+
+    def getassigned(self, assignee):
+        return self._data.loc[self._data['assigned to'] == assignee].values.tolist()

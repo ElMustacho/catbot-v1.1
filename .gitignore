@@ -1,6 +1,7 @@
 files-backswing/
 snowy/
 auth.token
+dsd.log
 ### Python template
 # Byte-compiled / optimized / DLL files
 __pycache__/

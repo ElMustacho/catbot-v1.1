@@ -61,7 +61,7 @@ async def on_message(message):
         await message.channel.send('Time is now: ' + str(data.timelastmessage))
 
     elif message.content.startswith('!helpme'):
-        if not isInServer(message.member):  # to request help, you need to be
+        if not isInServer(message.author):  # to request help, you need to be
             return                          # a member, also helps with spam
         channel_mod = client.get_channel(modchannelid)
         message_to_send = str(message.author.mention) + ' has requested help' + \
@@ -99,12 +99,24 @@ async def on_message(message):
         await channel_mod.send('Report has been set as solved')
 
     elif message.content.startswith('!assignto'):
+
         if not isAMod(message.author):  # modonly command
             return
+        if message.content.startswith('!assigntome'):
+            modqueue.setassigned(int(message.content[11:]), message.author.mention)
+        else:
+            modqueue.setassigned(int(message.content[9:message.content.find(
+                ',')]), message.content[message.content.find(',') + 2:])
         channel_mod = client.get_channel(modchannelid)
-        modqueue.setassigned(int(message.content[9:message.content.find(
-            ',')]), message.content[message.content.find(',')+2:])
         await channel_mod.send('Assignment done')
+
+    # elif message.content.startswith('!assigntome'):
+    #     if not isAMod(message.author):  # modonly command
+    #         return
+    #     channel_mod = client.get_channel(modchannelid)
+    #     modqueue.setassigned(int(message.content[11:message.content.find(
+    #         ',')]), message.author)
+    #     await channel_mod.send('Assignment done')
 
     elif message.content.startswith('!catstats'):
         if not isADM(message):
@@ -122,6 +134,22 @@ async def on_message(message):
             await message.channel.send('Invalid code for cat unit')
             return
         await message.channel.send(embed=catculator.getstatsEmbed(cat))
+
+    elif message.content.startswith('!myreports'):
+        if not isAMod(message.author):
+            return
+        channel_mod = client.get_channel(modchannelid)
+        for i in modqueue.getassigned(message.author.mention):  # at this point we know this is a mod
+            reportTitle = "Report id " + str(i[6])
+            embed = discord.Embed(description=reportTitle, color=0x50bdfe)
+            embed.set_author(name=client.user)
+            embed.add_field(name="Requester", value=i[0], inline=True)
+            embed.add_field(name="Date", value=i[1], inline=True)
+            embed.add_field(name="Location", value=i[2], inline=True)
+            embed.add_field(name="Reason", value=i[3], inline=True)
+            embed.add_field(name="Status", value=i[4], inline=True)
+            embed.add_field(name="Assigned to", value=i[5], inline=True)
+            await channel_mod.send(embed=embed)
 
 
 def isAMod(member):  # is a mod, but only in the battlecats server
