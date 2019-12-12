@@ -9,7 +9,7 @@ class Data_catbot:
     @classmethod
     def defFromFile(cls):
         try:
-            f = open("auth.txt", "r")
+            f = open("auth.token", "r")
             cls.auth_token = f.read(59)
         except OSError:
             print('oh shit')

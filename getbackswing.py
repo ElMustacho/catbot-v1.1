@@ -27,13 +27,27 @@ fullswingsvalues = []
 for fls in files:
     maximum = 0
     with open(fls, "r", encoding="utf-8") as fp:  # open file, ignore the name
-        line = fp.readline()                # get all the lines
-        cnt = 1                             # need to know which line
+        line = fp.readline()  # get all the lines
+        cnt = 1  # need to know which line
         while line:
-            if cnt > 5:                     # ignore the first lines
-                if ',' in line:             # filter unwanted lines
-                    maximum = max(int(line[0:line.find(',')]), maximum) # 1st number
+            if line.count(',') == 3:  # ignore the first lines
+                currentvalue = int(line[0:line.find(',')])
+                if currentvalue > maximum:
+                    maximum = currentvalue  # 1st number
             line = fp.readline()
             cnt += 1
-    fullswingsvalues.append([maximum+1, fls[-14:-7]])
-print(fullswingsvalues)
+    print(maximum + 1, fls[-14:-7])
+
+# maximum = 0
+# maxpos = 0
+# with open(fpath+'362true.maanim', "r", encoding="utf-8") as fp:  # open file, ignore the name
+#     line = fp.readline()  # get all the lines
+#     cnt = 1  # need to know which line
+#     while line:
+#         if line.count(',') == 3:  # ignore the first lines
+#             currentvalue = int(line[0:line.find(',')])
+#             if currentvalue > maximum:
+#                 maximum = currentvalue  # 1st number
+#         line = fp.readline()
+#         cnt += 1
+# print(maximum)

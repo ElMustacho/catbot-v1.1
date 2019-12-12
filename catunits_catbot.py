@@ -44,7 +44,7 @@ class Catunits:
         hpv = str(int(cat[9]) * self.levelMultiplier()) + ' HP - ' + str(cat[10]) + 'KB'
         catEmbed.add_field(name='HP-Knockbacks', value=hpv, inline=True)
         dmg = str(int(cat[12]) * self.levelMultiplier()) + ' Damage - ' + str(
-            int(float(cat[-1].replace(',', '.')) * self.levelMultiplier()))
+            int(float(cat[-1].replace(',', '.')) * self.levelMultiplier())) + ' DPS'
         catEmbed.add_field(name='Damage (currently only first attack) - DPS',
                            value=dmg, inline=True)
         catEmbed.add_field(name='Speed', value=str(cat[11]), inline=True)
@@ -52,7 +52,7 @@ class Catunits:
         return catEmbed
 
     def closeEnough(self, strToCmp):
-        names = self._cats.loc[:, 'correctname'].to_list()
+        names = self._cats.loc[:, 'searchname'].to_list()
         # edit distance of everything
         dss = list(map(lambda x: nl.edit_distance(x, strToCmp), names))
         if min(dss) > 6:
