@@ -6,6 +6,7 @@
 # don't upload to git unwanted files
 # get fixed values from a file, like the token
 # make embed function, for each kind of embed
+# tell the user what happens when a report belonging to him is solved or initiated
 import discord
 from datetime import datetime
 from data_catbot import Data_catbot
@@ -33,6 +34,9 @@ async def on_ready():
 @client.event
 async def on_message(message):
     if len(str(message.content)) > 200:  # don't bother with stuff too long
+        return
+
+    if '\t' is message.content:  # catbot doesn't like tab
         return
 
     if message.author == client.user:  # bot doesn't want to answer itself
