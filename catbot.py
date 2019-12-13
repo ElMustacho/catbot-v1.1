@@ -4,7 +4,8 @@
 # give out the previous two nicely
 # write/declare/init stuff only once
 # don't upload to git unwanted files
-
+# get fixed values from a file, like the token
+# make embed function, for each kind of embed
 import discord
 from datetime import datetime
 from data_catbot import Data_catbot
@@ -21,6 +22,7 @@ logger.addHandler(handler)
 
 client = discord.Client()
 modchannelid = 652569911113023498  # 647749653495808010 old channel
+logchannelid = 396154070890577922
 
 
 @client.event
@@ -56,16 +58,16 @@ async def on_message(message):
         data.timelastmessage = datetime.now()
         await message.channel.send('Time is now: ' + str(data.timelastmessage))
 
-    elif message.content.startswith('!helpme'):
+    elif message.content.startswith('!helpme'):  # todo beautify this
         if not isInServer(message.author):  # to request help, you need to be
             return                          # a member, also helps with spam
         channel_mod = client.get_channel(modchannelid)
         message_to_send = str(message.author.mention) + ' has requested help' + \
             ' regarding: ' + str(message.content[8:])
-        modqueue.addentry(str(message.author.mention), str(datetime.now()),
+        reportcode = modqueue.addentry(str(message.author.mention), str(datetime.now()),
                           str(message.channel), str(message.content[7:]),
                           'unsolved')
-        await channel_mod.send(message_to_send)
+        await channel_mod.send(message_to_send + '; report code for this report is ' + str(reportcode))
 
     elif message.content.startswith('!saverequests'):
         if isAMod(message.author):  # modonly command
@@ -143,8 +145,17 @@ async def on_message(message):
         if not isAMod(message.author):
             return
         channel_mod = client.get_channel(modchannelid)
-        modqueue.deletereportbyid(int(message.content[14:]))
+        report = modqueue.deletereportbyid(int(message.content[14:]))
         await channel_mod.send('Report successfully removed.')
+        embed = discord.Embed(description="Report id " + str(report[6]), color=0x123456)
+        embed.set_author(name=client.user)
+        embed.add_field(name="Requester", value=report[0], inline=True)
+        embed.add_field(name="Date", value=report[1], inline=True)
+        embed.add_field(name="Location", value=report[2], inline=True)
+        embed.add_field(name="Reason", value=report[3], inline=True)
+        embed.add_field(name="Status", value=report[4], inline=True)
+        embed.add_field(name="Assigned to", value=report[5], inline=True)
+        await client.get_channel(logchannelid).send(embed=embed)
 
 def isAMod(member):  # is a mod, but only in the battlecats server
     try:
@@ -177,7 +188,7 @@ def isInServer(member):
     return False
 
 
-modqueue = Modtools('results.csv', 'archives.tsv')
+modqueue = Modtools('results.tsv', 'archives.tsv')
 catculator = catunits_catbot.Catunits()
 data = Data_catbot.defFromFile()
 client.run(data.auth_token)

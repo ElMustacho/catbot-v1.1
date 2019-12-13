@@ -30,11 +30,15 @@ class Modtools:
 
     def addentry(self, user, date, channel, reason, status):
         assigned = 'no assignee'
-        reportcode = max(self._data['report-id'].to_list())+1
+        try:
+            reportcode = max(self._data['report-id'].to_list())+1
+        except ValueError:
+            reportcode = 1
         newrow = pd.DataFrame([[user, date, channel, reason, status, assigned, reportcode]],
                               columns=self._cols)
         self._data = pd.concat([self._data, newrow], ignore_index=True, sort=False)
         self.savereportsusual()
+        return reportcode
 
     def savereportsusual(self):
         self._data.to_csv(self._location, index=False, sep='\t')
@@ -62,6 +66,7 @@ class Modtools:
         self._data = self._data[self._data['report-id'] != value]
         self.savereportsusual()
         self.storereport(tostore)
+        return tostore.values.tolist()[0]
 
     def storereport(self, report):
         self._storedata = pd.concat([self._storedata, report], ignore_index=True, sort=False)

@@ -8,7 +8,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 archives.tsv
-results.csv
+results.tsv
 # C extensions
 *.so
 
