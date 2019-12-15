@@ -43,10 +43,14 @@ class Catunits:
         catEmbed.add_field(name='Level', value='30 (currently locked)', inline=True)
         hpv = str(int(cat[9]) * self.levelMultiplier()) + ' HP - ' + str(cat[10]) + 'KB'
         catEmbed.add_field(name='HP-Knockbacks', value=hpv, inline=True)
-        dmg = str(int(cat[12]) * self.levelMultiplier()) + ' Damage - ' + str(
-            int(float(cat[-1].replace(',', '.')) * self.levelMultiplier())) + ' DPS'
-        catEmbed.add_field(name='Damage (currently only first attack) - DPS',
-                           value=dmg, inline=True)
+        dmg = str(int(cat[12]) * self.levelMultiplier())
+        if int(cat[69]) > 0:
+            dmg += '/' + str(int(cat[69])*self.levelMultiplier())
+        if int(cat[70]) > 0:
+            dmg += '/' + str(int(cat[70]) * self.levelMultiplier())
+        dps = ' Damage - ' + str(int(float(cat[-1].replace(',', '.')) * self.levelMultiplier())) + ' DPS'
+        catEmbed.add_field(name='Damage - DPS',
+                           value=dmg+dps, inline=True)
         catEmbed.add_field(name='Speed', value=str(cat[11]), inline=True)
 
         return catEmbed

@@ -36,7 +36,7 @@ async def on_message(message):
     if len(str(message.content)) > 200:  # don't bother with stuff too long
         return
 
-    if '\t' is message.content:  # catbot doesn't like tab
+    if '\t' in message.content:  # catbot doesn't like tab
         return
 
     if message.author == client.user:  # bot doesn't want to answer itself
