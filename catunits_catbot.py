@@ -68,26 +68,42 @@ class Catunits:
     def levelMultiplier(self, data=None, level=None):
         return 17
 
-    def makeimagetraits(self, cat):
-        str = ''
-        with Image.open('traits-images/base.png', 'r').copy() as base:
-            if cat[20] != '0':  # antired
-                base.paste(Image.open("traits-images/red.png"), (0, 0))
-            if cat[26] != '0':  # antifloating
-                base.paste(Image.open("traits-images/floating.png"), (39, 0))
-            if cat[27] != '0':  # antiblack
-                base.paste(Image.open("traits-images/black.png"), (78, 0))
-            if cat[28] != '0':  # antimetal
-                base.paste(Image.open("traits-images/metal.png"), (0, 39))
-            if cat[29] != '0':  # antiwhite
-                base.paste(Image.open("traits-images/white.png"), (39, 39))
-            if cat[30] != '0':  # antiangel
-                base.paste(Image.open("traits-images/angel.png"), (78, 39))
-            if cat[31] != '0':  # antialien
-                base.paste(Image.open("traits-images/alien.png"), (0, 78))
-            if cat[32] != '0':  # antizombie
-                base.paste(Image.open("traits-images/zombie.png"), (39, 78))
-            if cat[88] != '0':  # antirelic
-                base.paste(Image.open("traits-images/relic.png"), (78, 78))
-
-        return None
+    def cattotriaitpics(self, cat):  # for each trait, add '1' to the string if it has the trait, '0' otherwise
+        fstr = ''
+        if cat[20] != '0':  # antired
+            fstr += '1'
+        else:
+            fstr += '0'
+        if cat[26] != '0':  # antifloating
+            fstr += '1'
+        else:
+            fstr += '0'
+        if cat[27] != '0':  # antiblack
+            fstr += '1'
+        else:
+            fstr += '0'
+        if cat[28] != '0':  # antimetal
+            fstr += '1'
+        else:
+            fstr += '0'
+        if cat[29] != '0':  # antiwhite
+            fstr += '1'
+        else:
+            fstr += '0'
+        if cat[30] != '0':  # antiangel
+            fstr += '1'
+        else:
+            fstr += '0'
+        if cat[31] != '0':  # antialien
+            fstr += '1'
+        else:
+            fstr += '0'
+        if cat[32] != '0':  # antizombie
+            fstr += '1'
+        else:
+            fstr += '0'
+        if cat[88] != '0':  # antirelic
+            fstr += '1'
+        else:
+            fstr += '0'
+        return 'traitpics/' + fstr + '.png'
