@@ -53,7 +53,7 @@ class Catunits:
         catEmbed.add_field(name='Damage - DPS',
                            value=dmg+dps, inline=True)
         catEmbed.add_field(name='Speed', value=str(cat[11]), inline=True)
-        catEmbed.set_thumbnail(url='https://i.imgur.com/NjsxXAh.png')
+        catEmbed.set_thumbnail(url=self.cattotriaitpics(cat))
 
         return catEmbed
 
@@ -70,40 +70,40 @@ class Catunits:
 
     def cattotriaitpics(self, cat):  # for each trait, add '1' to the string if it has the trait, '0' otherwise
         fstr = ''
-        if cat[20] != '0':  # antired
+        if cat[20] != 0:  # antired
             fstr += '1'
         else:
             fstr += '0'
-        if cat[26] != '0':  # antifloating
+        if cat[26] != 0:  # antifloating
             fstr += '1'
         else:
             fstr += '0'
-        if cat[27] != '0':  # antiblack
+        if cat[27] != 0:  # antiblack
             fstr += '1'
         else:
             fstr += '0'
-        if cat[28] != '0':  # antimetal
+        if cat[28] != 0:  # antimetal
             fstr += '1'
         else:
             fstr += '0'
-        if cat[29] != '0':  # antiwhite
+        if cat[29] != 0:  # antiwhite
             fstr += '1'
         else:
             fstr += '0'
-        if cat[30] != '0':  # antiangel
+        if cat[30] != 0:  # antiangel
             fstr += '1'
         else:
             fstr += '0'
-        if cat[31] != '0':  # antialien
+        if cat[31] != 0:  # antialien
             fstr += '1'
         else:
             fstr += '0'
-        if cat[32] != '0':  # antizombie
+        if cat[32] != 0:  # antizombie
             fstr += '1'
         else:
             fstr += '0'
-        if cat[88] != '0':  # antirelic
+        if cat[88] != 0:  # antirelic
             fstr += '1'
         else:
             fstr += '0'
-        return 'traitpics/' + fstr + '.png'
+        return 'https://raw.githubusercontent.com/ElMustacho/catbot-v1.1/master/traitpics/' + fstr + '.png'
