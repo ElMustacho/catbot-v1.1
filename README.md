@@ -26,5 +26,5 @@ Welcome to catbot, still in development/prerelease, gonna be short, here is the 
 
 !sayhi -> the bot greets, distinguishes between flaired users
 
-!catstats [name] -> will give out stats of the given unit, exact name doesn't need to be correct, a few errors are ok and it will be able to tell the differences (if such exists), but too many (5) means it won't try. Name is case insensitive, eventually it will work for custom names too
+!catstats [name]; [number] -> will give out stats of the given unit, exact name doesn't need to be correct, a few errors are ok and it will be able to tell the differences (if such exists), but too many (5) means it won't try. Name is case insensitive, eventually it will work for custom names too. Optionally, putting a '; ' after the name and a level will permit to get stats for that level, otherwise it defaults to 30
 

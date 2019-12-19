@@ -116,7 +116,10 @@ async def on_message(message):
         if not isADM(message):
             if not isWorthy(message.author):  # isWorthy command, for now
                 return
-        catstats = catculator.getUnitCode(message.content[10:].lower())
+        limit = message.content.find(';')-1
+        if limit == -2:
+            limit = len(message.content)-1
+        catstats = catculator.getUnitCode(message.content[10:limit].lower())
         if catstats is None:
             await message.channel.send('That was gibberish.')
             return
@@ -127,7 +130,13 @@ async def on_message(message):
         if cat is None:
             await message.channel.send('Invalid code for cat unit')
             return
-        await message.channel.send(embed=catculator.getstatsEmbed(cat))
+        try:
+            level = int(message.content[message.content.find(';')+2:])
+        except:
+            level = 30
+        if level < 0 or level > 131:
+            level = 30
+        await message.channel.send(embed=catculator.getstatsEmbed(cat, level))
 
     elif message.content.startswith('!myreports'):
         if not isAMod(message.author):
