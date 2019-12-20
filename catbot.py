@@ -14,7 +14,6 @@ import logging
 from modtools import Modtools
 import catunits_catbot
 
-
 logger = logging.getLogger('discord')
 logger.setLevel(logging.DEBUG)
 handler = logging.FileHandler(filename='dsd.log', encoding='utf-8', mode='w')
@@ -64,14 +63,23 @@ async def on_message(message):
 
     elif message.content.startswith('!helpme'):  # todo beautify this
         if not isInServer(message.author):  # to request help, you need to be
-            return                          # a member, also helps with spam
+            return  # a member, also helps with spam
         channel_mod = client.get_channel(modchannelid)
         message_to_send = str(message.author.mention) + ' has requested help' + \
-            ' regarding: ' + str(message.content[8:])
+                          ' regarding: ' + str(message.content[8:])
         reportcode = modqueue.addentry(str(message.author.mention), str(datetime.now()),
-                          str(message.channel), str(message.content[7:]),
-                          'unsolved')
-        await channel_mod.send(message_to_send + '; report code for this report is ' + str(reportcode))
+                                       str(message.channel), str(message.content[7:]),
+                                       'unsolved')
+        reportTitle = "New help request: " + str(reportcode)
+        embed = discord.Embed(description=reportTitle, color=0x50bdfe)
+        embed.set_author(name=client.user)
+        embed.add_field(name="Requester", value=message.author.mention, inline=True)
+        embed.add_field(name="Date", value=str(datetime.now()), inline=True)
+        embed.add_field(name="Location", value=str(message.channel), inline=True)
+        embed.add_field(name="Reason", value=str(message.content[7:]), inline=True)
+        await channel_mod.send(embed=embed)
+        await message.channel.send(
+            'Your request has been sent successfully. Your report code is ' + str(reportcode) + '.')
 
     elif message.content.startswith('!saverequests'):
         if isAMod(message.author):  # modonly command
@@ -116,27 +124,29 @@ async def on_message(message):
         if not isADM(message):
             if not isWorthy(message.author):  # isWorthy command, for now
                 return
-        limit = message.content.find(';')-1
+        limit = message.content.find(';')
         if limit == -2:
-            limit = len(message.content)-1
-        catstats = catculator.getUnitCode(message.content[10:limit].lower())
-        if catstats is None:
+            limit = len(message.content)
+        catstats = catculator.getUnitCode(message.content[10:limit].lower(),
+                                          6)  # second parameter is number of errors allowed
+        if catstats[0] is None:  # too many errors
             await message.channel.send('That was gibberish.')
             return
-        if len(catstats) > 1:
+        if len(catstats[0]) > 1:  # name wasn't unique
             await message.channel.send('Couldn\'t discriminate.')
             return
-        cat = catculator.getrow(catstats[0])
+        cat = catculator.getrow(catstats[0][0])
         if cat is None:
             await message.channel.send('Invalid code for cat unit')
             return
         try:
-            level = int(message.content[message.content.find(';')+2:])
+            level = int(message.content[message.content.find(';') + 2:])
         except:
             level = 30
         if level < 0 or level > 131:
             level = 30
-        await message.channel.send(embed=catculator.getstatsEmbed(cat, level))
+        embedsend = catculator.getstatsEmbed(cat, level, catstats[1])
+        await message.channel.send(embed=embedsend)
 
     elif message.content.startswith('!myreports'):
         if not isAMod(message.author):
@@ -169,6 +179,33 @@ async def on_message(message):
         embed.add_field(name="Status", value=report[4], inline=True)
         embed.add_field(name="Assigned to", value=report[5], inline=True)
         await client.get_channel(logchannelid).send(embed=embed)
+        await client.get_user(int(str(report[0])[2:-1])).dm_channel.send(
+            'Your request with the code ' + str(report[6]) + ' has been solved')
+
+    elif message.content.startswith('!renameunit'):
+        # if not isWorthy(message.author):  # isWorthy command, for now
+        #    return
+        limit = message.content.find(';')
+        if limit < 0:
+            await message.channel.send('Incorrect format, check command format')
+            return
+        realnameunit = message.content[12: limit]
+        catcode = catculator.getUnitCode(realnameunit.lower(), 0)
+        if catcode is None:  # too many errors
+            await message.channel.send('That was gibberish.')
+            return
+        if len(catcode[0]) > 1:  # name wasn't unique
+            await message.channel.send('Couldn\'t discriminate.')
+            return
+
+        if catcode[0][0] is None:
+            await message.channel.send('Invalid code for cat unit')
+            return
+        response = catculator.givenewname(catcode[0][0], message.content[limit+2:])
+        if response:
+            await message.channel.send('Should have worked')
+        else:
+            await message.channel.send('Name was already used')
 
 def isAMod(member):  # is a mod, but only in the battlecats server
     try:
@@ -181,10 +218,13 @@ def isAMod(member):  # is a mod, but only in the battlecats server
 
 
 def isWorthy(member):
-    if 'Muted' in member.roles:
+    try:
+        if 'Muted' in member.roles:
+            return False
+        if len(member.roles) > 1:
+            return True
+    except:  # if something goes wrong, they aren't worthy
         return False
-    if len(member.roles) > 1:
-        return True
     return False
 
 

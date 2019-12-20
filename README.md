@@ -22,6 +22,10 @@ Welcome to catbot, still in development/prerelease, gonna be short, here is the 
 
 !removereport [number] -> same as !deletereport
 
+# Special people commands
+
+!renameunit [exact unit name]; [custom name] allows to create an additional name to get an unit instead of using the full name. Short of case sensitiveness the first name doesn't allow errors. Custom names will be searchable immediately after.
+
 # User commands
 
 !sayhi -> the bot greets, distinguishes between flaired users
