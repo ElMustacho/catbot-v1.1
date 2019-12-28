@@ -48,9 +48,14 @@ class Modtools:
         return elaborateframe.values.tolist()
 
     def setsolvedbyindex(self, indexloc):
-        self._data.at[indexloc, 'status of this'] = 'solved'
-        self.savereportsusual()
-        return
+        looking = self._data['report-id'].to_list()
+        if indexloc in looking:
+            self._data.loc[self._data['report-id'] == indexloc, 'status of this'] = 'solved'
+            self.savereportsusual()
+            return True
+        else:
+            return False
+
 
     def setassigned(self, indexloc, who):
         self._data.at[indexloc, 'assigned to'] = who

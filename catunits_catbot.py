@@ -39,16 +39,16 @@ class Catunits:
             locator = self.closeEnough(identifier, errors)
         return locator
 
-    def getstatsEmbed(self, cat, level, errors=0):
+    def getstatsEmbed(self, cat, level, actualname):
         title = 'Stats of ' + cat[7]
-        if errors > 0:
-            title += '; (guessed)'
+        if nl.edit_distance(actualname.lower(), cat[7].lower()) > 0:
+            title += '; (nearest match)'
         catEmbed = emb(description=title, color=0xff3300)
         catEmbed.set_author(name='Cat Bot')
         catEmbed.add_field(name='Level', value=str(level), inline=True)
         lvmult = float(self.levelMultiplier(cat[2], cat[0], level))
         hpv = str(math.ceil(int(cat[9]) * lvmult)) + ' HP - ' + str(cat[10]) + ' KB'
-        catEmbed.add_field(name='HP-Knockbacks', value=hpv, inline=True)
+        catEmbed.add_field(name='HP - Knockbacks', value=hpv, inline=True)
         dmg = str(math.ceil(int(cat[12]) * lvmult))
         if int(cat[69]) > 0:
             dmg += '/' + str(math.ceil(int(cat[69]) * lvmult))
@@ -82,9 +82,9 @@ class Catunits:
         if cat[34] > 0:  # knockback
             offensivestr += 'Knockback ' + str(cat[34]) + '%, '
         if cat[35] > 0:  # freezes
-            offensivestr += 'Freeze' + str(cat[35]) + '% (' + str(round(cat[36]/30, 2)) + 's), '
+            offensivestr += 'Freeze ' + str(cat[35]) + '% (' + str(round(cat[36]/30, 2)) + 's), '
         if cat[37] > 0:  # slow
-            offensivestr += 'Slow' + str(cat[37]) + '% (' + str(round(cat[38] / 30, 2)) + 's), '
+            offensivestr += 'Slow ' + str(cat[37]) + '% (' + str(round(cat[38] / 30, 2)) + 's), '
         if cat[40] > 0:  # massive damage
             offensivestr += 'Massive Damage, '
         if cat[41] > 0:  # critical
@@ -142,7 +142,7 @@ class Catunits:
         if cat[90] > 0:  # insane resist
             defensivestr += 'Insanely resists, '
         if cat[94] > 0:  # dodge
-            defensivestr += 'Dodge' + str(cat[94]) + '% (' + str(round(cat[95] / 30, 2)) + 's), '
+            defensivestr += 'Dodge ' + str(cat[94]) + '% (' + str(round(cat[95] / 30, 2)) + 's), '
         defensivestr = defensivestr[:-2]
         if len(defensivestr) > 3:
             catEmbed.add_field(name='Defensive abilities', value=defensivestr, inline=True)

@@ -105,8 +105,10 @@ async def on_message(message):
         if not isAMod(message.author):  # modonly command
             return
         channel_mod = client.get_channel(modchannelid)
-        modqueue.setsolvedbyindex(int(message.content[7:]))
-        await channel_mod.send('Report has been set as solved')
+        if modqueue.setsolvedbyindex(int(message.content[7:])):  # if true it was deleted successfully
+            await channel_mod.send('Report has been set as solved')
+        else:
+            await channel_mod.send('Invalid report code')
 
     elif message.content.startswith('!assignto'):
 
@@ -125,12 +127,12 @@ async def on_message(message):
             if not isWorthy(message.author):  # isWorthy command, for now
                 return
         limit = message.content.find(';')
-        if limit == -2:
+        if limit == -1:
             limit = len(message.content)
         catstats = catculator.getUnitCode(message.content[10:limit].lower(),
                                           6)  # second parameter is number of errors allowed
         if catstats[0] is None:  # too many errors
-            await message.channel.send('That was gibberish.')
+            await message.channel.send(message.content[10:limit] + '; wasn\'t recognized')
             return
         if len(catstats[0]) > 1:  # name wasn't unique
             await message.channel.send('Couldn\'t discriminate.')
@@ -145,7 +147,7 @@ async def on_message(message):
             level = 30
         if level < 0 or level > 131:
             level = 30
-        embedsend = catculator.getstatsEmbed(cat, level, catstats[1])
+        embedsend = catculator.getstatsEmbed(cat, level, message.content[10:limit])
         await message.channel.send(embed=embedsend)
 
     elif message.content.startswith('!myreports'):
@@ -179,8 +181,9 @@ async def on_message(message):
         embed.add_field(name="Status", value=report[4], inline=True)
         embed.add_field(name="Assigned to", value=report[5], inline=True)
         await client.get_channel(logchannelid).send(embed=embed)
-        await client.get_user(int(str(report[0])[2:-1])).dm_channel.send(
-            'Your request with the code ' + str(report[6]) + ' has been solved')
+        respondto = int(str(report[0])[2:-1])
+        await client.get_user(respondto).send(
+            'Your request with the code ' + str(report[6]) + ' has been solved.')
 
     elif message.content.startswith('!renameunit'):
         # if not isWorthy(message.author):  # isWorthy command, for now
