@@ -51,8 +51,7 @@ async def on_message(message):
         elif 'Purple Flair' in list_roles:
             await message.channel.send('You have a Purple Flair, nice!')
         else:
-            await message.channel.send('You don\'t have a Purple Flair,'
-                                       + 'that\'s not cool.')
+            await message.channel.send('You don\'t have a Purple Flair, that\'s not cool.')
 
     elif message.content.startswith('!time'):
         if not isAMod(message.author):  # only mods can do this
@@ -147,7 +146,7 @@ async def on_message(message):
             level = 30
         if level < 0 or level > 131:
             level = 30
-        embedsend = catculator.getstatsEmbed(cat, level, message.content[10:limit])
+        embedsend = catculator.getstatsEmbed(cat, level, message.content[10:limit], catstats[0][0])
         await message.channel.send(embed=embedsend)
 
     elif message.content.startswith('!myreports'):

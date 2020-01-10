@@ -13,7 +13,7 @@ class Catunits:
         # headers = data.iloc[0]
         # print(headers)
         # self._cats  = pd.DataFrame(data.values[1:], columns=headers)
-        self._cats = pd.read_csv(str('unitdata.tsv'), sep='\t')
+        self._cats = pd.read_csv('unitdata9.2.tsv', sep='\t')
         try:
             self._customnames = pickle.load(open('customNames.pkl', 'rb'))  # this is a dictionary
         except FileNotFoundError:
@@ -23,7 +23,7 @@ class Catunits:
             return None
         returned = None
         try:
-            returned = self._cats.iloc[row].values.tolist()
+            returned = self._cats.iloc[row]
         except IndexError:
             returned = None
         return returned
@@ -39,117 +39,123 @@ class Catunits:
             locator = self.closeEnough(identifier, errors)
         return locator
 
-    def getstatsEmbed(self, cat, level, actualname):
-        title = 'Stats of ' + cat[7]
-        if nl.edit_distance(actualname.lower(), cat[7].lower()) > 0:
-            title += '; (nearest match)'
+    def getstatsEmbed(self, cat, level, actualname, unitcode):
+        title = 'Stats of ' + cat[93]
+        if len(cat[-4]) > 1:
+            title = 'Stats of ' + cat[95]
+            if nl.edit_distance(actualname.lower(), cat[95].lower()) > 0:
+                title += '; (nearest match)'
         catEmbed = emb(description=title, color=0xff3300)
         catEmbed.set_author(name='Cat Bot')
         catEmbed.add_field(name='Level', value=str(level), inline=True)
-        lvmult = float(self.levelMultiplier(cat[2], cat[0], level))
-        hpv = str(math.ceil(int(cat[9]) * lvmult)) + ' HP - ' + str(cat[10]) + ' KB'
+        lvmult = float(self.levelMultiplier(cat[94], unitcode, level))
+        hpv = str(math.ceil(int(cat[0]) * lvmult)) + ' HP - ' + str(round(int(cat[1]), 0)) + ' KB'
         catEmbed.add_field(name='HP - Knockbacks', value=hpv, inline=True)
-        dmg = str(math.ceil(int(cat[12]) * lvmult))
-        if int(cat[69]) > 0:
-            dmg += '/' + str(math.ceil(int(cat[69]) * lvmult))
-        if int(cat[70]) > 0:
-            dmg += '/' + str(math.ceil(int(cat[70]) * lvmult))
-        dps = ' Damage - ' + str(int(float(cat[-1].replace(',', '.')) * lvmult)) + ' DPS'
+        dmg = str(math.ceil(int(cat[3]) * lvmult))
+        if int(cat[59]) > 0:
+            dmg += '/' + str(math.ceil(int(cat[59]) * lvmult))
+        if int(cat[60]) > 0:
+            dmg += '/' + str(math.ceil(int(cat[60]) * lvmult))
+        dps = ' Damage - ' + str(int(float(cat[98].replace(',', '.')) * lvmult)) + ' DPS'
         damagekind = ''
-        if cat[22] == 1:
+        if cat[12] == 1:
             damagekind += 'area'
         else:
             damagekind += 'single'
-        if cat[54] > 0:
-            if cat[55] > 0:
+        if cat[44] > 0:
+            if cat[45] > 0:
                 damagekind += ', long range'
-            elif cat[55] < 0:
+            elif cat[45] < 0:
                 damagekind += ', omnistrike'
         damagetype = 'Damage (' + damagekind + ') - DPS'
         catEmbed.add_field(name=damagetype, value=dmg+dps, inline=True)
-        catEmbed.add_field(name='Speed - Attack Frequency', value=str(cat[11]) + ' - ' + str(round(cat[-3]/30, 2)) + 's', inline=True)
-        catEmbed.add_field(name='Cost - Respawn', value=str(cat[15]) + ' - ' + str(round(max(((cat[17]*2-254)/30), 2), 2)) + 's', inline=True)
+        tba = str(round(int(cat[97])/30, 2))
+        catEmbed.add_field(name='Speed - Attack Frequency', value=str(round(int(cat[2]) ,0)) + ' - ' + tba + 's', inline=True)
+        catEmbed.add_field(name='Cost - Respawn', value=str(round(int(cat[6]*1.5), 0)) + ' - ' + str(round(max(((cat[7]*2-254)/30), 2), 2)) + 's', inline=True)
         rangestr = ''
         if ',' in damagekind:  # it's long range or omni
-            rangestr += str(cat[54]) + ' to ' + str(cat[54]+cat[55]) + '; stands at ' + str(cat[14])
+            rangestr += str(round(int(cat[44]), 0)) + ' to ' + str(round(int(cat[44]+cat[45]))) + '; stands at ' + str(round(int(cat[5])))
         else:  # otherwise only range is needed
-            rangestr += str(cat[14])
+            rangestr += str(round(int(cat[5])))
         catEmbed.add_field(name='Range', value=rangestr, inline=True)
         catEmbed.set_thumbnail(url=self.cattotriaitpics(cat))
         offensivestr = ''
-        if cat[33] > 0:  # strong
+        if cat[23] > 0:  # strong
             offensivestr += 'Strong, '
-        if cat[34] > 0:  # knockback
-            offensivestr += 'Knockback ' + str(cat[34]) + '%, '
-        if cat[35] > 0:  # freezes
-            offensivestr += 'Freeze ' + str(cat[35]) + '% (' + str(round(cat[36]/30, 2)) + 's), '
-        if cat[37] > 0:  # slow
-            offensivestr += 'Slow ' + str(cat[37]) + '% (' + str(round(cat[38] / 30, 2)) + 's), '
-        if cat[40] > 0:  # massive damage
+        if cat[24] > 0:  # knockback
+            offensivestr += 'Knockback ' + str(round(int(cat[24]))) + '%, '
+        if cat[25] > 0:  # freezes
+            offensivestr += 'Freeze ' + str(round(int(cat[25]))) + '% (' + str(round(int(cat[26] / 30, 2))) + 's), '
+        if cat[27] > 0:  # slow
+            offensivestr += 'Slow ' + str(round(int(cat[27]))) + '% (' + str(round(int(cat[28] / 30, 2))) + 's), '
+        if cat[30] > 0:  # massive damage
             offensivestr += 'Massive Damage, '
-        if cat[41] > 0:  # critical
-            offensivestr += 'Critical ' + str(cat[41]) + '%, '
-        if cat[42] > 0:  # targets only
+        if cat[31] > 0:  # critical
+            offensivestr += 'Critical ' + str(round(int(cat[31]))) + '%, '
+        if cat[32] > 0:  # targets only
             offensivestr += 'Targets only, '
-        if cat[43] > 0:  # cash
+        if cat[33] > 0:  # cash
             offensivestr += 'Double money, '
-        if cat[44] > 0:  # base destroyer
+        if cat[34] > 0:  # base destroyer
             offensivestr += 'Base destroyer, '
-        if cat[45] > 0:  # wave attack
-            offensivestr += 'Wave attack ' + str(cat[45]) + '% (level ' + str(cat[46]) + '), '
-        if cat[47] > 0:  # weaken
-            offensivestr += 'Weaken ' + str(cat[47]) + '% (' + str(cat[49]) + '% power, ' + str(round(cat[48] / 30, 2)) + 's), '
-        if cat[50] > 0:  # strengthen
-            offensivestr += 'Strengthen ' + str(cat[51]) + '% (at ' + str(cat[50]) + '% hp), '
-        if cat[62] > 0:  # zombie killer
+        if cat[35] > 0:  # wave attack
+            offensivestr += 'Wave attack ' + str(round(int(cat[35]))) + '% (level ' + str(round(int(cat[36]))) + '), '
+        if cat[37] > 0:  # weaken
+            offensivestr += 'Weaken ' + str(round(int(cat[37]))) + '% (' + str(round(int(cat[39]))) + '% power, ' + str(round(int(cat[38] / 30, 2))) + 's), '
+        if cat[40] > 0:  # strengthen
+            offensivestr += 'Strengthen ' + str(round(int(cat[51]))) + '% (at ' + str(round(int(cat[50]))) + '% hp), '
+        if cat[52] > 0:  # zombie killer
             offensivestr += 'Zombie killer, '
-        if cat[63] > 0:  # witch killer (collab)
+        if cat[53] > 0:  # witch killer (collab)
             offensivestr += 'Witch killer, '
-        if cat[80] > 0:  # barrier breaks
-            offensivestr += 'Barrier breaks ' + str(cat[80]) + '%, '
-        if cat[81] > 0:  # warp, currently unused
-            offensivestr += 'Warp ' + str(cat[81]) + '% (' + str(cat[83]) + '-' + str(cat[84]) + ', ' + str(round(cat[82] / 30, 2)) + 's), '
-        if cat[91] > 0:  # insane damage
+        if cat[70] > 0:  # barrier breaks
+            offensivestr += 'Barrier breaks ' + str(round(int(cat[70]))) + '%, '
+        if cat[71] > 0:  # warp, currently unused
+            offensivestr += 'Warp ' + str(round(int(cat[71]))) + '% (' + str(round(int(cat[73]))) + '-' + str(round(int(cat[74]))) + ', ' + str(round(int(cat[72] / 30, 2))) + 's), '
+        if cat[81] > 0:  # insane damage
             offensivestr += 'Insane damage, '
-        if cat[92] > 0:  # savage blow
-            offensivestr += 'Savage Blow ' + str(cat[92]) + '%(' + str(cat[93]) + '% extra power), '
+        if cat[82] > 0:  # savage blow
+            offensivestr += 'Savage Blow ' + str(round(int(cat[82]))) + '% (' + str(round(int(cat[83]))) + '% extra power), '
+        if cat[86] > 0:  # volcano attack
+            offensivestr += 'Volcano Attack ' + str(round(int(cat[86]))) + '% (' + str(round(int(cat[88]/4))) + '-' + str(round(int(cat[87]/4))) + ', ' + str(round(int(cat[89]))) + 's), '
         offensivestr = offensivestr[:-2]
         if len(offensivestr) > 3:
             catEmbed.add_field(name='Offensive abilities', value=offensivestr, inline=True)
         defensivestr = ''
-        if cat[39] > 0:  # strong
+        if cat[29] > 0:  # strong
             defensivestr += 'Resistant, '
-        if cat[52] > 0:  # survive
-            offensivestr += 'Survive ' + str(cat[52]) + '%, '
-        if cat[53] > 0:  # metal
+        if cat[42] > 0:  # survive
+            offensivestr += 'Survive ' + str(round(int(cat[42]))) + '%, '
+        if cat[43] > 0:  # metal
             defensivestr += 'Metal, '
-        if cat[56] > 0:  # wave immune
+        if cat[46] > 0:  # wave immune
             defensivestr += 'Wave immune, '
-        if cat[57] > 0:  # wave block
+        if cat[47] > 0:  # wave block
             defensivestr += 'Wave block, '
-        if cat[58] > 0:  # knockback immune
+        if cat[48] > 0:  # knockback immune
             defensivestr += 'Knockback immune, '
-        if cat[59] > 0:  # freeze immune
+        if cat[49] > 0:  # freeze immune
             defensivestr += 'Freeze immune, '
-        if cat[60] > 0:  # slow immune
+        if cat[50] > 0:  # slow immune
             defensivestr += 'Slow immune, '
-        if cat[61] > 0:  # weaken immune
+        if cat[51] > 0:  # weaken immune
             defensivestr += 'Weaken immune, '
-        if cat[85] > 0:  # warp immune
+        if cat[75] > 0:  # warp immune
             defensivestr += 'Warp immune, '
-        if cat[89] > 0:  # curse immune
+        if cat[79] > 0:  # curse immune
             defensivestr += 'Curse immune, '
-        if cat[90] > 0:  # insane resist
+        if cat[80] > 0:  # insane resist
             defensivestr += 'Insanely resists, '
-        if cat[94] > 0:  # dodge
-            defensivestr += 'Dodge ' + str(cat[94]) + '% (' + str(round(cat[95] / 30, 2)) + 's), '
+        if cat[84] > 0:  # dodge
+            defensivestr += 'Dodge ' + str(round(int(cat[84]))) + '% (' + str(round(int(cat[85] / 30, 2))) + 's), '
         defensivestr = defensivestr[:-2]
         if len(defensivestr) > 3:
             catEmbed.add_field(name='Defensive abilities', value=defensivestr, inline=True)
         return catEmbed
 
     def closeEnough(self, strToCmp, errors):
-        names = self._cats.loc[:, 'searchname'].to_list()
+        names = self._cats.loc[:, 'enname'].to_list()
+        names = [str(x).lower() for x in names]
         # edit distance of everything in the tsv
         dss = list(map(lambda x: nl.edit_distance(x, strToCmp), names))
 
@@ -159,7 +165,11 @@ class Catunits:
         distancedict = defaultdict(list)
         for i in self._customnames:
             distancedict[nl.edit_distance(strToCmp, i)].append(self._customnames[i])
-        customnames = min(distancedict.items())
+        customnames = []
+        try:
+            customnames = min(distancedict.items())
+        except ValueError:  # empty custom names
+            customnames.append(errors+1)
         if min(dss) > errors and customnames[0] > errors:  # both were too bad
             return None
         if min(dss) < customnames[0]:  # normal names were better
@@ -205,39 +215,39 @@ class Catunits:
 
     def cattotriaitpics(self, cat):  # for each trait, add '1' to the string if it has the trait, '0' otherwise
         fstr = ''
-        if cat[20] != 0:  # antired
+        if cat[10] != 0:  # antired
             fstr += '1'
         else:
             fstr += '0'
-        if cat[26] != 0:  # antifloating
+        if cat[16] != 0:  # antifloating
             fstr += '1'
         else:
             fstr += '0'
-        if cat[27] != 0:  # antiblack
+        if cat[17] != 0:  # antiblack
             fstr += '1'
         else:
             fstr += '0'
-        if cat[28] != 0:  # antimetal
+        if cat[18] != 0:  # antimetal
             fstr += '1'
         else:
             fstr += '0'
-        if cat[29] != 0:  # antiwhite
+        if cat[19] != 0:  # antiwhite
             fstr += '1'
         else:
             fstr += '0'
-        if cat[30] != 0:  # antiangel
+        if cat[20] != 0:  # antiangel
             fstr += '1'
         else:
             fstr += '0'
-        if cat[31] != 0:  # antialien
+        if cat[21] != 0:  # antialien
             fstr += '1'
         else:
             fstr += '0'
-        if cat[32] != 0:  # antizombie
+        if cat[22] != 0:  # antizombie
             fstr += '1'
         else:
             fstr += '0'
-        if cat[88] != 0:  # antirelic
+        if cat[78] != 0:  # antirelic
             fstr += '1'
         else:
             fstr += '0'

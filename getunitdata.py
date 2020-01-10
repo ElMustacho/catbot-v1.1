@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 datax = []
-dirx = 'your path'
+dirx = "C:/Users/Fabrizio/Desktop/BCU/assets/assets/unit"
 columns = ['-18- health (x17 for level 30 w/ treasure stat)',
 '-14- knockback',
 '-10- movement speed',
@@ -87,13 +87,61 @@ columns = ['-18- health (x17 for level 30 w/ treasure stat)',
 '130 - Savage blow chance',
 '134 - Savage blow damage buff +%',
 '138 - Dodge attack chance activation',
-'13C - Dodge attack duration']
+'13C - Dodge attack duration',
+'140',
+'144',
+'148',
+'14C',
+'150',
+'154',
+'innercounting'
+]
 for dirs, subdirs, files in os.walk(dirx):
     for f in files:
         if f.endswith('.csv'):
-            data2 = pd.read_csv(os.path.join(dirs, f), sep=',', header=None, names=columns, na_filter=False).replace('', 0)
-            datax.append(data2)
+            if not f.endswith('339.csv'):  # fuck iron wall cat
+                data2 = pd.read_csv(os.path.join(dirs, f), sep=',', header=None, names=columns, na_filter=False).replace('', 0)
+                location = int(f[-7:-4])
+                data2.iat[0, -1] = location * 3
+                data2.iat[1, -1] = location * 3 + 1
+                data2.iat[2, -1] = location * 3 + 2
+                datax.append(data2.head(3))
 frame = pd.concat(datax)
+frame.to_csv('unitsnextgen.csv', sep=',', index=False)
+frame['fullswing'] = '0'
+print(frame)
+for dirs, subdirs, files in os.walk(dirx):
+    for f in files:
+        if '339' in f:  # fuck iron wall cat
+            continue
+        if f.endswith('02.maanim') and len(f)<20:
+            filename = f[-14:]
+            maximum = 0
+            with open(dirs+'/'+f, "r", encoding="utf-8") as fp:  # open file, ignore the name
+                line = fp.readline()  # get all the lines
+                cnt = 1  # need to know which line
+                while line:
+                    if line.count(',') == 3:  # ignore the first lines
+                        currentvalue = int(line[0:line.find(',')])
+                        if currentvalue > maximum:
+                            maximum = currentvalue  # 1st number
+                    line = fp.readline()
+                    cnt += 1
+            try:
+                position = int(filename[:3])
+            except ValueError:
+                print(filename)
+                exit(-1)
+            if position > 339:
+                position -= 1
+            offset = None
+            if filename[-10] == 'c':
+                offset = 1
+            elif filename[-10] == 'f':
+                offset = 0
+            else:
+                offset = 2
+            frame.iat[position*3+offset, -1] = maximum+1
 frame.to_csv('unitsnextgen.csv', sep=',', index=False)
 # all_csv_files = [file
                  # for path, subdir, files in os.walk(path)
