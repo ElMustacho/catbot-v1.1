@@ -100,6 +100,9 @@ async def on_message(message):
             embed.add_field(name="Assigned to", value=i[5], inline=True)
             await channel_mod.send(embed=embed)
 
+    elif message.content.startswith('!mytier'):
+        await message.channel.send('Your tier is: ' + str(privilegelevel(message.author)))
+
     elif message.content.startswith('!solve'):
         if not isAMod(message.author):  # modonly command
             return
@@ -228,6 +231,24 @@ def isWorthy(member):
     except:  # if something goes wrong, they aren't worthy
         return False
     return False
+
+
+def privilegelevel(member):
+    level = 1  # by default a user is unworthy
+    if member.id == 301847661181665280:  # daddy
+        return 5
+    if not isInServer(member):
+        return 0  # catbot banned
+    for i in member.roles:
+        if i.id == 360553848500256778:  # has cat role
+            level = max(level, 2)  # generic user
+        if i.id == 602057565378969601:  # muted
+            return 1
+        if i.id == 355179381842378752 or i.id == 660426571164811264 or i.id == 393910325675819048:  # purple/vip/worthy helper
+            level = max(level, 3)
+        if 355179088245424128 == i.id or 355179230889508864 == i.id:  # mods
+            level = max(level, 4)
+    return level
 
 
 def isADM(message):

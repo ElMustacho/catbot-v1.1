@@ -56,7 +56,7 @@ class Catunits:
             dmg += '/' + str(math.ceil(int(cat[59]) * lvmult))
         if int(cat[60]) > 0:
             dmg += '/' + str(math.ceil(int(cat[60]) * lvmult))
-        dps = ' Damage - ' + str(int(float(cat[98].replace(',', '.')) * lvmult)) + ' DPS'
+        dps = ' Damage - ' + str(int(float(cat[98]) * lvmult)) + ' DPS'
         damagekind = ''
         if cat[12] == 1:
             damagekind += 'area'
@@ -85,9 +85,9 @@ class Catunits:
         if cat[24] > 0:  # knockback
             offensivestr += 'Knockback ' + str(round(int(cat[24]))) + '%, '
         if cat[25] > 0:  # freezes
-            offensivestr += 'Freeze ' + str(round(int(cat[25]))) + '% (' + str(round(int(cat[26] / 30, 2))) + 's), '
+            offensivestr += 'Freeze ' + str(round(int(cat[25]))) + '% (' + str(round(int(cat[26]) / 30, 2)) + 's), '
         if cat[27] > 0:  # slow
-            offensivestr += 'Slow ' + str(round(int(cat[27]))) + '% (' + str(round(int(cat[28] / 30, 2))) + 's), '
+            offensivestr += 'Slow ' + str(round(int(cat[27]))) + '% (' + str(round(int(cat[28]) / 30, 2)) + 's), '
         if cat[30] > 0:  # massive damage
             offensivestr += 'Massive Damage, '
         if cat[31] > 0:  # critical
@@ -101,7 +101,7 @@ class Catunits:
         if cat[35] > 0:  # wave attack
             offensivestr += 'Wave attack ' + str(round(int(cat[35]))) + '% (level ' + str(round(int(cat[36]))) + '), '
         if cat[37] > 0:  # weaken
-            offensivestr += 'Weaken ' + str(round(int(cat[37]))) + '% (' + str(round(int(cat[39]))) + '% power, ' + str(round(int(cat[38] / 30, 2))) + 's), '
+            offensivestr += 'Weaken ' + str(round(int(cat[37]))) + '% (' + str(round(int(cat[39]))) + '% power, ' + str(round(int(cat[38]) / 30, 2)) + 's), '
         if cat[40] > 0:  # strengthen
             offensivestr += 'Strengthen ' + str(round(int(cat[51]))) + '% (at ' + str(round(int(cat[50]))) + '% hp), '
         if cat[52] > 0:  # zombie killer
@@ -117,7 +117,7 @@ class Catunits:
         if cat[82] > 0:  # savage blow
             offensivestr += 'Savage Blow ' + str(round(int(cat[82]))) + '% (' + str(round(int(cat[83]))) + '% extra power), '
         if cat[86] > 0:  # volcano attack
-            offensivestr += 'Volcano Attack ' + str(round(int(cat[86]))) + '% (' + str(round(int(cat[88]/4))) + '-' + str(round(int(cat[87]/4))) + ', ' + str(round(int(cat[89]))) + 's), '
+            offensivestr += 'Volcano Attack ' + str(round(int(cat[86]))) + '% (' + str(round(int(cat[88]/4))) + '-' + str(round(int(cat[87]/4))) + ', level ' + str(round(int(cat[89]))) + '), '
         offensivestr = offensivestr[:-2]
         if len(offensivestr) > 3:
             catEmbed.add_field(name='Offensive abilities', value=offensivestr, inline=True)
@@ -147,7 +147,7 @@ class Catunits:
         if cat[80] > 0:  # insane resist
             defensivestr += 'Insanely resists, '
         if cat[84] > 0:  # dodge
-            defensivestr += 'Dodge ' + str(round(int(cat[84]))) + '% (' + str(round(int(cat[85] / 30, 2))) + 's), '
+            defensivestr += 'Dodge ' + str(round(int(cat[84]))) + '% (' + str(round(int(cat[85]) / 30, 2)) + 's), '
         defensivestr = defensivestr[:-2]
         if len(defensivestr) > 3:
             catEmbed.add_field(name='Defensive abilities', value=defensivestr, inline=True)
@@ -178,11 +178,11 @@ class Catunits:
             return [customnames[1], customnames[0]]  # the best matches of all custom names
 
     def levelMultiplier(self, rarity, unitkind, level=0):
-        if unitkind in range(91, 99):
+        if unitkind in range(274, 299):
             isCrazed = True  # this is a crazed/manic unit
         else:
             isCrazed = False
-        if unitkind == 78:
+        if unitkind == 76:
             isBahamut = True  # this is awakened bahamut cat
         else:
             isBahamut = False
@@ -197,7 +197,7 @@ class Catunits:
                 toret += float((level-20)*0.125)
             return 2+toret*2
         toret = float(min(60, level)*0.25)
-        if rarity == 'R':
+        if rarity == 2:
             if level > 60:
                 toret += float(min(10, level-60)*0.25)
             if level > 70:
@@ -207,9 +207,9 @@ class Catunits:
         else:
             if level > 60:
                 toret += float(min(20, level-60)*0.125)
-            if rarity in ['U', 'S'] and level > 80:
+            if rarity in [5, 4, 3] and level > 80:
                 toret += float((level-80)*0.0625)
-            if rarity not in ['U', 'S'] and level > 80:
+            if rarity not in [5, 4, 3] and level > 80:
                 toret += float((level-80)*0.125)
         return 2+toret*2
 
