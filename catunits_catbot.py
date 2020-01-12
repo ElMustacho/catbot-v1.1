@@ -56,7 +56,7 @@ class Catunits:
             dmg += '/' + str(math.ceil(int(cat[59]) * lvmult))
         if int(cat[60]) > 0:
             dmg += '/' + str(math.ceil(int(cat[60]) * lvmult))
-        dps = ' Damage - ' + str(int(float(cat[98]) * lvmult)) + ' DPS'
+        dps = ' Damage - ' + str(int(float(cat[98].replace(',','.')) * lvmult)) + ' DPS'
         damagekind = ''
         if cat[12] == 1:
             damagekind += 'area'
@@ -117,7 +117,7 @@ class Catunits:
         if cat[82] > 0:  # savage blow
             offensivestr += 'Savage Blow ' + str(round(int(cat[82]))) + '% (' + str(round(int(cat[83]))) + '% extra power), '
         if cat[86] > 0:  # volcano attack
-            offensivestr += 'Volcano Attack ' + str(round(int(cat[86]))) + '% (' + str(round(int(cat[88]/4))) + '-' + str(round(int(cat[87]/4))) + ', level ' + str(round(int(cat[89]))) + '), '
+            offensivestr += 'Volcano Attack ' + str(round(int(cat[86]))) + '% (' + str(round(int(cat[88]/4))) + '-' + str(round(int(cat[87]/4)+int(cat[88]/4))) + ', level ' + str(round(int(cat[89]))) + '), '
         offensivestr = offensivestr[:-2]
         if len(offensivestr) > 3:
             catEmbed.add_field(name='Offensive abilities', value=offensivestr, inline=True)
@@ -182,7 +182,7 @@ class Catunits:
             isCrazed = True  # this is a crazed/manic unit
         else:
             isCrazed = False
-        if unitkind == 76:
+        if unitkind == 77:
             isBahamut = True  # this is awakened bahamut cat
         else:
             isBahamut = False
