@@ -103,7 +103,7 @@ class Catunits:
         if cat[37] > 0:  # weaken
             offensivestr += 'Weaken ' + str(round(int(cat[37]))) + '% (' + str(round(int(cat[39]))) + '% power, ' + str(round(int(cat[38]) / 30, 2)) + 's), '
         if cat[40] > 0:  # strengthen
-            offensivestr += 'Strengthen ' + str(round(int(cat[51]))) + '% (at ' + str(round(int(cat[50]))) + '% hp), '
+            offensivestr += 'Strengthen ' + str(round(int(cat[41]))) + '% (at ' + str(round(int(cat[40]))) + '% hp), '
         if cat[52] > 0:  # zombie killer
             offensivestr += 'Zombie killer, '
         if cat[53] > 0:  # witch killer (collab)
@@ -178,7 +178,7 @@ class Catunits:
             return [customnames[1], customnames[0]]  # the best matches of all custom names
 
     def levelMultiplier(self, rarity, unitkind, level=0):
-        if unitkind in range(274, 299):
+        if unitkind in range(273, 300):
             isCrazed = True  # this is a crazed/manic unit
         else:
             isCrazed = False
