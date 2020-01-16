@@ -53,7 +53,7 @@ async def on_message(message):
         elif level == 4:
             await message.channel.send("Hi moderator, how you doin'?")
         elif level == 3:
-            await message.channel.send("Wow, you are somewhat important, that's cool.")
+            await message.channel.send("Wow, you are important, that's cool!")
         elif level == 2:
             await message.channel.send('Well, at least you are here.')
         else:
@@ -140,7 +140,7 @@ async def on_message(message):
             await message.channel.send('Invalid code for cat unit')
             return
         try:
-            level = int(message.content[message.content.find(';') + 2:])
+            level = int(message.content[message.content.find(';') + 1:])
         except:
             level = 30
         if level < 0 or level > 131:
@@ -254,7 +254,7 @@ def privilegelevel(member):
             level = max(level, 2)  # generic user
         if i.id == 602057565378969601:  # muted
             return 1
-        if i.id == 355179381842378752 or i.id == 660426571164811264 or i.id == 393910325675819048:  # purple/vip/worthy helper
+        if i.id == 355179381842378752 or i.id == 660426571164811264 or i.id == 393910325675819048 or i. id == 597183582838194197:  # purple/vip/worthy helper/booster
             level = max(level, 3)
         if 355179088245424128 == i.id or 355179230889508864 == i.id:  # mods
             level = max(level, 4)
