@@ -8,7 +8,7 @@
 # make embed function, for each kind of embed
 # tell the user what happens when a report belonging to him is solved or initiated
 import discord
-from datetime import datetime
+from datetime import datetime, timedelta
 from data_catbot import Data_catbot
 import logging
 from modtools import Modtools
@@ -32,7 +32,7 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    if len(str(message.content)) > 200:  # don't bother with stuff too long
+    if len(str(message.content)) > 300:  # don't bother with stuff too long
         return
 
     if '\t' in message.content:  # catbot doesn't like tab
@@ -42,33 +42,29 @@ async def on_message(message):
         return
 
     elif message.content.startswith('!sayhi'):
+        level = privilegelevel(message.author)
+        if not canSend(1, level, message):
+            return
         if isADM(message):
             await message.channel.send('Greetings, user.')
             return
-        list_roles = [str(role) for role in message.author.roles]  # tbd
-        if isAMod(message.author):
-            await message.channel.send('So cool, you are a mod <3!')
-        elif 'Purple Flair' in list_roles:
-            await message.channel.send('You have a Purple Flair, nice!')
+        if level == 5:
+            await message.channel.send('Hi dad!')
+        elif level == 4:
+            await message.channel.send("Hi moderator, how you doin'?")
+        elif level == 3:
+            await message.channel.send("Wow, you are somewhat important, that's cool.")
+        elif level == 2:
+            await message.channel.send('Well, at least you are here.')
         else:
-            await message.channel.send('You don\'t have a Purple Flair, that\'s not cool.')
-
-    elif message.content.startswith('!time'):
-        if not isAMod(message.author):  # only mods can do this
-            return
-        await message.channel.send('Time was: ' + str(data.timelastmessage))
-        data.timelastmessage = datetime.now()
-        await message.channel.send('Time is now: ' + str(data.timelastmessage))
+            await message.channel.send('You can do better than this.')
 
     elif message.content.startswith('!helpme'):  # todo beautify this
-        if not isInServer(message.author):  # to request help, you need to be
-            return  # a member, also helps with spam
+        if not canSend(1, privilegelevel(message.author), message):
+            return
         channel_mod = client.get_channel(modchannelid)
-        message_to_send = str(message.author.mention) + ' has requested help' + \
-                          ' regarding: ' + str(message.content[8:])
         reportcode = modqueue.addentry(str(message.author.mention), str(datetime.now()),
-                                       str(message.channel), str(message.content[7:]),
-                                       'unsolved')
+                                       str(message.channel), str(message.content[7:]), 'unsolved')
         reportTitle = "New help request: " + str(reportcode)
         embed = discord.Embed(description=reportTitle, color=0x50bdfe)
         embed.set_author(name=client.user)
@@ -81,11 +77,11 @@ async def on_message(message):
             'Your request has been sent successfully. Your report code is ' + str(reportcode) + '.')
 
     elif message.content.startswith('!saverequests'):
-        if isAMod(message.author):  # modonly command
+        if canSend(4, privilegelevel(message.author), message):
             modqueue.savereportsusual()
 
     elif message.content.startswith('!unsolved'):
-        if not isAMod(message.author):  # modonly command
+        if not canSend(4, privilegelevel(message.author), message):
             return
         channel_mod = client.get_channel(modchannelid)
         for i in modqueue.getunsolved():
@@ -101,10 +97,12 @@ async def on_message(message):
             await channel_mod.send(embed=embed)
 
     elif message.content.startswith('!mytier'):
+        if not canSend(1, privilegelevel(message.author), message):
+            return
         await message.channel.send('Your tier is: ' + str(privilegelevel(message.author)))
 
     elif message.content.startswith('!solve'):
-        if not isAMod(message.author):  # modonly command
+        if not canSend(4, privilegelevel(message.author), message):
             return
         channel_mod = client.get_channel(modchannelid)
         if modqueue.setsolvedbyindex(int(message.content[7:])):  # if true it was deleted successfully
@@ -113,8 +111,7 @@ async def on_message(message):
             await channel_mod.send('Invalid report code')
 
     elif message.content.startswith('!assignto'):
-
-        if not isAMod(message.author):  # modonly command
+        if not canSend(4, privilegelevel(message.author), message):
             return
         if message.content.startswith('!assigntome'):
             modqueue.setassigned(int(message.content[11:]), message.author.mention)
@@ -125,9 +122,8 @@ async def on_message(message):
         await channel_mod.send('Assignment done')
 
     elif message.content.startswith('!catstats'):
-        if not isADM(message):
-            if not isWorthy(message.author):  # isWorthy command, for now
-                return
+        if not canSend(1, privilegelevel(message.author), message):
+            return
         limit = message.content.find(';')
         if limit == -1:
             limit = len(message.content)
@@ -153,7 +149,7 @@ async def on_message(message):
         await message.channel.send(embed=embedsend)
 
     elif message.content.startswith('!myreports'):
-        if not isAMod(message.author):
+        if not canSend(4, privilegelevel(message.author), message):
             return
         channel_mod = client.get_channel(modchannelid)
         for i in modqueue.getassigned(message.author.mention):  # at this point we know this is a mod
@@ -169,7 +165,7 @@ async def on_message(message):
             await channel_mod.send(embed=embed)
 
     elif message.content.startswith('!deletereport') or message.content.startswith('!removereport'):
-        if not isAMod(message.author):
+        if not canSend(4, privilegelevel(message.author), message):
             return
         channel_mod = client.get_channel(modchannelid)
         report = modqueue.deletereportbyid(int(message.content[14:]))
@@ -188,8 +184,8 @@ async def on_message(message):
             'Your request with the code ' + str(report[6]) + ' has been solved.')
 
     elif message.content.startswith('!renameunit'):
-        # if not isWorthy(message.author):  # isWorthy command, for now
-        #    return
+        if not canSend(3, privilegelevel(message.author), message):
+            return
         limit = message.content.find(';')
         if limit < 0:
             await message.channel.send('Incorrect format, check command format')
@@ -211,6 +207,19 @@ async def on_message(message):
             await message.channel.send('Should have worked')
         else:
             await message.channel.send('Name was already used')
+
+    elif message.content.startswith('!silence'):
+        if not canSend(3, privilegelevel(message.author), message):
+            return
+        timestop = min(60, int(message.content[9:]))
+        data.timelastmessage = datetime.now() + timedelta(minutes=timestop)
+        await message.channel.send("I'll be silent for a while")
+
+    elif message.content.startswith('!letfree'):
+        if not canSend(3, privilegelevel(message.author), message):
+            return
+        data.timelastmessage = datetime.now()
+        await message.channel.send("I can speak again")
 
 def isAMod(member):  # is a mod, but only in the battlecats server
     try:
@@ -235,10 +244,11 @@ def isWorthy(member):
 
 def privilegelevel(member):
     level = 1  # by default a user is unworthy
-    if member.id == 301847661181665280:  # daddy
+    if member.id == 301847661181665280:  # daddy: 301847661181665280
         return 5
-    if not isInServer(member):
-        return 0  # catbot banned
+    member = serveruser(member)
+    if member is False:  # user not in server
+        return 0
     for i in member.roles:
         if i.id == 360553848500256778:  # has cat role
             level = max(level, 2)  # generic user
@@ -249,6 +259,20 @@ def privilegelevel(member):
         if 355179088245424128 == i.id or 355179230889508864 == i.id:  # mods
             level = max(level, 4)
     return level
+
+
+def canAnswer(message):
+    if not isADM(message) and data.timelastmessage > datetime.now():  # second condition is asking if silence is active
+        if privilegelevel(serveruser(message.author)) < 3:  # if you are important you can skip the silence
+            return False
+    return True
+
+
+def canSend(tier_req, tier, message):
+    if tier_req <= tier:
+        if isInServer(message.author):
+            return canAnswer(message)
+    return False
 
 
 def isADM(message):
@@ -263,6 +287,12 @@ def isInServer(member):
         return True
     return False
 
+
+def serveruser(member):  # real server 355179033018892289
+    legit_members = client.get_guild(355179033018892289)  # server id
+    if member in legit_members.members:
+        return legit_members.get_member(member.id)
+    return False
 
 modqueue = Modtools('results.tsv', 'archives.tsv')
 catculator = catunits_catbot.Catunits()

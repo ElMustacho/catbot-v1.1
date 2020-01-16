@@ -164,7 +164,7 @@ class Catunits:
         # from dictionary
         distancedict = defaultdict(list)
         for i in self._customnames:
-            distancedict[nl.edit_distance(strToCmp, i)].append(self._customnames[i])
+            distancedict[nl.edit_distance(strToCmp, i.lower())].append(self._customnames[i])
         customnames = []
         try:
             customnames = min(distancedict.items())

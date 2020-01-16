@@ -4,7 +4,7 @@ class Data_catbot:
     def __init__(self, auth_token, timelastmessage):
         self._auth_token = auth_token
         self._timelastmessage = timelastmessage
-        self._purr = 0
+        self._purr = 0  # probably going to remove this
 
     @classmethod
     def defFromFile(cls):
