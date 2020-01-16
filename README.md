@@ -42,7 +42,7 @@ Welcome to catbot, still in development/prerelease, gonna be short, here is the 
 
 2 -> generic users; has the cat role, can use catbot on the server with limited usage
 
-3 -> worthy (purple flair, pink role, fandom vip); can give custom names to units and can issue silence lv 2 (tier 2 and lower can't use commands in public up to an hour)
+3 -> worthy (purple flair, I make strats for cat food, fandom vip, I boost for cat food); can give custom names to units and can issue silence lv 2 (tier 2 and lower can't use commands in public up to an hour)
 
 4 -> moderator; all commands and can issue silence lv 3 (tier 3 and lower can't use commands in public, until revoked) or lower
 
