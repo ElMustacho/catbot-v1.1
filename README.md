@@ -40,14 +40,14 @@ Welcome to catbot, still in development/prerelease, gonna be short, here is the 
 
 # Tier Explanations
 
-0 -> catbotbanned; people not registered in this server, catbot won't answer to anything
+0 -> catbotbanned; people not registered in this server, catbot won't answer to anything.
 
-1 -> not worthy; can only send private messages, such as helpme and catstats. muted and people without the cat role are here, being muted overrides your higher tier
+1 -> not worthy; can only send private messages, such as helpme and catstats. Muted and people without the cat role are here, being muted overrides your higher tier.
 
-2 -> generic users; has the cat role, can use catbot on the server with limited usage
+2 -> generic users; has the cat role, can use catbot on the server with limited usage.
 
-3 -> worthy (purple flair, I make strats for cat food, fandom vip, I boost for cat food); can give custom names to units and can issue silence lv 2 (tier 2 and lower can't use commands in public up to an hour)
+3 -> worthy (purple flair, I make strats for cat food, fandom vip, I boost for cat food); can give custom names to units and can issue silence lv 2 (tier 2 and lower can't use commands in public up to an hour).
 
-4 -> moderator; all commands and can issue silence lv 3 (tier 3 and lower can't use commands in public, until revoked) or lower
+4 -> moderator; all commands and can issue silence lv 3 (tier 3 and lower can't use commands in public, until revoked) or lower.
 
-5 -> daddy/mommy (me); all commands and can issue lv 4 silence (I shutdown catbot), ignores being muted
+5 -> daddy/mommy (me); all commands and can issue lv 4 silence (I shutdown catbot), ignores being muted.
