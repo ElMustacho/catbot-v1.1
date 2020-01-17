@@ -9,15 +9,13 @@ from PIL import Image
 
 class Catunits:
     def __init__(self):
-        # data = pd.read_csv(str('unitdata.tsv'), sep='\t')
-        # headers = data.iloc[0]
-        # print(headers)
-        # self._cats  = pd.DataFrame(data.values[1:], columns=headers)
         self._cats = pd.read_csv('unitdata9.2.tsv', sep='\t')
+        self._customnames = None
         try:
             self._customnames = pickle.load(open('customNames.pkl', 'rb'))  # this is a dictionary
         except FileNotFoundError:
             self._customnames = {}
+
     def getrow(self, row):
         if row < 0:
             return None
@@ -27,9 +25,6 @@ class Catunits:
         except IndexError:
             returned = None
         return returned
-
-    def getcolumn(self, column):
-        return None
 
     def getUnitCode(self, identifier, errors):
         locator = None
@@ -252,6 +247,22 @@ class Catunits:
         else:
             fstr += '0'
         return 'https://raw.githubusercontent.com/ElMustacho/catbot-v1.1/master/traitpics/' + fstr + '.png'
+
+    def getnames(self, cat, catcode):
+        name = cat[95]
+        allnames = 'The custom names of ' + name + ' are: '
+        for key, value in self._customnames.items():
+            if value == catcode:
+                allnames += key + '; '
+        return allnames
+
+    def removename(self, catcode, nametoremove):
+        for key, value in self._customnames.items():
+            if value == catcode and nametoremove == key:
+                del self._customnames[nametoremove]
+                self.storedict()
+                return True
+        return False
 
     def givenewname(self, unitcode, newname):
         if newname in self._customnames:  # can't have a name refer to 2 different units

@@ -124,6 +124,8 @@ async def on_message(message):
     elif message.content.startswith('!catstats'):
         if not canSend(1, privilegelevel(message.author), message):
             return
+        if privilegelevel(message.author) < 3 and message.channel.id != 667373267689930772:
+            return
         limit = message.content.find(';')
         if limit == -1:
             limit = len(message.content)
@@ -204,7 +206,7 @@ async def on_message(message):
             return
         response = catculator.givenewname(catcode[0][0], message.content[limit+2:])
         if response:
-            await message.channel.send('Should have worked')
+            await message.channel.send('The name ' + message.content[limit+2:] + ' is now assigned.')
         else:
             await message.channel.send('Name was already used')
 
@@ -220,6 +222,45 @@ async def on_message(message):
             return
         data.timelastmessage = datetime.now()
         await message.channel.send("I can speak again")
+
+    elif message.content.startswith('!namesof'):
+        if not canSend(2, privilegelevel(message.author), message):
+            return
+        catstats = catculator.getUnitCode(message.content[9:].lower(),
+                                          6)  # second parameter is number of errors allowed
+        if catstats[0] is None:  # too many errors
+            await message.channel.send(message.content[9:] + '; wasn\'t recognized')
+            return
+        if len(catstats[0]) > 1:  # name wasn't unique
+            await message.channel.send('Couldn\'t discriminate.')
+            return
+        cat = catculator.getrow(catstats[0][0])
+        await message.channel.send(catculator.getnames(cat, catstats[0][0]))
+
+    elif message.content.startswith('!removename'):
+        if not canSend(3, privilegelevel(message.author), message):
+            return
+        limit = message.content.find(';')
+        if limit < 0:
+            await message.channel.send('Incorrect format, check command format')
+            return
+        realnameunit = message.content[12: limit]
+        catcode = catculator.getUnitCode(realnameunit.lower(), 0)
+        if catcode is None:  # too many errors
+            await message.channel.send('That was gibberish.')
+            return
+        if len(catcode[0]) > 1:  # name wasn't unique
+            await message.channel.send('Couldn\'t discriminate.')
+            return
+        if catcode[0][0] is None:
+            await message.channel.send('Invalid code for cat unit')
+            return
+        operationsuccess = catculator.removename(catcode[0][0], message.content[limit+2:])
+        if operationsuccess:
+            await message.channel.send('Name was deleted successfully.')
+        else:
+            await message.channel.send('No such name to delete')
+
 
 def isAMod(member):  # is a mod, but only in the battlecats server
     try:
