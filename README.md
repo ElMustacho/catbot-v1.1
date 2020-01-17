@@ -26,7 +26,7 @@ Welcome to catbot, still in development/prerelease, gonna be short, here is the 
 
 *!letfree* removes the silence.
 
-*!deletename [unit name]; [custom name to delete]* -> removes a custom name of [unit name], which can itself be a custom name (eg !removeunit mlg; mlg works and removes the name mlg from the expected unit). Short of case sensitiveness, no errors are allowed in [unit name]
+*!deletename [unit name]; [custom name to delete]* -> removes a custom name of [unit name], which can itself be a custom name (eg !removeunit mlg; mlg works and removes the name mlg from the expected unit). Short of case sensitiveness, no errors are allowed in [unit name] and [custom name to delete]
 
 # User commands
 

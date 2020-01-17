@@ -237,7 +237,7 @@ async def on_message(message):
         cat = catculator.getrow(catstats[0][0])
         await message.channel.send(catculator.getnames(cat, catstats[0][0]))
 
-    elif message.content.startswith('!removename'):
+    elif message.content.startswith('!deletename'):
         if not canSend(3, privilegelevel(message.author), message):
             return
         limit = message.content.find(';')

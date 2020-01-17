@@ -254,6 +254,8 @@ class Catunits:
         for key, value in self._customnames.items():
             if value == catcode:
                 allnames += key + '; '
+        if allnames[-2:] == ': ':
+            allnames = name + ' has no custom name.'
         return allnames
 
     def removename(self, catcode, nametoremove):
