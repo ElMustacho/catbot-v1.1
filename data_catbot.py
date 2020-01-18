@@ -1,20 +1,16 @@
 from datetime import datetime
+import json
 
 class Data_catbot:
-    def __init__(self, auth_token, timelastmessage):
-        self._auth_token = auth_token
+    def __init__(self, auth_token, timelastmessage, requireddata):
         self._timelastmessage = timelastmessage
-        self._purr = 0  # probably going to remove this
+        self._requireddata = requireddata
+
 
     @classmethod
     def defFromFile(cls):
-        try:
-            f = open("confing.json", "r")
-            cls.auth_token = f.read(59)
-        except OSError:
-            print('oh shit')
-        finally:
-            f.close()
+        with open('config.json') as json_file:
+            cls.requireddata = json.load(json_file)
         cls.timelastmessage = datetime.now()
         return cls
 
@@ -22,17 +18,7 @@ class Data_catbot:
     def timelastmessage(self):
         return self._timelastmessage
 
-    @property
-    def auth_token(self):
-        return self._auth_token
-
     @timelastmessage.setter
     def timelastmessage(self, value):
         self._timelastmessage = value
 
-    def purrcatbot(self):
-        self._purr += 1
-
-    @property
-    def purr(self):
-        return self._purr

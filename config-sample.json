@@ -1,0 +1,29 @@
+{
+  "auth-token": "sorry pals but I ain't giving out the auth token, get yours",
+  "freeforall-channels": [
+    667373267689930772
+  ],
+  "log-channel-id": 396154070890577922,
+  "mod-channel-id": 652569911113023498,
+  "moderation": true,
+  "server-id": 355179033018892289,
+  "tier-1-roles": [
+    602057565378969601
+  ],
+  "tier-2-roles": [
+    360553848500256778
+  ],
+  "tier-3-roles": [
+    355179381842378752,
+    660426571164811264,
+    393910325675819048,
+    597183582838194197
+  ],
+  "tier-4-roles": [
+    355179088245424128,
+    355179230889508864
+  ],
+  "tier-5-users": [
+    301847661181665280
+  ]
+}

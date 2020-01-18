@@ -19,10 +19,7 @@ logger.setLevel(logging.DEBUG)
 handler = logging.FileHandler(filename='dsd.log', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
-modstuff = True
 client = discord.Client()
-modchannelid = 652569911113023498  # 647749653495808010 old channel
-logchannelid = 396154070890577922
 
 
 @client.event
@@ -64,30 +61,10 @@ async def on_message(message):
             return
         await message.channel.send('Your tier is: ' + str(privilegelevel(message.author)))
 
-    elif message.content.startswith('!solve'):
-        if not canSend(4, privilegelevel(message.author), message):
-            return
-        channel_mod = client.get_channel(modchannelid)
-        if modqueue.setsolvedbyindex(int(message.content[7:])):  # if true it was deleted successfully
-            await channel_mod.send('Report has been set as solved')
-        else:
-            await channel_mod.send('Invalid report code')
-
-    elif message.content.startswith('!assignto'):
-        if not canSend(4, privilegelevel(message.author), message):
-            return
-        if message.content.startswith('!assigntome'):
-            modqueue.setassigned(int(message.content[11:]), message.author.mention)
-        else:
-            modqueue.setassigned(int(message.content[9:message.content.find(
-                ',')]), message.content[message.content.find(',') + 2:])
-        channel_mod = client.get_channel(modchannelid)
-        await channel_mod.send('Assignment done')
-
     elif message.content.startswith('!catstats'):
         if not canSend(1, privilegelevel(message.author), message):
             return
-        if privilegelevel(message.author) < 3 and message.channel.id != 667373267689930772:
+        if privilegelevel(message.author) < 3 and message.channel.id not in data.requireddata['freeforall-channels']:
             return
         limit = message.content.find(';')
         if limit == -1:
@@ -189,13 +166,33 @@ async def on_message(message):
         else:
             await message.channel.send('No such name to delete')
 
-    elif not modstuff:
+    elif not data.requireddata['moderation']:
         return
+
+    elif message.content.startswith('!solve'):
+        if not canSend(4, privilegelevel(message.author), message):
+            return
+        channel_mod = client.get_channel(data.requireddata['mod-channel-id'])
+        if modqueue.setsolvedbyindex(int(message.content[7:])):  # if true it was solved successfully
+            await channel_mod.send('Report has been set as solved')
+        else:
+            await channel_mod.send('Invalid report code')
+
+    elif message.content.startswith('!assignto'):
+        if not canSend(4, privilegelevel(message.author), message):
+            return
+        if message.content.startswith('!assigntome'):
+            modqueue.setassigned(int(message.content[11:]), message.author.mention)
+        else:
+            modqueue.setassigned(int(message.content[9:message.content.find(
+                ',')]), message.content[message.content.find(',') + 2:])
+        channel_mod = client.get_channel(data.requireddata['mod-channel-id'])
+        await channel_mod.send('Assignment done')
 
     elif message.content.startswith('!helpme'):  # todo beautify this
         if not canSend(1, privilegelevel(message.author), message):
             return
-        channel_mod = client.get_channel(modchannelid)
+        channel_mod = client.get_channel(data.requireddata['mod-channel-id'])
         reportcode = modqueue.addentry(str(message.author.mention), str(datetime.now()),
                                        str(message.channel), str(message.content[7:]), 'unsolved')
         reportTitle = "New help request: " + str(reportcode)
@@ -216,7 +213,7 @@ async def on_message(message):
     elif message.content.startswith('!unsolved'):
         if not canSend(4, privilegelevel(message.author), message):
             return
-        channel_mod = client.get_channel(modchannelid)
+        channel_mod = client.get_channel(data.requireddata['mod-channel-id'])
         for i in modqueue.getunsolved():
             reportTitle = "Report id " + str(i[6])
             embed = discord.Embed(description=reportTitle, color=0x50bdfe)
@@ -232,7 +229,7 @@ async def on_message(message):
     elif message.content.startswith('!myreports'):
         if not canSend(4, privilegelevel(message.author), message):
             return
-        channel_mod = client.get_channel(modchannelid)
+        channel_mod = client.get_channel(data.requireddata['mod-channel-id'])
         for i in modqueue.getassigned(message.author.mention):  # at this point we know this is a mod
             reportTitle = "Report id " + str(i[6])
             embed = discord.Embed(description=reportTitle, color=0x50bdfe)
@@ -248,7 +245,7 @@ async def on_message(message):
     elif message.content.startswith('!deletereport') or message.content.startswith('!removereport'):
         if not canSend(4, privilegelevel(message.author), message):
             return
-        channel_mod = client.get_channel(modchannelid)
+        channel_mod = client.get_channel(data.requireddata['mod-channel-id'])
         report = modqueue.deletereportbyid(int(message.content[14:]))
         await channel_mod.send('Report successfully removed.')
         embed = discord.Embed(description="Report id " + str(report[6]), color=0x123456)
@@ -259,49 +256,27 @@ async def on_message(message):
         embed.add_field(name="Reason", value=report[3], inline=True)
         embed.add_field(name="Status", value=report[4], inline=True)
         embed.add_field(name="Assigned to", value=report[5], inline=True)
-        await client.get_channel(logchannelid).send(embed=embed)
-        respondto = int(str(report[0])[2:-1])
+        await client.get_channel(data.requireddata['log-channel-id']).send(embed=embed)
+        respondto = int(str(report[0])[3:-1])
         await client.get_user(respondto).send(
             'Your request with the code ' + str(report[6]) + ' has been solved.')
 
 
-
-def isAMod(member):  # is a mod, but only in the battlecats server
-    try:
-        for i in member.roles:  # 355179088245424128, 355179230889508864 are mods
-            if 355179088245424128 == i.id or 355179230889508864 == i.id:
-                return isInServer(member)
-    except:  # if it breaks, in doubt, the user isn't a mod
-        print('something failed, please check')  # tbi
-    return False
-
-
-def isWorthy(member):
-    try:
-        if 'Muted' in member.roles:
-            return False
-        if len(member.roles) > 1:
-            return True
-    except:  # if something goes wrong, they aren't worthy
-        return False
-    return False
-
-
 def privilegelevel(member):
     level = 1  # by default a user is unworthy
-    if member.id == 301847661181665280:  # daddy: 301847661181665280
+    if member.id in data.requireddata['tier-5-users']:  # daddy: 301847661181665280
         return 5
     member = serveruser(member)
     if member is False:  # user not in server
         return 0
     for i in member.roles:
-        if i.id == 360553848500256778:  # has cat role
-            level = max(level, 2)  # generic user
-        if i.id == 602057565378969601:  # muted
-            return 1
-        if i.id == 355179381842378752 or i.id == 660426571164811264 or i.id == 393910325675819048 or i. id == 597183582838194197:  # purple/vip/worthy helper/booster
+        if i.id in data.requireddata['tier-2-roles']:
+            level = max(level, 2)  # this tier is for common users
+        if i.id == data.requireddata['tier-1-roles']:
+            return 1  # muted
+        if i.id == data.requireddata['tier-3-roles']:  # purple/vip/worthy helper/boosters
             level = max(level, 3)
-        if 355179088245424128 == i.id or 355179230889508864 == i.id:  # mods
+        if i.id in data.requireddata['tier-4-roles']:  # mods
             level = max(level, 4)
     return level
 
@@ -327,19 +302,20 @@ def isADM(message):
 
 
 def isInServer(member):
-    legit_members = client.get_guild(355179033018892289).members  # server id
+    legit_members = client.get_guild(data.requireddata['server-id']).members  # server id
     if member in legit_members:
         return True
     return False
 
 
-def serveruser(member):  # real server 355179033018892289
-    legit_members = client.get_guild(355179033018892289)  # server id
+def serveruser(member):
+    legit_members = client.get_guild(data.requireddata['server-id'])  # server id
     if member in legit_members.members:
         return legit_members.get_member(member.id)
     return False
 
+
 modqueue = Modtools('results.tsv', 'archives.tsv')
 catculator = catunits_catbot.Catunits()
 data = Data_catbot.defFromFile()
-client.run(data.auth_token)
+client.run(data.requireddata['auth-token'])
