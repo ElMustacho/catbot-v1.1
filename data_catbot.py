@@ -9,7 +9,7 @@ class Data_catbot:
     @classmethod
     def defFromFile(cls):
         try:
-            f = open("auth.token", "r")
+            f = open("confing.json", "r")
             cls.auth_token = f.read(59)
         except OSError:
             print('oh shit')

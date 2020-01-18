@@ -19,7 +19,7 @@ logger.setLevel(logging.DEBUG)
 handler = logging.FileHandler(filename='dsd.log', encoding='utf-8', mode='w')
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
-
+modstuff = True
 client = discord.Client()
 modchannelid = 652569911113023498  # 647749653495808010 old channel
 logchannelid = 396154070890577922
@@ -58,43 +58,6 @@ async def on_message(message):
             await message.channel.send('Well, at least you are here.')
         else:
             await message.channel.send('You can do better than this.')
-
-    elif message.content.startswith('!helpme'):  # todo beautify this
-        if not canSend(1, privilegelevel(message.author), message):
-            return
-        channel_mod = client.get_channel(modchannelid)
-        reportcode = modqueue.addentry(str(message.author.mention), str(datetime.now()),
-                                       str(message.channel), str(message.content[7:]), 'unsolved')
-        reportTitle = "New help request: " + str(reportcode)
-        embed = discord.Embed(description=reportTitle, color=0x50bdfe)
-        embed.set_author(name=client.user)
-        embed.add_field(name="Requester", value=message.author.mention, inline=True)
-        embed.add_field(name="Date", value=str(datetime.now()), inline=True)
-        embed.add_field(name="Location", value=str(message.channel), inline=True)
-        embed.add_field(name="Reason", value=str(message.content[7:]), inline=True)
-        await channel_mod.send(embed=embed)
-        await message.channel.send(
-            'Your request has been sent successfully. Your report code is ' + str(reportcode) + '.')
-
-    elif message.content.startswith('!saverequests'):
-        if canSend(4, privilegelevel(message.author), message):
-            modqueue.savereportsusual()
-
-    elif message.content.startswith('!unsolved'):
-        if not canSend(4, privilegelevel(message.author), message):
-            return
-        channel_mod = client.get_channel(modchannelid)
-        for i in modqueue.getunsolved():
-            reportTitle = "Report id " + str(i[6])
-            embed = discord.Embed(description=reportTitle, color=0x50bdfe)
-            embed.set_author(name=client.user)
-            embed.add_field(name="Requester", value=i[0], inline=True)
-            embed.add_field(name="Date", value=i[1], inline=True)
-            embed.add_field(name="Location", value=i[2], inline=True)
-            embed.add_field(name="Reason", value=i[3], inline=True)
-            embed.add_field(name="Status", value=i[4], inline=True)
-            embed.add_field(name="Assigned to", value=i[5], inline=True)
-            await channel_mod.send(embed=embed)
 
     elif message.content.startswith('!mytier'):
         if not canSend(1, privilegelevel(message.author), message):
@@ -149,41 +112,6 @@ async def on_message(message):
             level = 30
         embedsend = catculator.getstatsEmbed(cat, level, message.content[10:limit], catstats[0][0])
         await message.channel.send(embed=embedsend)
-
-    elif message.content.startswith('!myreports'):
-        if not canSend(4, privilegelevel(message.author), message):
-            return
-        channel_mod = client.get_channel(modchannelid)
-        for i in modqueue.getassigned(message.author.mention):  # at this point we know this is a mod
-            reportTitle = "Report id " + str(i[6])
-            embed = discord.Embed(description=reportTitle, color=0x50bdfe)
-            embed.set_author(name=client.user)
-            embed.add_field(name="Requester", value=i[0], inline=True)
-            embed.add_field(name="Date", value=i[1], inline=True)
-            embed.add_field(name="Location", value=i[2], inline=True)
-            embed.add_field(name="Reason", value=i[3], inline=True)
-            embed.add_field(name="Status", value=i[4], inline=True)
-            embed.add_field(name="Assigned to", value=i[5], inline=True)
-            await channel_mod.send(embed=embed)
-
-    elif message.content.startswith('!deletereport') or message.content.startswith('!removereport'):
-        if not canSend(4, privilegelevel(message.author), message):
-            return
-        channel_mod = client.get_channel(modchannelid)
-        report = modqueue.deletereportbyid(int(message.content[14:]))
-        await channel_mod.send('Report successfully removed.')
-        embed = discord.Embed(description="Report id " + str(report[6]), color=0x123456)
-        embed.set_author(name=client.user)
-        embed.add_field(name="Requester", value=report[0], inline=True)
-        embed.add_field(name="Date", value=report[1], inline=True)
-        embed.add_field(name="Location", value=report[2], inline=True)
-        embed.add_field(name="Reason", value=report[3], inline=True)
-        embed.add_field(name="Status", value=report[4], inline=True)
-        embed.add_field(name="Assigned to", value=report[5], inline=True)
-        await client.get_channel(logchannelid).send(embed=embed)
-        respondto = int(str(report[0])[2:-1])
-        await client.get_user(respondto).send(
-            'Your request with the code ' + str(report[6]) + ' has been solved.')
 
     elif message.content.startswith('!renameunit'):
         if not canSend(3, privilegelevel(message.author), message):
@@ -260,6 +188,82 @@ async def on_message(message):
             await message.channel.send('Name was deleted successfully.')
         else:
             await message.channel.send('No such name to delete')
+
+    elif not modstuff:
+        return
+
+    elif message.content.startswith('!helpme'):  # todo beautify this
+        if not canSend(1, privilegelevel(message.author), message):
+            return
+        channel_mod = client.get_channel(modchannelid)
+        reportcode = modqueue.addentry(str(message.author.mention), str(datetime.now()),
+                                       str(message.channel), str(message.content[7:]), 'unsolved')
+        reportTitle = "New help request: " + str(reportcode)
+        embed = discord.Embed(description=reportTitle, color=0x50bdfe)
+        embed.set_author(name=client.user)
+        embed.add_field(name="Requester", value=message.author.mention, inline=True)
+        embed.add_field(name="Date", value=str(datetime.now()), inline=True)
+        embed.add_field(name="Location", value=str(message.channel), inline=True)
+        embed.add_field(name="Reason", value=str(message.content[7:]), inline=True)
+        await channel_mod.send(embed=embed)
+        await message.channel.send(
+            'Your request has been sent successfully. Your report code is ' + str(reportcode) + '.')
+
+    elif message.content.startswith('!saverequests'):
+        if canSend(4, privilegelevel(message.author), message):
+            modqueue.savereportsusual()
+
+    elif message.content.startswith('!unsolved'):
+        if not canSend(4, privilegelevel(message.author), message):
+            return
+        channel_mod = client.get_channel(modchannelid)
+        for i in modqueue.getunsolved():
+            reportTitle = "Report id " + str(i[6])
+            embed = discord.Embed(description=reportTitle, color=0x50bdfe)
+            embed.set_author(name=client.user)
+            embed.add_field(name="Requester", value=i[0], inline=True)
+            embed.add_field(name="Date", value=i[1], inline=True)
+            embed.add_field(name="Location", value=i[2], inline=True)
+            embed.add_field(name="Reason", value=i[3], inline=True)
+            embed.add_field(name="Status", value=i[4], inline=True)
+            embed.add_field(name="Assigned to", value=i[5], inline=True)
+            await channel_mod.send(embed=embed)
+
+    elif message.content.startswith('!myreports'):
+        if not canSend(4, privilegelevel(message.author), message):
+            return
+        channel_mod = client.get_channel(modchannelid)
+        for i in modqueue.getassigned(message.author.mention):  # at this point we know this is a mod
+            reportTitle = "Report id " + str(i[6])
+            embed = discord.Embed(description=reportTitle, color=0x50bdfe)
+            embed.set_author(name=client.user)
+            embed.add_field(name="Requester", value=i[0], inline=True)
+            embed.add_field(name="Date", value=i[1], inline=True)
+            embed.add_field(name="Location", value=i[2], inline=True)
+            embed.add_field(name="Reason", value=i[3], inline=True)
+            embed.add_field(name="Status", value=i[4], inline=True)
+            embed.add_field(name="Assigned to", value=i[5], inline=True)
+            await channel_mod.send(embed=embed)
+
+    elif message.content.startswith('!deletereport') or message.content.startswith('!removereport'):
+        if not canSend(4, privilegelevel(message.author), message):
+            return
+        channel_mod = client.get_channel(modchannelid)
+        report = modqueue.deletereportbyid(int(message.content[14:]))
+        await channel_mod.send('Report successfully removed.')
+        embed = discord.Embed(description="Report id " + str(report[6]), color=0x123456)
+        embed.set_author(name=client.user)
+        embed.add_field(name="Requester", value=report[0], inline=True)
+        embed.add_field(name="Date", value=report[1], inline=True)
+        embed.add_field(name="Location", value=report[2], inline=True)
+        embed.add_field(name="Reason", value=report[3], inline=True)
+        embed.add_field(name="Status", value=report[4], inline=True)
+        embed.add_field(name="Assigned to", value=report[5], inline=True)
+        await client.get_channel(logchannelid).send(embed=embed)
+        respondto = int(str(report[0])[2:-1])
+        await client.get_user(respondto).send(
+            'Your request with the code ' + str(report[6]) + ' has been solved.')
+
 
 
 def isAMod(member):  # is a mod, but only in the battlecats server
