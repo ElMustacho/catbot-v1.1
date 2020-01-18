@@ -85,7 +85,7 @@ async def on_message(message):
             level = int(message.content[message.content.find(';') + 1:])
         except:
             level = 30
-        if level < 0 or level > 131:
+        if level < 0 or level > 130:
             level = 30
         embedsend = catculator.getstatsEmbed(cat, level, message.content[10:limit], catstats[0][0])
         await message.channel.send(embed=embedsend)
@@ -264,7 +264,7 @@ async def on_message(message):
 
 def privilegelevel(member):
     level = 1  # by default a user is unworthy
-    if member.id in data.requireddata['tier-5-users']:  # daddy: 301847661181665280
+    if member.id in data.requireddata['tier-5-users']:
         return 5
     member = serveruser(member)
     if member is False:  # user not in server
@@ -272,9 +272,9 @@ def privilegelevel(member):
     for i in member.roles:
         if i.id in data.requireddata['tier-2-roles']:
             level = max(level, 2)  # this tier is for common users
-        if i.id == data.requireddata['tier-1-roles']:
+        if i.id in data.requireddata['tier-1-roles']:
             return 1  # muted
-        if i.id == data.requireddata['tier-3-roles']:  # purple/vip/worthy helper/boosters
+        if i.id in data.requireddata['tier-3-roles']:  # purple/vip/worthy helper/boosters
             level = max(level, 3)
         if i.id in data.requireddata['tier-4-roles']:  # mods
             level = max(level, 4)
