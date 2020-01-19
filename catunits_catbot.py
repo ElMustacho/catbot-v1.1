@@ -51,7 +51,7 @@ class Catunits:
             dmg += '/' + str(math.ceil(int(cat[59]) * lvmult))
         if int(cat[60]) > 0:
             dmg += '/' + str(math.ceil(int(cat[60]) * lvmult))
-        dps = ' Damage - ' + str(int(float(cat[98].replace(',','.')) * lvmult)) + ' DPS'
+        dps = ' Damage - ' + str(int(float(cat[98].replace(',', '.')) * lvmult)) + ' DPS'
         damagekind = ''
         if cat[12] == 1:
             damagekind += 'area'
@@ -69,7 +69,9 @@ class Catunits:
         catEmbed.add_field(name='Cost - Respawn', value=str(round(int(cat[6]*1.5), 0)) + ' - ' + str(round(max(((cat[7]*2-254)/30), 2), 2)) + 's', inline=True)
         rangestr = ''
         if ',' in damagekind:  # it's long range or omni
-            rangestr += str(round(int(cat[44]), 0)) + ' to ' + str(round(int(cat[44]+cat[45]))) + '; stands at ' + str(round(int(cat[5])))
+            leftrange = str(max(round(int(cat[44]), 0), round(int(cat[44]+cat[45]))))
+            rightrange = str(min(round(int(cat[44]), 0), round(int(cat[44]+cat[45]))))
+            rangestr += leftrange + ' to ' + rightrange + '; stands at ' + str(round(int(cat[5])))
         else:  # otherwise only range is needed
             rangestr += str(round(int(cat[5])))
         catEmbed.add_field(name='Range', value=rangestr, inline=True)
@@ -94,7 +96,7 @@ class Catunits:
         if cat[34] > 0:  # base destroyer
             offensivestr += 'Base destroyer, '
         if cat[35] > 0:  # wave attack
-            offensivestr += 'Wave attack ' + str(round(int(cat[35]))) + '% (level ' + str(round(int(cat[36]))) + '), '
+            offensivestr += 'Wave attack ' + str(round(int(cat[35]))) + '% (' + str(333+round(int(cat[36])-1)*200) + ' range), '
         if cat[37] > 0:  # weaken
             offensivestr += 'Weaken ' + str(round(int(cat[37]))) + '% (' + str(round(int(cat[39]))) + '% power, ' + str(round(int(cat[38]) / 30, 2)) + 's), '
         if cat[40] > 0:  # strengthen
@@ -146,6 +148,13 @@ class Catunits:
         defensivestr = defensivestr[:-2]
         if len(defensivestr) > 3:
             catEmbed.add_field(name='Defensive abilities', value=defensivestr, inline=True)
+        atkroutine = str(round(int(cat[13])))
+        if int(cat[61]) > 0:
+            atkroutine += 'f / ' + str(round(int(cat[13]) + int(cat[61])))
+        if int(cat[62]) > 0:
+            atkroutine += 'f / ' + str(round(int(cat[13]) + int(cat[61]) + int(cat[62])))
+        atkroutine += 'f / ' + str(round(int(cat[96]))) + 'f'
+        catEmbed.add_field(name='Attack timings', value=atkroutine, inline=True)
         return catEmbed
 
     def closeEnough(self, strToCmp, errors):
