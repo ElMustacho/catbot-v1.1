@@ -71,7 +71,7 @@ async def on_message(message):
             limit = len(message.content)
         catstats = catculator.getUnitCode(message.content[10:limit].lower(),
                                           6)  # second parameter is number of errors allowed
-        if catstats[0] is None:  # too many errors
+        if catstats is None:  # too many errors
             await message.channel.send(message.content[10:limit] + '; wasn\'t recognized')
             return
         if len(catstats[0]) > 1:  # name wasn't unique

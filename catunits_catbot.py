@@ -4,8 +4,6 @@ from discord import Embed as emb
 import math
 import pickle
 from collections import defaultdict
-from PIL import Image
-
 
 class Catunits:
     def __init__(self):
@@ -35,6 +33,7 @@ class Catunits:
         return locator
 
     def getstatsEmbed(self, cat, level, actualname, unitcode):
+        isinline = True
         title = 'Stats of ' + cat[93]
         if len(cat[-4]) > 1:
             title = 'Stats of ' + cat[95]
@@ -42,10 +41,10 @@ class Catunits:
                 title += '; (nearest match)'
         catEmbed = emb(description=title, color=0xff3300)
         catEmbed.set_author(name='Cat Bot')
-        catEmbed.add_field(name='Level', value=str(level), inline=True)
+        catEmbed.add_field(name='Level', value=str(level), inline=isinline)
         lvmult = float(self.levelMultiplier(cat[94], unitcode, level))
         hpv = str(math.ceil(int(cat[0]) * lvmult)) + ' HP - ' + str(round(int(cat[1]), 0)) + ' KB'
-        catEmbed.add_field(name='HP - Knockbacks', value=hpv, inline=True)
+        catEmbed.add_field(name='HP - Knockbacks', value=hpv, inline=isinline)
         dmg = str(math.ceil(int(cat[3]) * lvmult))
         if int(cat[59]) > 0:
             dmg += '/' + str(math.ceil(int(cat[59]) * lvmult))
@@ -63,10 +62,10 @@ class Catunits:
             elif cat[45] < 0:
                 damagekind += ', omnistrike'
         damagetype = 'Damage (' + damagekind + ') - DPS'
-        catEmbed.add_field(name=damagetype, value=dmg+dps, inline=True)
+        catEmbed.add_field(name=damagetype, value=dmg+dps, inline=isinline)
         tba = str(round(int(cat[97])/30, 2))
-        catEmbed.add_field(name='Speed - Attack Frequency', value=str(round(int(cat[2]) ,0)) + ' - ' + tba + 's', inline=True)
-        catEmbed.add_field(name='Cost - Respawn', value=str(round(int(cat[6]*1.5), 0)) + ' - ' + str(round(max(((cat[7]*2-254)/30), 2), 2)) + 's', inline=True)
+        catEmbed.add_field(name='Speed - Attack Frequency', value=str(round(int(cat[2]) ,0)) + ' - ' + tba + 's', inline=isinline)
+        catEmbed.add_field(name='Cost - Respawn', value=str(round(int(cat[6]*1.5), 0)) + ' - ' + str(round(max(((cat[7]*2-254)/30), 2), 2)) + 's', inline=isinline)
         rangestr = ''
         if ',' in damagekind:  # it's long range or omni
             leftrange = str(max(round(int(cat[44]), 0), round(int(cat[44]+cat[45]))))
@@ -74,7 +73,7 @@ class Catunits:
             rangestr += leftrange + ' to ' + rightrange + '; stands at ' + str(round(int(cat[5])))
         else:  # otherwise only range is needed
             rangestr += str(round(int(cat[5])))
-        catEmbed.add_field(name='Range', value=rangestr, inline=True)
+        catEmbed.add_field(name='Range', value=rangestr, inline=isinline)
         catEmbed.set_thumbnail(url=self.cattotriaitpics(cat))
         offensivestr = ''
         if cat[23] > 0:  # strong
@@ -117,12 +116,12 @@ class Catunits:
             offensivestr += 'Volcano Attack ' + str(round(int(cat[86]))) + '% (' + str(round(int(cat[88]/4))) + '-' + str(round(int(cat[87]/4)+int(cat[88]/4))) + ', level ' + str(round(int(cat[89]))) + '), '
         offensivestr = offensivestr[:-2]
         if len(offensivestr) > 3:
-            catEmbed.add_field(name='Offensive abilities', value=offensivestr, inline=True)
+            catEmbed.add_field(name='Offensive abilities', value=offensivestr, inline=isinline)
         defensivestr = ''
         if cat[29] > 0:  # strong
             defensivestr += 'Resistant, '
         if cat[42] > 0:  # survive
-            offensivestr += 'Survive ' + str(round(int(cat[42]))) + '%, '
+            defensivestr += 'Survive ' + str(round(int(cat[42]))) + '%, '
         if cat[43] > 0:  # metal
             defensivestr += 'Metal, '
         if cat[46] > 0:  # wave immune
@@ -147,14 +146,14 @@ class Catunits:
             defensivestr += 'Dodge ' + str(round(int(cat[84]))) + '% (' + str(round(int(cat[85]) / 30, 2)) + 's), '
         defensivestr = defensivestr[:-2]
         if len(defensivestr) > 3:
-            catEmbed.add_field(name='Defensive abilities', value=defensivestr, inline=True)
+            catEmbed.add_field(name='Defensive abilities', value=defensivestr, inline=isinline)
         atkroutine = str(round(int(cat[13])))
         if int(cat[61]) > 0:
             atkroutine += 'f / ' + str(round(int(cat[13]) + int(cat[61])))
         if int(cat[62]) > 0:
             atkroutine += 'f / ' + str(round(int(cat[13]) + int(cat[61]) + int(cat[62])))
         atkroutine += 'f / ' + str(round(int(cat[96]))) + 'f'
-        catEmbed.add_field(name='Attack timings', value=atkroutine, inline=True)
+        catEmbed.add_field(name='Attack timings', value=atkroutine, inline=isinline)
         return catEmbed
 
     def closeEnough(self, strToCmp, errors):
@@ -276,7 +275,8 @@ class Catunits:
         return False
 
     def givenewname(self, unitcode, newname):
-        if newname in self._customnames:  # can't have a name refer to 2 different units
+        lowernames = {k.lower(): v for k, v in self._customnames.items()}
+        if newname.lower() in lowernames:  # can't have a name refer to 2 different units
             return False
         self._customnames[newname] = unitcode
         self.storedict()
