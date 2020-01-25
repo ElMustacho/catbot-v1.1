@@ -10,7 +10,7 @@ class Catunits:
         self._cats = pd.read_csv('unitdata9.2.tsv', sep='\t')
         self._customnames = None
         try:
-            self._customnames = pickle.load(open('customNames.pkl', 'rb'))  # this is a dictionary
+            self._customnames = pickle.load(open('catCustomUnits.pkl', 'rb'))  # this is a dictionary
         except FileNotFoundError:
             self._customnames = {}
 
@@ -283,5 +283,5 @@ class Catunits:
         return True
 
     def storedict(self):
-        with open('customNames.pkl', 'wb') as f:
+        with open('catCustomUnits.pkl', 'wb') as f:
             pickle.dump(self._customnames, f, pickle.DEFAULT_PROTOCOL)

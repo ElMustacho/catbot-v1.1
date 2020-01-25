@@ -13,6 +13,7 @@ from data_catbot import Data_catbot
 import logging
 from modtools import Modtools
 import catunits_catbot
+import enemyunits_catbot
 
 # logger = logging.getLogger('discord')
 # logger.setLevel(logging.DEBUG)
@@ -72,14 +73,18 @@ async def on_message(message):
         catstats = catculator.getUnitCode(message.content[10:limit].lower(),
                                           6)  # second parameter is number of errors allowed
         if catstats is None:  # too many errors
-            await message.channel.send(message.content[10:limit] + '; wasn\'t recognized')
+            await message.channel.send(message.content[10:limit] + '; wasn\'t recognized.')
             return
+        try:
+            lenght = len(catstats[0])
+        except TypeError:  # it's a number
+            catstats[0] = [catstats[0]]
         if len(catstats[0]) > 1:  # name wasn't unique
             await message.channel.send('Couldn\'t discriminate.')
             return
         cat = catculator.getrow(catstats[0][0])
         if cat is None:
-            await message.channel.send('Invalid code for cat unit')
+            await message.channel.send('Invalid code for cat unit.')
             return
         try:
             level = int(message.content[message.content.find(';') + 1:])
@@ -88,6 +93,39 @@ async def on_message(message):
         if level < 0 or level > 130:
             level = 30
         embedsend = catculator.getstatsEmbed(cat, level, message.content[10:limit], catstats[0][0])
+        await message.channel.send(embed=embedsend)
+
+    elif message.content.startswith('!enemystats'):
+        if not canSend(1, privilegelevel(message.author), message):
+            return
+        if privilegelevel(message.author) < 3 and message.channel.id not in data.requireddata['freeforall-channels']:
+            return
+        limit = message.content.find(';')
+        if limit == -1:
+            limit = len(message.content)
+        enemystats = enemyculator.getUnitCode(message.content[12:limit].lower(),
+                                          6)  # second parameter is number of errors allowed
+        if enemystats is None:  # too many errors
+            await message.channel.send(message.content[12:limit] + '; wasn\'t recognized.')
+            return
+        try:
+            lenght = len(enemystats[0])
+        except TypeError:
+            enemystats[0] = [enemystats[0]]
+        if len(enemystats[0]) > 1:  # name wasn't unique
+            await message.channel.send('Couldn\'t discriminate.')
+            return
+        enemy = enemyculator.getrow(enemystats[0][0])
+        if enemy is None:
+            await message.channel.send('Invalid code for enemy unit.')
+            return
+        try:
+            magnification = float(int(message.content[message.content.find(';') + 1:message.content.find('%')])/100)
+        except:
+            magnification = 1
+        if magnification < 0 or magnification > 1000000:
+            magnification = 1
+        embedsend = enemyculator.getstatsembed(enemy, magnification, message.content[12:limit])
         await message.channel.send(embed=embedsend)
 
     elif message.content.startswith('!renamecat'):
@@ -315,6 +353,7 @@ def serveruser(member):
     return False
 
 
+enemyculator = enemyunits_catbot.Enemyunits()
 modqueue = Modtools('results.tsv', 'archives.tsv')
 catculator = catunits_catbot.Catunits()
 data = Data_catbot.defFromFile()

@@ -1,3 +1,3 @@
 import pickle
-unitnames = pickle.load(open('customNames.pkl', 'rb'))
+unitnames = pickle.load(open('catCustomUnits.pkl', 'rb'))
 print(unitnames)
