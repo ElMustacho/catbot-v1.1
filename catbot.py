@@ -14,11 +14,11 @@ import logging
 from modtools import Modtools
 import catunits_catbot
 
-logger = logging.getLogger('discord')
-logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler(filename='dsd.log', encoding='utf-8', mode='w')
-handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
-logger.addHandler(handler)
+# logger = logging.getLogger('discord')
+# logger.setLevel(logging.DEBUG)
+# handler = logging.FileHandler(filename='dsd.log', encoding='utf-8', mode='w')
+# handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+# logger.addHandler(handler)
 client = discord.Client()
 
 
@@ -90,14 +90,14 @@ async def on_message(message):
         embedsend = catculator.getstatsEmbed(cat, level, message.content[10:limit], catstats[0][0])
         await message.channel.send(embed=embedsend)
 
-    elif message.content.startswith('!renameunit'):
+    elif message.content.startswith('!renamecat'):
         if not canSend(3, privilegelevel(message.author), message):
             return
         limit = message.content.find(';')
         if limit < 0:
             await message.channel.send('Incorrect format, check command format')
             return
-        realnameunit = message.content[12: limit]
+        realnameunit = message.content[11: limit]
         catcode = catculator.getUnitCode(realnameunit.lower(), 0)
         if catcode is None:  # too many errors
             await message.channel.send('That was gibberish.')
@@ -128,13 +128,13 @@ async def on_message(message):
         data.timelastmessage = datetime.now()
         await message.channel.send("I can speak again")
 
-    elif message.content.startswith('!namesof'):
+    elif message.content.startswith('!catnamesof'):
         if not canSend(2, privilegelevel(message.author), message):
             return
-        catstats = catculator.getUnitCode(message.content[9:].lower(),
+        catstats = catculator.getUnitCode(message.content[12:].lower(),
                                           6)  # second parameter is number of errors allowed
         if catstats[0] is None:  # too many errors
-            await message.channel.send(message.content[9:] + '; wasn\'t recognized')
+            await message.channel.send(message.content[12:] + '; wasn\'t recognized')
             return
         if len(catstats[0]) > 1:  # name wasn't unique
             await message.channel.send('Couldn\'t discriminate.')
@@ -142,14 +142,14 @@ async def on_message(message):
         cat = catculator.getrow(catstats[0][0])
         await message.channel.send(catculator.getnames(cat, catstats[0][0]))
 
-    elif message.content.startswith('!deletename'):
+    elif message.content.startswith('!deletecatname'):
         if not canSend(3, privilegelevel(message.author), message):
             return
         limit = message.content.find(';')
         if limit < 0:
             await message.channel.send('Incorrect format, check command format')
             return
-        realnameunit = message.content[12: limit]
+        realnameunit = message.content[15: limit]
         catcode = catculator.getUnitCode(realnameunit.lower(), 0)
         if catcode is None:  # too many errors
             await message.channel.send('That was gibberish.')

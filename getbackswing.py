@@ -3,7 +3,7 @@
 import os
 import shutil
 
-path = 'C:\\Users\\Fabrizio\\Desktop\\catbot-v1\\files-backswing\\ordered-files'
+path = 'C:\\Users\\Fabrizio\\Desktop\\catbot-v1\\files-backswing\\enemy'
 
 files = []
 # r=root, d=directories, f = files
@@ -26,6 +26,8 @@ fpath = 'C:\\Users\\Fabrizio\\Desktop\\catbot-v1\\files-backswing\\ordered-files
 fullswingsvalues = []
 for fls in files:
     maximum = 0
+    if not fls.endswith('02.maanim'):
+        continue
     with open(fls, "r", encoding="utf-8") as fp:  # open file, ignore the name
         line = fp.readline()  # get all the lines
         cnt = 1  # need to know which line
@@ -36,7 +38,7 @@ for fls in files:
                     maximum = currentvalue  # 1st number
             line = fp.readline()
             cnt += 1
-    print(maximum + 1, fls[-14:-7])
+    print(maximum + 1)
 
 # maximum = 0
 # maxpos = 0
