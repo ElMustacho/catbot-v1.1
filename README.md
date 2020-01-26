@@ -18,19 +18,19 @@ Welcome to catbot, still in development/prerelease, gonna be short, here is the 
 
 *!removereport [number]* -> same as !deletereport.
 
-# Special people commands
+# Special people commands ([unit] means 'cat' or 'enemy', with no quotes)
 
-*!renamecat [exact unit name]; [custom name]* allows to create an additional name to get an unit instead of using the full name. Short of case sensitiveness the first name doesn't allow errors. Custom names will be searchable immediately after.
+*!rename[unit] [exact unit name]; [custom name]* allows to create an additional name to get an unit instead of using the full name. Short of case sensitiveness the first name doesn't allow errors. Custom names will be searchable immediately after.
 
 *!silence [number]* -> makes catbot unable to answer tier 2 or lower users in public. DM are not affected. The number means the amount of minutes of silence, capped at 60. Repeated commands reset the time and thus do not stack.
 
 *!letfree* removes the silence.
 
-*!deletecatname [unit name]; [custom name to delete]* -> removes a custom name of [unit name], which can itself be a custom name (eg !removeunit mlg; mlg works and removes the name mlg from the expected unit). Short of case sensitiveness, no errors are allowed in [unit name] and [custom name to delete]
+*!delete[unit]name [unit name]; [custom name to delete]* -> removes a custom name of [unit name], which can itself be a custom name (eg !removeunit mlg; mlg works and removes the name mlg from the expected unit). Short of case sensitiveness, no errors are allowed in [unit name] and [custom name to delete]
 
 # User commands
 
-*!catnamesof [name]* -> gives all the custom names of the requested unit. The requested unit can be called by a custom name itself.
+*![unit]namesof [name]* -> gives all the custom names of the requested unit. The requested unit can be called by a custom name itself.
 
 *!sayhi* -> the bot greets, distinguishes between flaired users.
 

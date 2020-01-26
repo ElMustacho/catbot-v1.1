@@ -10,7 +10,7 @@ class Enemyunits:
         self._enemies = pd.read_csv('enemyunits.tsv', sep='\t')
         self._customnames = None
         try:
-            self._customnames = pickle.load(open('enemynames.pkl', 'rb'))  # this is a dictionary
+            self._customnames = pickle.load(open('enemyCustomUnits.pkl', 'rb'))  # this is a dictionary
         except FileNotFoundError:
             self._customnames = {}
 
@@ -127,7 +127,7 @@ class Enemyunits:
         tba = str(round(int(enemy[90]) / 30, 2))
         enemyEmbed.add_field(name='Speed - Attack Frequency', value=str(round(int(enemy[2]), 0)) + ' - ' + tba + 's',
                            inline=isinline)
-        enemyEmbed.add_field(name='Cash Awarded', value=str(round(int(enemy[6]), 0)), inline=isinline)
+        enemyEmbed.add_field(name='Cash Awarded', value=str(round(int(enemy[6]*3.95), 0)), inline=isinline)
         rangestr = ''
         if ',' in damagekind:  # it's long range or omni
             leftrange = str(max(round(int(enemy[35]), 0), round(int(enemy[35] + enemy[36]))))
@@ -139,7 +139,7 @@ class Enemyunits:
         enemyEmbed.set_thumbnail(url=self.enemytraitstopic(enemy))
         offensive = ''
         if enemy[20] > 0:  # knockback
-            offensive += 'Knockback ' + str(round(int(enemy[24]))) + '%, '
+            offensive += 'Knockback ' + str(round(int(enemy[20]))) + '%, '
         if enemy[21] > 0:  # freezes
             offensive += 'Freeze ' + str(round(int(enemy[21]))) + '% (' + str(round(int(enemy[22]) / 30, 2)) + 's), '
         if enemy[23] > 0:  # slow
@@ -163,14 +163,6 @@ class Enemyunits:
             else:
                 offensive += 'Burrows infinite times'
             offensive += ' (for ' + str(int(enemy[44]/4)) + ' range), '
-        if enemy[45] != 0:  # resurrects
-            if enemy[45] == 1:
-                offensive += 'Revives once'
-            elif enemy[45] > 1:
-                offensive += 'Revives ' + str(enemy[45]) + ' times'
-            else:
-                offensive += 'Revives until z-killed'
-            offensive += '(in ' + str(round(enemy[45]/30, 2)) + 's, at ' + str(enemy[46]) + '% hp), '
         if enemy[48] > 0:  # witch trait
             offensive += "It's a witch enemy"
         if enemy[65] > 0:  # warp
@@ -188,4 +180,68 @@ class Enemyunits:
         offensive = offensive[:-2]
         if len(offensive) > 3:
             enemyEmbed.add_field(name='Offensive abilities', value=offensive, inline=isinline)
+        defensive = ''
+        if enemy[34] > 0:  # survive
+            defensive += 'Survive ' + str(round(int(enemy[34]))) + '%, '
+        if enemy[37] > 0:  # wave immune
+            defensive += 'Wave immune, '
+        if enemy[39] > 0:  # knockback immune
+            defensive += 'Knockback immune, '
+        if enemy[40] > 0:  # freeze immune
+            defensive += 'Freeze immune, '
+        if enemy[41] > 0:  # slow immune
+            defensive += 'Slow immune, '
+        if enemy[42] > 0:  # weaken immune
+            defensive += 'Weaken immune, '
+        if enemy[45] != 0:  # resurrects
+            if enemy[45] == 1:
+                defensive += 'Revives once'
+            elif enemy[45] > 1:
+                defensive += 'Revives ' + str(enemy[45]) + ' times'
+            else:
+                defensive += 'Revives until z-killed'
+            defensive += ' (in ' + str(round(enemy[46]/30, 2)) + 's, at ' + str(enemy[47]) + '% hp), '
+        if enemy[49] > 0:  # it's a base
+            defensive += "It's a base, "
+        if enemy[64] > 0:  # has a barrier
+            defensive += 'Has a ' + str(int(enemy[64])) + 'hp barrier, '
+        if len(defensive) > 3:
+            enemyEmbed.add_field(name='Defensive abilities', value=defensive, inline=isinline)
+        atkroutine = str(round(int(enemy[12])))
+        if int(enemy[61]) > 0:
+            atkroutine += 'f / ' + str(round(int(enemy[12]) + int(enemy[57])))
+        if int(enemy[62]) > 0:
+            atkroutine += 'f / ' + str(round(int(enemy[12]) + int(enemy[57]) + int(enemy[58])))
+        atkroutine += 'f / ' + str(round(int(enemy[89]))) + 'f'
+        enemyEmbed.add_field(name='Attack timings', value=atkroutine, inline=isinline)
         return enemyEmbed
+
+    def givenewname(self, enemycode, newname):
+        lowernames = {k.lower(): v for k, v in self._customnames.items()}
+        if newname.lower() in lowernames:  # can't have a name refer to 2 different units
+            return False
+        self._customnames[newname] = enemycode
+        self.storedict()
+        return True
+
+    def storedict(self):
+        with open('enemyCustomUnits.pkl', 'wb') as f:
+            pickle.dump(self._customnames, f, pickle.DEFAULT_PROTOCOL)
+
+    def getnames(self, enemy, enemycode):
+        name = enemy[86]
+        allnames = 'The custom names of ' + name + ' are: '
+        for key, value in self._customnames.items():
+            if value == enemycode:
+                allnames += key + '; '
+        if allnames[-2:] == ': ':
+            allnames = name + ' has no custom name.'
+        return allnames
+
+    def removename(self, enemy, nametoremove):
+        for key, value in self._customnames.items():
+            if value == enemy and nametoremove == key:
+                del self._customnames[nametoremove]
+                self.storedict()
+                return True
+        return False

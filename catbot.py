@@ -133,7 +133,7 @@ async def on_message(message):
             return
         limit = message.content.find(';')
         if limit < 0:
-            await message.channel.send('Incorrect format, check command format')
+            await message.channel.send('Incorrect format, check command format.')
             return
         realnameunit = message.content[11: limit]
         catcode = catculator.getUnitCode(realnameunit.lower(), 0)
@@ -151,7 +151,32 @@ async def on_message(message):
         if response:
             await message.channel.send('The name ' + message.content[limit+2:] + ' is now assigned.')
         else:
-            await message.channel.send('Name was already used')
+            await message.channel.send('Name was already used.')
+
+    elif message.content.startswith('!renameenemy'):
+        if not canSend(3, privilegelevel(message.author), message):
+            return
+        limit = message.content.find(';')
+        if limit < 0:
+            await message.channel.send('Incorrect format, check command format.')
+            return
+        realnameunit = message.content[13: limit]
+        enemycode = enemyculator.getUnitCode(realnameunit.lower(), 0)
+        if enemycode is None:  # too many errors
+            await message.channel.send('That was gibberish.')
+            return
+        if len(enemycode[0]) > 1:  # name wasn't unique
+            await message.channel.send('Couldn\'t discriminate.')
+            return
+
+        if enemycode[0][0] is None:
+            await message.channel.send('Invalid code for cat unit')
+            return
+        response = enemyculator.givenewname(enemycode[0][0], message.content[limit+2:])
+        if response:
+            await message.channel.send('The name ' + message.content[limit+2:] + ' is now assigned.')
+        else:
+            await message.channel.send('Name was already used.')
 
     elif message.content.startswith('!silence'):
         if not canSend(3, privilegelevel(message.author), message):
@@ -180,6 +205,20 @@ async def on_message(message):
         cat = catculator.getrow(catstats[0][0])
         await message.channel.send(catculator.getnames(cat, catstats[0][0]))
 
+    elif message.content.startswith('!enemynamesof'):
+        if not canSend(2, privilegelevel(message.author), message):
+            return
+        enemystats = enemyculator.getUnitCode(message.content[14:].lower(),
+                                          6)  # second parameter is number of errors allowed
+        if enemystats[0] is None:  # too many errors
+            await message.channel.send(message.content[15:] + '; wasn\'t recognized')
+            return
+        if len(enemystats[0]) > 1:  # name wasn't unique
+            await message.channel.send('Couldn\'t discriminate.')
+            return
+        enemy = enemyculator.getrow(enemystats[0][0])
+        await message.channel.send(enemyculator.getnames(enemy, enemystats[0][0]))
+
     elif message.content.startswith('!deletecatname'):
         if not canSend(3, privilegelevel(message.author), message):
             return
@@ -203,6 +242,32 @@ async def on_message(message):
             await message.channel.send('Name was deleted successfully.')
         else:
             await message.channel.send('No such name to delete')
+
+    elif message.content.startswith('!deleteenemyname'):
+        if not canSend(3, privilegelevel(message.author), message):
+            return
+        limit = message.content.find(';')
+        if limit < 0:
+            await message.channel.send('Incorrect format, check command format')
+            return
+        realnameunit = message.content[17: limit]
+        enemycode = enemyculator.getUnitCode(realnameunit.lower(), 0)
+        if enemycode is None:  # too many errors
+            await message.channel.send('That was gibberish.')
+            return
+        if len(enemycode[0]) > 1:  # name wasn't unique
+            await message.channel.send('Couldn\'t discriminate.')
+            return
+        if enemycode[0][0] is None:
+            await message.channel.send('Invalid code for cat unit')
+            return
+        operationsuccess = enemyculator.removename(enemycode[0][0], message.content[limit + 2:])
+        if operationsuccess:
+            await message.channel.send('Name was deleted successfully.')
+        else:
+            await message.channel.send('No such name to delete')
+
+
 
     elif not data.requireddata['moderation']:
         return
