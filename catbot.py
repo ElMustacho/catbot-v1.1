@@ -120,7 +120,10 @@ async def on_message(message):
             await message.channel.send('Invalid code for enemy unit.')
             return
         try:
-            magnification = float(int(message.content[message.content.find(';') + 1:message.content.find('%')])/100)
+            border = message.content.find('%')
+            if border == -1:
+                border = len(message.content)
+            magnification = float(int(message.content[message.content.find(';') + 1:border])/100)
         except:
             magnification = 1
         if magnification < 0 or magnification > 1000000:

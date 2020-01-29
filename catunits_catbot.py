@@ -112,8 +112,8 @@ class Catunits:
             offensivestr += 'Insane damage, '
         if cat[82] > 0:  # savage blow
             offensivestr += 'Savage Blow ' + str(round(int(cat[82]))) + '% (' + str(round(int(cat[83]))) + '% extra power), '
-        if cat[86] > 0:  # volcano attack
-            offensivestr += 'Volcano Attack ' + str(round(int(cat[86]))) + '% (' + str(round(int(cat[88]/4))) + '-' + str(round(int(cat[87]/4)+int(cat[88]/4))) + ', level ' + str(round(int(cat[89]))) + '), '
+        if cat[86] > 0:  # surge attack
+            offensivestr += 'Surge Attack ' + str(round(int(cat[86]))) + '% (' + str(round(int(cat[88]/4))) + '-' + str(round(int(cat[87]/4)+int(cat[88]/4))) + ', level ' + str(round(int(cat[89]))) + '), '
         offensivestr = offensivestr[:-2]
         if len(offensivestr) > 3:
             catEmbed.add_field(name='Offensive abilities', value=offensivestr, inline=isinline)
@@ -148,11 +148,19 @@ class Catunits:
         if len(defensivestr) > 3:
             catEmbed.add_field(name='Defensive abilities', value=defensivestr, inline=isinline)
         atkroutine = str(round(int(cat[13])))
-        if int(cat[61]) > 0:
-            atkroutine += 'f / ' + str(round(int(cat[13]) + int(cat[61])))
+        if cat[63] > 0:  # first attack applies effects
+            atkroutine = '**' + atkroutine + '**'
+        if int(cat[61]) > 0:  # has a second attack
+            if cat[64] > 0:  # second attack applies effect
+                atkroutine += 'f / **' + str(round(int(cat[13]) + int(cat[61]))) + '**'
+            else:
+                atkroutine += 'f / ' + str(round(int(cat[13]) + int(cat[61])))
         if int(cat[62]) > 0:
-            atkroutine += 'f / ' + str(round(int(cat[13]) + int(cat[61]) + int(cat[62])))
-        atkroutine += 'f / ' + str(round(int(cat[96]))) + 'f'
+            if cat[65] > 0:  # third attack has effect
+                atkroutine += 'f / **' + str(round(int(cat[13]) + int(cat[61]) + int(cat[62]))) + '**'
+            else:
+                atkroutine += 'f / ' + str(round(int(cat[13]) + int(cat[61]) + int(cat[62])))
+        atkroutine += 'f / ' + str(round(int(cat[96]))) + 'f'  # backswing
         catEmbed.add_field(name='Attack timings', value=atkroutine, inline=isinline)
         return catEmbed
 

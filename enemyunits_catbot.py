@@ -166,17 +166,24 @@ class Enemyunits:
         if enemy[48] > 0:  # witch trait
             offensive += "It's a witch enemy"
         if enemy[65] > 0:  # warp
-            offensive += 'Warp ' + str(round(int(enemy[65]))) + '% (' + str(round(int(enemy[67]))) + ' range, ' + str(round(int(enemy[66] / 30, 2))) + 's), '
+            warp1 = str(round(int(enemy[65])))
+            warp2 = str(round(int(enemy[67]/4)))
+            warp3 = str(round(int(enemy[68]/4)))
+            warp4 = str(round(float(enemy[66] / 30), 2))
+            offensive += 'Warp ' + warp1 + '% (' + warp2 + ' / ' + warp3 + ' range, ' + warp4 + 's), '
         if enemy[69] > 0:  # is staralien
-            offensive += "It's a star alien, "
+            if enemy[69] == 1:
+                offensive += "It's a star alien, "
+            else:
+                offensive += "It's a Cat God, "
         if enemy[71] > 0:  # is eva
             offensive += "It's an EVA unit, "
         if enemy[73] > 0:  # curses
             offensive += 'Curses ' + str(round(int(enemy[73]))) + '% (' + str(round(int(enemy[74]) / 30, 2)) + 's), '
         if enemy[79] > 0:  # poison
             offensive += 'Poisons ' + str(round(int(enemy[79]))) + '% (' + str(int(enemy[80])) + '% hp), '
-        if enemy[81] > 0:  # volcano attack
-            offensive += 'Volcano Attack ' + str(round(int(enemy[81]))) + '% (' + str(round(int(enemy[82]/4))) + '-' + str(round(int(enemy[82]/4)+int(enemy[83]/4))) + ', level ' + str(round(int(enemy[84]))) + '), '
+        if enemy[81] > 0:  # surge attack
+            offensive += 'Surge Attack ' + str(round(int(enemy[81]))) + '% (' + str(round(int(enemy[82]/4))) + '-' + str(round(int(enemy[82]/4)+int(enemy[83]/4))) + ', level ' + str(round(int(enemy[84]))) + '), '
         offensive = offensive[:-2]
         if len(offensive) > 3:
             enemyEmbed.add_field(name='Offensive abilities', value=offensive, inline=isinline)
@@ -205,12 +212,15 @@ class Enemyunits:
             defensive += "It's a base, "
         if enemy[64] > 0:  # has a barrier
             defensive += 'Has a ' + str(int(enemy[64])) + 'hp barrier, '
+        if enemy[70] > 0:  # resists warp (never used)
+            defensive += 'Immune to warp, '
+        defensive = defensive[:-2]
         if len(defensive) > 3:
             enemyEmbed.add_field(name='Defensive abilities', value=defensive, inline=isinline)
         atkroutine = str(round(int(enemy[12])))
-        if int(enemy[61]) > 0:
+        if int(enemy[57]) > 0:
             atkroutine += 'f / ' + str(round(int(enemy[12]) + int(enemy[57])))
-        if int(enemy[62]) > 0:
+        if int(enemy[58]) > 0:
             atkroutine += 'f / ' + str(round(int(enemy[12]) + int(enemy[57]) + int(enemy[58])))
         atkroutine += 'f / ' + str(round(int(enemy[89]))) + 'f'
         enemyEmbed.add_field(name='Attack timings', value=atkroutine, inline=isinline)
