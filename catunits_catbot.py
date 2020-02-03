@@ -41,7 +41,20 @@ class Catunits:
                 title += '; (nearest match)'
         catEmbed = emb(description=title, color=0xff3300)
         catEmbed.set_author(name='Cat Bot')
-        catEmbed.add_field(name='Level', value=str(level), inline=isinline)
+        rarity = ''
+        if cat[94] == 0:
+            rarity = 'Normal Rare'
+        elif cat[94] == 1:
+            rarity = 'Special Rare'
+        elif cat[94] == 2:
+            rarity = 'Rare'
+        elif cat[94] == 3:
+            rarity = 'Super Rare'
+        elif cat[94] == 4:
+            rarity = 'Uber Super Rare'
+        elif cat[94] == 5:
+            rarity = 'Legend Rare'
+        catEmbed.add_field(name='Level - Rarity', value=str(level) + ' - ' + rarity, inline=isinline)
         lvmult = float(self.levelMultiplier(cat[94], unitcode, level))
         hpv = str(math.ceil(int(cat[0]) * lvmult)) + ' HP - ' + str(round(int(cat[1]), 0)) + ' KB'
         catEmbed.add_field(name='HP - Knockbacks', value=hpv, inline=isinline)

@@ -1,0 +1,19 @@
+Stage
+
+first line
+castle code,
+second line
+stage length, base hp (if doge cannon it can be higher due to >1 stars),,,background image, max enemies
+cat lines
+unitcode, amount, magnification, respawn first time * 2, respawn second time, hp base required, first layer, last layer, is a boss, time before spawn
+
+MapStageData
+
+first line
+
+second line
+
+third line
+energy cost, base xp, starting music code, % music change, second music code, chance first gift, first gift code, amount, [...]
+
+

@@ -164,7 +164,7 @@ class Enemyunits:
                 offensive += 'Burrows infinite times'
             offensive += ' (for ' + str(int(enemy[44]/4)) + ' range), '
         if enemy[48] > 0:  # witch trait
-            offensive += "It's a witch enemy"
+            offensive += "It's a witch enemy, "
         if enemy[65] > 0:  # warp
             warp1 = str(round(int(enemy[65])))
             warp2 = str(round(int(enemy[67]/4)))
