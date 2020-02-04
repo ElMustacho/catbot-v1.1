@@ -7,7 +7,7 @@ from collections import defaultdict
 
 class Catunits:
     def __init__(self):
-        self._cats = pd.read_csv('unitdata9.2.tsv', sep='\t')
+        self._cats = pd.read_csv('unitdata9.3.tsv', sep='\t')
         self._customnames = None
         try:
             self._customnames = pickle.load(open('catCustomUnits.pkl', 'rb'))  # this is a dictionary
