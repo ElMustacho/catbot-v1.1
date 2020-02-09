@@ -90,9 +90,9 @@ class Enemyunits:
         else:
             fstr += '0'
         if enemy[48] > 0:  # witch trait
-            fstr = "witch"
+            fstr = "witchtrait"
         if enemy[71] > 0:  # is eva
-            fstr = "eva"
+            fstr = "evatrait"
         return 'https://raw.githubusercontent.com/ElMustacho/catbot-v1.1/master/traitpics/' + fstr + '.png'
 
     def getUnitCode(self, identifier, errors):
