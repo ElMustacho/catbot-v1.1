@@ -277,7 +277,7 @@ async def on_message(message):
         if message.channel.id == data.requireddata['welcome-channel']:
             member = serveruser(message.author)
             await member.add_roles(discord.utils.get(client.get_guild(data.requireddata['server-id']).roles,
-                                                     id=data.requireddata['tier-2-roles'][0]), reason='Entering server')
+                                                      id=data.requireddata['tier-2-roles'][0]), reason='Entering server')
             await message.delete()
             await client.get_channel(data.requireddata['log-channel-id']).send(message.author.mention + ' has used the password.')
 

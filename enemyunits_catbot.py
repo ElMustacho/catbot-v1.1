@@ -75,7 +75,10 @@ class Enemyunits:
         else:
             fstr += '0'
         if enemy[18] != 0:  # alien
-            fstr += '1'
+            if enemy[69] == 1:  # star alien
+                fstr += '2'
+            else:
+                fstr += '1'
         else:
             fstr += '0'
         if enemy[19] != 0:  # zombie
@@ -86,6 +89,10 @@ class Enemyunits:
             fstr += '1'
         else:
             fstr += '0'
+        if enemy[48] > 0:  # witch trait
+            fstr = "witch"
+        if enemy[71] > 0:  # is eva
+            fstr = "eva"
         return 'https://raw.githubusercontent.com/ElMustacho/catbot-v1.1/master/traitpics/' + fstr + '.png'
 
     def getUnitCode(self, identifier, errors):
@@ -171,11 +178,6 @@ class Enemyunits:
             warp3 = str(round(int(enemy[68]/4)))
             warp4 = str(round(float(enemy[66] / 30), 2))
             offensive += 'Warp ' + warp1 + '% (' + warp2 + ' / ' + warp3 + ' range, ' + warp4 + 's), '
-        if enemy[69] > 0:  # is staralien
-            if enemy[69] == 1:
-                offensive += "It's a star alien, "
-            else:
-                offensive += "It's a Cat God, "
         if enemy[71] > 0:  # is eva
             offensive += "It's an EVA unit, "
         if enemy[73] > 0:  # curses
