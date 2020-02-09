@@ -170,16 +170,12 @@ class Enemyunits:
             else:
                 offensive += 'Burrows infinite times'
             offensive += ' (for ' + str(int(enemy[44]/4)) + ' range), '
-        if enemy[48] > 0:  # witch trait
-            offensive += "It's a witch enemy, "
         if enemy[65] > 0:  # warp
             warp1 = str(round(int(enemy[65])))
             warp2 = str(round(int(enemy[67]/4)))
             warp3 = str(round(int(enemy[68]/4)))
             warp4 = str(round(float(enemy[66] / 30), 2))
             offensive += 'Warp ' + warp1 + '% (' + warp2 + ' / ' + warp3 + ' range, ' + warp4 + 's), '
-        if enemy[71] > 0:  # is eva
-            offensive += "It's an EVA unit, "
         if enemy[73] > 0:  # curses
             offensive += 'Curses ' + str(round(int(enemy[73]))) + '% (' + str(round(int(enemy[74]) / 30, 2)) + 's), '
         if enemy[79] > 0:  # poison
