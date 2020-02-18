@@ -37,8 +37,13 @@ class Catunits:
         title = 'Stats of ' + cat[93]
         if len(cat[-4]) > 1:
             title = 'Stats of ' + cat[95]
-            if nl.edit_distance(actualname.lower(), cat[95].lower()) > 0:
-                title += '; (nearest match)'
+        if unitcode%3 == 0:
+            title += ' - First form'
+        elif unitcode%3 == 1:
+            title += ' - Evolved form'
+        else:
+            title += ' - True form'
+        title += ' - Unitcode: '+str(unitcode)
         catEmbed = emb(description=title, color=0xff3300)
         catEmbed.set_author(name='Cat Bot')
         rarity = ''
