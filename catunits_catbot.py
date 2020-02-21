@@ -37,9 +37,10 @@ class Catunits:
         title = 'Stats of ' + cat[93]
         if len(cat[-4]) > 1:
             title = 'Stats of ' + cat[95]
-        if unitcode%3 == 0:
+        whichform = unitcode-1 if unitcode > 1019 else unitcode
+        if whichform % 3 == 0:
             title += ' - First form'
-        elif unitcode%3 == 1:
+        elif whichform % 3 == 1:
             title += ' - Evolved form'
         else:
             title += ' - True form'
