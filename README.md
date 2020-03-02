@@ -20,11 +20,13 @@ Welcome to catbot, still in development/prerelease, gonna be short, here is the 
 
 # Special people commands ([unit] means 'cat' or 'enemy', with no quotes)
 
-*!rename[unit] [exact unit name]; [custom name]* allows to create an additional name to get an unit instead of using the full name. Short of case sensitiveness the first name doesn't allow errors. Custom names will be searchable immediately after.
+*!stage [stage name]; [magnification]* -> given a stage name, returns the schematics of that stage. The command is still in beta, so it only has SoL stages and lacks some of the informations about them. Magnification is between 100% and 300%.
+
+*!rename[unit] [exact unit name]; [custom name]* -> allows to create an additional name to get an unit instead of using the full name. Short of case sensitiveness the first name doesn't allow errors. Custom names will be searchable immediately after.
 
 *!silence [number]* -> makes catbot unable to answer tier 2 or lower users in public. DM are not affected. The number means the amount of minutes of silence, capped at 60. Repeated commands reset the time and thus do not stack.
 
-*!letfree* removes the silence.
+*!letfree* -> removes the silence.
 
 *!delete[unit]name [unit name]; [custom name to delete]* -> removes a custom name of [unit name], which can itself be a custom name (eg !removeunit mlg; mlg works and removes the name mlg from the expected unit). Short of case sensitiveness, no errors are allowed in [unit name] and [custom name to delete]
 
@@ -34,7 +36,9 @@ Welcome to catbot, still in development/prerelease, gonna be short, here is the 
 
 *!sayhi* -> the bot greets, distinguishes between flaired users.
 
-*!catstats [name]; [number]* -> will give out stats of the given unit, exact name doesn't need to be correct, a few errors are ok and it will be able to tell the differences (if such exists), but too many (5) means it won't try. Name is case insensitive. Optionally, putting a '; ' after the name and a level will permit to get stats for that level, otherwise it defaults to 30 (accepted range is 0-130).
+*!enemystats [name]; [number]* -> (short version replaces *enemystats* with *es*) will give out stats of the given enemy, exact name doesn't need to be correct, a few errors are ok and it will be able to tell the differences (if such exists), but too many (5) means it won't try. Name is case insensitive. Optionally, putting a '; ' after the name and a level will permit to get stats for that magnification (in percentage, % isn't necessary), otherwise it defaults to 100% (accepted range is 0(excluded)-100000000%)
+
+*!catstats [name]; [number]* -> (short version replaces *catstats* with *cs*) will give out stats of the given unit, exact name doesn't need to be correct, a few errors are ok and it will be able to tell the differences (if such exists), but too many (5) means it won't try. Name is case insensitive. Optionally, putting a '; ' after the name and a level will permit to get stats for that level, otherwise it defaults to 30 (accepted range is 0-130).
 
 *!helpme [...]* -> the bot creates a requests, and takes the appropriate parameters. [...] is a comment, and supports calling users and channels (inside the same server).
 
