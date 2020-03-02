@@ -14,6 +14,11 @@ class Enemyunits:
         except FileNotFoundError:
             self._customnames = {}
 
+    def namefromcode(self, enemycode):
+        returnthis = self._enemies.iloc[enemycode]
+        returnthis = returnthis.iat[86]
+        return returnthis
+
     def getrow(self, row):
         if row < 0:
             return None

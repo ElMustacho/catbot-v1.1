@@ -14,6 +14,7 @@ import logging
 from modtools import Modtools
 import catunits_catbot
 import enemyunits_catbot
+import stagedata_catbot
 
 # logger = logging.getLogger('discord')
 # logger.setLevel(logging.DEBUG)
@@ -62,7 +63,7 @@ async def on_message(message):
             return
         await message.channel.send('Your tier is: ' + str(privilegelevel(message.author)))
 
-    elif message.content.startswith('!catstats'):
+    elif message.content.startswith('!catstats') or message.content.startswith('!cs'):
         if not canSend(1, privilegelevel(message.author), message):
             return
         if privilegelevel(message.author) < 3 and message.channel.id not in data.requireddata['freeforall-channels']:
@@ -70,10 +71,10 @@ async def on_message(message):
         limit = message.content.find(';')
         if limit == -1:
             limit = len(message.content)
-        catstats = catculator.getUnitCode(message.content[10:limit].lower(),
+        catstats = catculator.getUnitCode(message.content[message.content.find(' ')+1:limit].lower(),
                                           6)  # second parameter is number of errors allowed
         if catstats is None:  # too many errors
-            await message.channel.send(message.content[10:limit] + '; wasn\'t recognized.')
+            await message.channel.send(message.content[message.content.find(' ')+1:limit] + '; wasn\'t recognized.')
             return
         try:
             lenght = len(catstats[0])
@@ -92,10 +93,10 @@ async def on_message(message):
             level = 30
         if level < 0 or level > 130:
             level = 30
-        embedsend = catculator.getstatsEmbed(cat, level, message.content[10:limit], catstats[0][0])
+        embedsend = catculator.getstatsEmbed(cat, level, message.content[message.content.find(' '):limit], catstats[0][0])
         await message.channel.send(embed=embedsend)
 
-    elif message.content.startswith('!enemystats'):
+    elif message.content.startswith('!enemystats') or message.content.startswith('!es'):
         if not canSend(1, privilegelevel(message.author), message):
             return
         if privilegelevel(message.author) < 3 and message.channel.id not in data.requireddata['freeforall-channels']:
@@ -103,10 +104,10 @@ async def on_message(message):
         limit = message.content.find(';')
         if limit == -1:
             limit = len(message.content)
-        enemystats = enemyculator.getUnitCode(message.content[12:limit].lower(),
+        enemystats = enemyculator.getUnitCode(message.content[message.content.find(' ')+1:limit].lower(),
                                           6)  # second parameter is number of errors allowed
         if enemystats is None:  # too many errors
-            await message.channel.send(message.content[12:limit] + '; wasn\'t recognized.')
+            await message.channel.send(message.content[message.content.find(' ')+1:limit] + '; wasn\'t recognized.')
             return
         try:
             lenght = len(enemystats[0])
@@ -128,7 +129,7 @@ async def on_message(message):
             magnification = 1
         if magnification < 0 or magnification > 1000000:
             magnification = 1
-        embedsend = enemyculator.getstatsembed(enemy, magnification, message.content[12:limit])
+        embedsend = enemyculator.getstatsembed(enemy, magnification, message.content[message.content.find(' ')+1:limit])
         await message.channel.send(embed=embedsend)
 
     elif message.content.startswith('!renamecat'):
@@ -194,7 +195,7 @@ async def on_message(message):
         data.timelastmessage = datetime.now()
         await message.channel.send("I can speak again")
 
-    elif message.content.startswith('!catnamesof'):
+    elif message.content.startswith(','):
         if not canSend(2, privilegelevel(message.author), message):
             return
         catstats = catculator.getUnitCode(message.content[12:].lower(),
@@ -269,6 +270,30 @@ async def on_message(message):
             await message.channel.send('Name was deleted successfully.')
         else:
             await message.channel.send('No such name to delete')
+
+    elif message.content.startswith('!stage'):
+        if not canSend(3, privilegelevel(message.author), message):
+            return
+        stagestring = message.content[message.content.find(' ')+1: message.content.find(';')]
+        stageenemies = stagedata.nametoenemies(stagestring, 5)
+        if stageenemies == 0:  # too many errors
+            await message.channel.send("That stage doesn't exists.")
+            return
+        elif stageenemies == 1:  # could not tell between more than 1 stage
+            await message.channel.send("You need to be more specific.")
+            return
+        elif stageenemies is None:
+            await message.channel.send("Catbot is confused and doesn't know what happened.")
+            return
+        level = 0
+        try:
+            level = int(message.content[message.content.find(';') + 1:])
+        except:
+            level = 100
+        if level < 100 or level > 400:
+            level = 100
+        embtosend = stagedata.dataToEmbed(stageenemies, 'Currently unavailable', level/100)
+        await message.channel.send(embed=embtosend)
 
     elif not data.requireddata['moderation']:
         return
@@ -431,4 +456,5 @@ enemyculator = enemyunits_catbot.Enemyunits()
 modqueue = Modtools('results.tsv', 'archives.tsv')
 catculator = catunits_catbot.Catunits()
 data = Data_catbot.defFromFile()
+stagedata = stagedata_catbot.Stagedata(enemyculator)
 client.run(data.requireddata['auth-token'])

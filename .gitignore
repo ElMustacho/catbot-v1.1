@@ -2,6 +2,7 @@ files-backswing/
 snowy/
 config.json
 dsd.log
+stage_input.py
 ### Python template
 # Byte-compiled / optimized / DLL files
 __pycache__/
