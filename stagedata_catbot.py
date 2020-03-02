@@ -54,7 +54,7 @@ class Stagedata:
                 results = 1
                 raise Exception('Could not discriminate.')
             else:
-                nearestmatch = [(stagenames[0])]
+                nearestmatch = [(stagenames[nearestmatch[0]])]
                 cursor.execute('SELECT * from enemylines, stage where stage.stage_id=enemylines.stage_appearance and LOWER(name)=?', nearestmatch)
                 results = cursor.fetchall()
         except:
