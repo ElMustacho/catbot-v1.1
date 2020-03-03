@@ -7,7 +7,7 @@ from collections import defaultdict
 
 class Catunits:
     def __init__(self):
-        self._cats = pd.read_csv('unitdata9.3.tsv', sep='\t')
+        self._cats = pd.read_csv('unitdata9.4.tsv', sep='\t')
         self._customnames = None
         try:
             self._customnames = pickle.load(open('catCustomUnits.pkl', 'rb'))  # this is a dictionary
@@ -163,6 +163,8 @@ class Catunits:
             defensivestr += 'Insanely resists, '
         if cat[84] > 0:  # dodge
             defensivestr += 'Dodge ' + str(round(int(cat[84]))) + '% (' + str(round(int(cat[85]) / 30, 2)) + 's), '
+        if cat[90] > 0:  # poison immune
+            defensivestr += 'Poison immune, '
         defensivestr = defensivestr[:-2]
         if len(defensivestr) > 3:
             catEmbed.add_field(name='Defensive abilities', value=defensivestr, inline=isinline)
