@@ -173,14 +173,14 @@ class Catunits:
             atkroutine = '**' + atkroutine + '**'
         if int(cat[61]) > 0:  # has a second attack
             if cat[64] > 0:  # second attack applies effect
-                atkroutine += 'f / **' + str(round(int(cat[13]) + int(cat[61]))) + '**'
+                atkroutine += 'f / **' + str(round(int(cat[61]))) + '**'
             else:
-                atkroutine += 'f / ' + str(round(int(cat[13]) + int(cat[61])))
+                atkroutine += 'f / ' + str(round(int(cat[61])))
         if int(cat[62]) > 0:
             if cat[65] > 0:  # third attack has effect
-                atkroutine += 'f / **' + str(round(int(cat[13]) + int(cat[61]) + int(cat[62]))) + '**'
+                atkroutine += 'f / **' + str(round(int(cat[62]))) + '**'
             else:
-                atkroutine += 'f / ' + str(round(int(cat[13]) + int(cat[61]) + int(cat[62])))
+                atkroutine += 'f / ' + str(round(int(cat[62])))
         atkroutine += 'f / ' + str(round(int(cat[96]))) + 'f'  # backswing
         catEmbed.add_field(name='Attack timings', value=atkroutine, inline=isinline)
         return catEmbed

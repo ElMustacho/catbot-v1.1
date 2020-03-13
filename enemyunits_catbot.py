@@ -111,8 +111,6 @@ class Enemyunits:
     def getstatsembed(self, enemy, magnification, name):
         isinline = True
         title = 'Stats of ' + str(enemy[86])
-        if nl.edit_distance(name.lower(), str(enemy[86]).lower()) > 0:
-            title += '; (nearest match)'
         enemyEmbed = emb(description=title, color=0x00ff00)
         enemyEmbed.set_author(name='Cat Bot')
         enemyEmbed.add_field(name='Magnification', value=str(int(magnification*100)) + '%', inline=isinline)
@@ -171,7 +169,7 @@ class Enemyunits:
             if enemy[43] == 1:
                 offensive += 'Burrows once'
             elif enemy[43] > 1:
-                offensive += 'Burrows ' + enemy[43] + ' times'
+                offensive += 'Burrows ' + str(enemy[43]) + ' times'
             else:
                 offensive += 'Burrows infinite times'
             offensive += ' (for ' + str(int(enemy[44]/4)) + ' range), '
@@ -220,11 +218,20 @@ class Enemyunits:
         defensive = defensive[:-2]
         if len(defensive) > 3:
             enemyEmbed.add_field(name='Defensive abilities', value=defensive, inline=isinline)
-        atkroutine = str(round(int(enemy[12])))
+        if int(enemy[59]) > 0:
+            atkroutine = '**' + str(round(int(enemy[12]))) + '**'
+        else:
+            atkroutine = str(round(int(enemy[12])))
         if int(enemy[57]) > 0:
-            atkroutine += 'f / ' + str(round(int(enemy[12]) + int(enemy[57])))
+            if int(enemy[60]) > 0:
+                atkroutine += 'f / **' + str(round(int(enemy[57]))) + '**'
+            else:
+                atkroutine += 'f / ' + str(round(int(enemy[57])))
         if int(enemy[58]) > 0:
-            atkroutine += 'f / ' + str(round(int(enemy[12]) + int(enemy[57]) + int(enemy[58])))
+            if int(enemy[61]) > 0:
+                atkroutine += 'f / **' + str(round(int(enemy[58]))) + '**'
+            else:
+                atkroutine += 'f / ' + str(round(int(enemy[58])))
         atkroutine += 'f / ' + str(round(int(enemy[89]))) + 'f'
         enemyEmbed.add_field(name='Attack timings', value=atkroutine, inline=isinline)
         return enemyEmbed

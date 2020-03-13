@@ -195,7 +195,7 @@ async def on_message(message):
         data.timelastmessage = datetime.now()
         await message.channel.send("I can speak again")
 
-    elif message.content.startswith(','):
+    elif message.content.startswith('!catnamesof'):
         if not canSend(2, privilegelevel(message.author), message):
             return
         catstats = catculator.getUnitCode(message.content[12:].lower(),
@@ -294,6 +294,21 @@ async def on_message(message):
             level = 100
         embtosend = stagedata.dataToEmbed(stageenemies, 'Currently unavailable', level/100)
         await message.channel.send(embed=embtosend)
+
+    elif message.content.startswith('!enemysearch'):  # todo look at enemyculator todos
+        if not canSend(3, privilegelevel(message.author), message):
+            return
+        enemystats = enemyculator.getUnitCode(message.content[message.content.find(' ') + 1:].lower(), 6)  # 2nd is errs
+
+        if enemystats[0] is None:  # too many errors
+            await message.channel.send(message.content[15:] + '; wasn\'t recognized')
+            return
+        if len(enemystats[0]) > 1:  # name wasn't unique
+            await message.channel.send('Couldn\'t discriminate.')
+            return
+        nameunit = enemyculator.namefromcode(enemystats[0][0])
+        await message.channel.send(stagedata.enemytostages(enemystats[0][0], nameunit))
+
 
     elif not data.requireddata['moderation']:
         return
