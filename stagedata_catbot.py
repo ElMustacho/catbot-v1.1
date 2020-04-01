@@ -66,8 +66,9 @@ class Stagedata:
         with sqlite3.connect('stages.db') as conn:
             cursor = conn.cursor()
             results = cursor.execute(
-                'SELECT DISTINCT searchunitstages.name from searchunitstages join stage on searchunitstages.name = '
-                'stage.name join enemylines on enemylines.stage_appearance=stage.stage_id where unitcode=?;',
+                'SELECT DISTINCT stage.name from searchunitstages join stage on searchunitstages.name = stage.name '
+                'join enemylines on enemylines.stage_appearance=stage.stage_id where unitcode=? order by '
+                'enemylines.id;',
                 [str(unitcode)]).fetchall()
             if len(results) == 0:
                 return name + " wasn't found in current stages."

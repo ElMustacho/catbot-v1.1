@@ -66,8 +66,9 @@ async def on_message(message):
     elif message.content.startswith('!catstats') or message.content.startswith('!cs'):
         if not canSend(1, privilegelevel(message.author), message):
             return
-        if privilegelevel(message.author) < 3 and message.channel.id not in data.requireddata['freeforall-channels']:
-            return
+        if privilegelevel(message.author) < 3 and message.channel.id not in catbotdata.requireddata['freeforall-channels']:
+            if not isokayifnotclog(message):
+                return
         limit = message.content.find(';')
         if limit == -1:
             limit = len(message.content)
@@ -99,8 +100,9 @@ async def on_message(message):
     elif message.content.startswith('!enemystats') or message.content.startswith('!es'):
         if not canSend(1, privilegelevel(message.author), message):
             return
-        if privilegelevel(message.author) < 3 and message.channel.id not in data.requireddata['freeforall-channels']:
-            return
+        if privilegelevel(message.author) < 3 and message.channel.id not in catbotdata.requireddata['freeforall-channels']:
+            if not isokayifnotclog(message):
+                return
         limit = message.content.find(';')
         if limit == -1:
             limit = len(message.content)
@@ -186,13 +188,13 @@ async def on_message(message):
         if not canSend(3, privilegelevel(message.author), message):
             return
         timestop = min(60, int(message.content[9:]))
-        data.timelastmessage = datetime.now() + timedelta(minutes=timestop)
+        catbotdata.timelastmessage = datetime.now() + timedelta(minutes=timestop)
         await message.channel.send("I'll be silent for a while")
 
     elif message.content.startswith('!letfree'):
         if not canSend(3, privilegelevel(message.author), message):
             return
-        data.timelastmessage = datetime.now()
+        catbotdata.timelastmessage = datetime.now()
         await message.channel.send("I can speak again")
 
     elif message.content.startswith('!catnamesof'):
@@ -310,21 +312,21 @@ async def on_message(message):
         await message.channel.send(stagedata.enemytostages(enemystats[0][0], nameunit))
 
 
-    elif not data.requireddata['moderation']:
+    elif not catbotdata.requireddata['moderation']:
         return
 
     elif message.content == '$password ururun wolf':
-        if message.channel.id == data.requireddata['welcome-channel']:
+        if message.channel.id == catbotdata.requireddata['welcome-channel']:
             member = serveruser(message.author)
-            await member.add_roles(discord.utils.get(client.get_guild(data.requireddata['server-id']).roles,
-                                                      id=data.requireddata['tier-2-roles'][0]), reason='Entering server')
+            await member.add_roles(discord.utils.get(client.get_guild(catbotdata.requireddata['server-id']).roles,
+                                                     id=catbotdata.requireddata['tier-2-roles'][0]), reason='Entering server')
             await message.delete()
-            await client.get_channel(data.requireddata['log-channel-id']).send(message.author.mention + ' has used the password.')
+            await client.get_channel(catbotdata.requireddata['log-channel-id']).send(message.author.mention + ' has used the password.')
 
     elif message.content.startswith('!solve'):
         if not canSend(4, privilegelevel(message.author), message):
             return
-        channel_mod = client.get_channel(data.requireddata['mod-channel-id'])
+        channel_mod = client.get_channel(catbotdata.requireddata['mod-channel-id'])
         if modqueue.setsolvedbyindex(int(message.content[7:])):  # if true it was solved successfully
             await channel_mod.send('Report has been set as solved')
         else:
@@ -338,13 +340,13 @@ async def on_message(message):
         else:
             modqueue.setassigned(int(message.content[9:message.content.find(
                 ',')]), message.content[message.content.find(',') + 2:])
-        channel_mod = client.get_channel(data.requireddata['mod-channel-id'])
+        channel_mod = client.get_channel(catbotdata.requireddata['mod-channel-id'])
         await channel_mod.send('Assignment done')
 
     elif message.content.startswith('!helpme'):  # todo beautify this
         if not canSend(1, privilegelevel(message.author), message):
             return
-        channel_mod = client.get_channel(data.requireddata['mod-channel-id'])
+        channel_mod = client.get_channel(catbotdata.requireddata['mod-channel-id'])
         reportcode = modqueue.addentry(str(message.author.mention), str(datetime.now()),
                                        str(message.channel), str(message.content[7:]), 'unsolved')
         reportTitle = "New help request: " + str(reportcode)
@@ -365,7 +367,7 @@ async def on_message(message):
     elif message.content.startswith('!unsolved'):
         if not canSend(4, privilegelevel(message.author), message):
             return
-        channel_mod = client.get_channel(data.requireddata['mod-channel-id'])
+        channel_mod = client.get_channel(catbotdata.requireddata['mod-channel-id'])
         for i in modqueue.getunsolved():
             reportTitle = "Report id " + str(i[6])
             embed = discord.Embed(description=reportTitle, color=0x50bdfe)
@@ -381,7 +383,7 @@ async def on_message(message):
     elif message.content.startswith('!myreports'):
         if not canSend(4, privilegelevel(message.author), message):
             return
-        channel_mod = client.get_channel(data.requireddata['mod-channel-id'])
+        channel_mod = client.get_channel(catbotdata.requireddata['mod-channel-id'])
         for i in modqueue.getassigned(message.author.mention):  # at this point we know this is a mod
             reportTitle = "Report id " + str(i[6])
             embed = discord.Embed(description=reportTitle, color=0x50bdfe)
@@ -397,7 +399,7 @@ async def on_message(message):
     elif message.content.startswith('!deletereport') or message.content.startswith('!removereport'):
         if not canSend(4, privilegelevel(message.author), message):
             return
-        channel_mod = client.get_channel(data.requireddata['mod-channel-id'])
+        channel_mod = client.get_channel(catbotdata.requireddata['mod-channel-id'])
         report = modqueue.deletereportbyid(int(message.content[14:]))
         await channel_mod.send('Report successfully removed.')
         embed = discord.Embed(description="Report id " + str(report[6]), color=0x123456)
@@ -408,7 +410,7 @@ async def on_message(message):
         embed.add_field(name="Reason", value=report[3], inline=True)
         embed.add_field(name="Status", value=report[4], inline=True)
         embed.add_field(name="Assigned to", value=report[5], inline=True)
-        await client.get_channel(data.requireddata['log-channel-id']).send(embed=embed)
+        await client.get_channel(catbotdata.requireddata['log-channel-id']).send(embed=embed)
         respondto = int(str(report[0])[3:-1])
         await client.get_user(respondto).send(
             'Your request with the code ' + str(report[6]) + ' has been solved.')
@@ -416,25 +418,25 @@ async def on_message(message):
 
 def privilegelevel(member):
     level = 1  # by default a user is unworthy
-    if member.id in data.requireddata['tier-5-users']:
+    if member.id in catbotdata.requireddata['tier-5-users']:
         return 5
     member = serveruser(member)
     if member is False:  # user not in server
         return 0
     for i in member.roles:
-        if i.id in data.requireddata['tier-2-roles']:
+        if i.id in catbotdata.requireddata['tier-2-roles']:
             level = max(level, 2)  # this tier is for common users
-        if i.id in data.requireddata['tier-1-roles']:
+        if i.id in catbotdata.requireddata['tier-1-roles']:
             return 1  # muted
-        if i.id in data.requireddata['tier-3-roles']:  # purple/vip/worthy helper/boosters
+        if i.id in catbotdata.requireddata['tier-3-roles']:  # purple/vip/worthy helper/boosters
             level = max(level, 3)
-        if i.id in data.requireddata['tier-4-roles']:  # mods
+        if i.id in catbotdata.requireddata['tier-4-roles']:  # mods
             level = max(level, 4)
     return level
 
 
 def canAnswer(message):
-    if not isADM(message) and data.timelastmessage > datetime.now():  # second condition is asking if silence is active
+    if not isADM(message) and catbotdata.timelastmessage > datetime.now():  # second condition is asking if silence is active
         if privilegelevel(serveruser(message.author)) < 3:  # if you are important you can skip the silence
             return False
     return True
@@ -454,22 +456,32 @@ def isADM(message):
 
 
 def isInServer(member):
-    legit_members = client.get_guild(data.requireddata['server-id']).members  # server id
+    legit_members = client.get_guild(catbotdata.requireddata['server-id']).members  # server id
     if member in legit_members:
         return True
     return False
 
 
 def serveruser(member):
-    legit_members = client.get_guild(data.requireddata['server-id'])  # server id
+    legit_members = client.get_guild(catbotdata.requireddata['server-id'])  # server id
     if member in legit_members.members:
         return legit_members.get_member(member.id)
     return False
 
 
+def isokayifnotclog(message):  # if we are here, we know it's not tier 3
+    if message.channel.id in catbotdata.requireddata['partial-permit-channels']:  # maybe if nobody is clogging
+        rightnow = datetime.now()
+        time_elapsed = rightnow - catbotdata.timerlowtier
+        toret = False
+        if time_elapsed.seconds > 60:  # wait for a minute
+            toret = True
+        catbotdata.timerlowtier = rightnow
+        return toret
+
 enemyculator = enemyunits_catbot.Enemyunits()
 modqueue = Modtools('results.tsv', 'archives.tsv')
 catculator = catunits_catbot.Catunits()
-data = Data_catbot.defFromFile()
+catbotdata = Data_catbot.defFromFile()
 stagedata = stagedata_catbot.Stagedata(enemyculator)
-client.run(data.requireddata['auth-token'])
+client.run(catbotdata.requireddata['auth-token'])
