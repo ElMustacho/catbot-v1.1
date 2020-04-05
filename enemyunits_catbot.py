@@ -215,6 +215,8 @@ class Enemyunits:
             defensive += 'Has a ' + str(int(enemy[64])) + 'hp barrier, '
         if enemy[70] > 0:  # resists warp (never used)
             defensive += 'Immune to warp, '
+        if enemy[77] > 0:  # dodge
+            defensive += 'Dodge ' + str(round(int(enemy[77]))) + '% (' + str(round(int(enemy[78]) / 30, 2)) + 's), '
         defensive = defensive[:-2]
         if len(defensive) > 3:
             enemyEmbed.add_field(name='Defensive abilities', value=defensive, inline=isinline)
