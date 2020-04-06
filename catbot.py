@@ -60,14 +60,15 @@ async def on_message(message):
 
     elif message.content.startswith('!mytier'):
         if not canSend(1, privilegelevel(message.author), message):
-            return
+            if not isokayifnotclog(message, isADM(message)):
+                return
         await message.channel.send('Your tier is: ' + str(privilegelevel(message.author)))
 
     elif message.content.startswith('!catstats') or message.content.startswith('!cs'):
         if not canSend(1, privilegelevel(message.author), message):
             return
         if privilegelevel(message.author) < 3 and message.channel.id not in catbotdata.requireddata['freeforall-channels']:
-            if not isokayifnotclog(message):
+            if not isokayifnotclog(message, isADM(message)):
                 return
         limit = message.content.find(';')
         if limit == -1:
@@ -101,7 +102,7 @@ async def on_message(message):
         if not canSend(1, privilegelevel(message.author), message):
             return
         if privilegelevel(message.author) < 3 and message.channel.id not in catbotdata.requireddata['freeforall-channels']:
-            if not isokayifnotclog(message):
+            if not isokayifnotclog(message, isADM(message)):
                 return
         limit = message.content.find(';')
         if limit == -1:
@@ -199,7 +200,8 @@ async def on_message(message):
 
     elif message.content.startswith('!catnamesof'):
         if not canSend(2, privilegelevel(message.author), message):
-            return
+            if not isokayifnotclog(message, isADM(message)):
+                return
         catstats = catculator.getUnitCode(message.content[12:].lower(),
                                           6)  # second parameter is number of errors allowed
         if catstats[0] is None:  # too many errors
@@ -213,7 +215,8 @@ async def on_message(message):
 
     elif message.content.startswith('!enemynamesof'):
         if not canSend(2, privilegelevel(message.author), message):
-            return
+            if not isokayifnotclog(message, isADM(message)):
+                return
         enemystats = enemyculator.getUnitCode(message.content[14:].lower(),
                                           6)  # second parameter is number of errors allowed
         if enemystats[0] is None:  # too many errors
@@ -469,7 +472,7 @@ def serveruser(member):
     return False
 
 
-def isokayifnotclog(message):  # if we are here, we know it's not tier 3
+def isokayifnotclog(message, message_dm):  # if we are here, we know it's not tier 3
     if message.channel.id in catbotdata.requireddata['partial-permit-channels']:  # maybe if nobody is clogging
         rightnow = datetime.now()
         time_elapsed = rightnow - catbotdata.timerlowtier
@@ -478,6 +481,8 @@ def isokayifnotclog(message):  # if we are here, we know it's not tier 3
             toret = True
         catbotdata.timerlowtier = rightnow
         return toret
+    if message_dm:
+        return True
 
 enemyculator = enemyunits_catbot.Enemyunits()
 modqueue = Modtools('results.tsv', 'archives.tsv')
