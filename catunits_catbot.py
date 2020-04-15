@@ -34,9 +34,9 @@ class Catunits:
 
     def getstatsEmbed(self, cat, level, actualname, unitcode):
         isinline = True
-        title = 'Stats of ' + cat[93]
+        title = 'Stats of ' + cat[95]
         if len(cat[-4]) > 1:
-            title = 'Stats of ' + cat[95]
+            title = 'Stats of ' + cat[97]
         whichform = unitcode-1 if unitcode > 1019 else unitcode
         if whichform % 3 == 0:
             title += ' - First form'
@@ -48,20 +48,20 @@ class Catunits:
         catEmbed = emb(description=title, color=0xff3300)
         catEmbed.set_author(name='Cat Bot')
         rarity = ''
-        if cat[94] == 0:
+        if cat[96] == 0:
             rarity = 'Normal Rare'
-        elif cat[94] == 1:
+        elif cat[96] == 1:
             rarity = 'Special Rare'
-        elif cat[94] == 2:
+        elif cat[96] == 2:
             rarity = 'Rare'
-        elif cat[94] == 3:
+        elif cat[96] == 3:
             rarity = 'Super Rare'
-        elif cat[94] == 4:
+        elif cat[96] == 4:
             rarity = 'Uber Super Rare'
-        elif cat[94] == 5:
+        elif cat[96] == 5:
             rarity = 'Legend Rare'
         catEmbed.add_field(name='Level - Rarity', value=str(level) + ' - ' + rarity, inline=isinline)
-        lvmult = float(self.levelMultiplier(cat[94], unitcode, level))
+        lvmult = float(self.levelMultiplier(cat[96], unitcode, level))
         hpv = str(math.ceil(int(cat[0]) * lvmult)) + ' HP - ' + str(round(int(cat[1]), 0)) + ' KB'
         catEmbed.add_field(name='HP - Knockbacks', value=hpv, inline=isinline)
         dmg = str(math.ceil(int(cat[3]) * lvmult))
@@ -69,7 +69,7 @@ class Catunits:
             dmg += '/' + str(math.ceil(int(cat[59]) * lvmult))
         if int(cat[60]) > 0:
             dmg += '/' + str(math.ceil(int(cat[60]) * lvmult))
-        dps = ' Damage - ' + str(int(float(cat[98].replace(',', '.')) * lvmult)) + ' DPS'
+        dps = ' Damage - ' + str(int(float(cat[100].replace(',', '.')) * lvmult)) + ' DPS'
         damagekind = ''
         if cat[12] == 1:
             damagekind += 'area'
@@ -82,7 +82,7 @@ class Catunits:
                 damagekind += ', omnistrike'
         damagetype = 'Damage (' + damagekind + ') - DPS'
         catEmbed.add_field(name=damagetype, value=dmg+dps, inline=isinline)
-        tba = str(round(int(cat[97])/30, 2))
+        tba = str(round(int(cat[99])/30, 2))
         catEmbed.add_field(name='Speed - Attack Frequency', value=str(round(int(cat[2]) ,0)) + ' - ' + tba + 's', inline=isinline)
         catEmbed.add_field(name='Cost - Respawn', value=str(round(int(cat[6]*1.5), 0)) + ' - ' + str(round(max(((cat[7]*2-254)/30), 2), 2)) + 's', inline=isinline)
         rangestr = ''
@@ -133,6 +133,8 @@ class Catunits:
             offensivestr += 'Savage Blow ' + str(round(int(cat[82]))) + '% (' + str(round(int(cat[83]))) + '% extra power), '
         if cat[86] > 0:  # surge attack
             offensivestr += 'Surge Attack ' + str(round(int(cat[86]))) + '% (' + str(round(int(cat[88]/4))) + '-' + str(round(int(cat[87]/4)+int(cat[88]/4))) + ', level ' + str(round(int(cat[89]))) + '), '
+        if cat[91] > 0:  # curse attack
+            offensivestr += 'Curses ' + str(round(int(cat[92]))) + '% for ' + str(round(cat[93] / 30, 2)) + 's, '
         offensivestr = offensivestr[:-2]
         if len(offensivestr) > 3:
             catEmbed.add_field(name='Offensive abilities', value=offensivestr, inline=isinline)
@@ -181,7 +183,7 @@ class Catunits:
                 atkroutine += 'f / **' + str(round(int(cat[62]))) + '**'
             else:
                 atkroutine += 'f / ' + str(round(int(cat[62])))
-        atkroutine += 'f / ' + str(round(int(cat[96]))) + 'f'  # backswing
+        atkroutine += 'f / ' + str(round(int(cat[98]))) + 'f'  # backswing
         catEmbed.add_field(name='Attack timings', value=atkroutine, inline=isinline)
         return catEmbed
 
