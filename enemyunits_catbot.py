@@ -159,7 +159,7 @@ class Enemyunits:
         if enemy[26] > 0:  # base destroyer
             offensive += 'Base Destroyer, '
         if enemy[27] > 0:  # wave attack
-            offensive += 'Wave attack ' + str(round(int(enemy[27]))) + '% (' + str(333 + round(int(enemy[28]) - 1) * 200) + ' range), '
+            offensive += 'Wave attack ' + str(round(int(enemy[27]))) + '% (' + str(467 + round(int(enemy[28]) - 1) * 200) + ' range), '
         if enemy[29] > 0:  # weaken
             offensive += 'Weaken ' + str(round(int(enemy[29]))) + '% (' + str(round(int(enemy[31]))) + '% power, ' + str(
                 round(int(enemy[30]) / 30, 2)) + 's), '

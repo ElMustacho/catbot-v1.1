@@ -276,7 +276,7 @@ async def on_message(message):
         else:
             await message.channel.send('No such name to delete')
 
-    elif message.content.startswith('!stage'):
+    elif message.content.startswith('!stage '):
         if not canSend(3, privilegelevel(message.author), message):
             return
         stagestring = message.content[message.content.find(' ')+1: message.content.find(';')]
@@ -299,6 +299,43 @@ async def on_message(message):
             level = 100
         embtosend = stagedata.dataToEmbed(stageenemies, 'Currently unavailable', level/100)
         await message.channel.send(embed=embtosend)
+
+    elif message.content.startswith('!stagebeta'):
+        if not canSend(2, privilegelevel(message.author), message):
+            return
+        if privilegelevel(message.author) < 3 and message.channel.id not in catbotdata.requireddata['freeforall-channels']:
+            if not isokayifnotclog(message, isADM(message)):
+                return
+        limit = message.content.find(';')
+        if limit == -1:
+            limit = len(message.content)
+        stagestring = message.content[message.content.find(' ')+1:limit]
+        stagelevel = message.content[message.content.find(';')+1:message.content.find(';', message.content.find(';')+1)]
+        categorystring = message.content[message.content.rfind(';')+2:]
+        if message.content.count(';') < 2:
+            categorystring = ''
+        if message.content.count(';') < 1:
+            stagelevel = ''
+        if message.content.count(';') > 2:
+            await message.channel.send("Wrong syntax, check again again command usage guide.")
+            return
+        stageid = stagedata.getstageid(stagestring, 5, stagelevel, categorystring)
+        if stageid == -1:  # too many errors
+            await message.channel.send("That stage doesn't exist.")
+            return
+        elif stageid == -2:  # could not tell between more than 1 stage
+            await message.channel.send("You need to be more specific.")
+            return
+        elif stageid is None:
+            await message.channel.send("Catbot is confused and doesn't know what happened.")
+            return
+        stageinfo = stagedata.idtostage(stageid)
+        stageenemies = stagedata.idtoenemies(stageid)
+        stagetimed = stagedata.idtotimed(stageid)
+        stagereward = stagedata.idtoreward(stageid)
+        stagerestrictions = stagedata.idtorestrictions(stageid)
+        embedtosend = stagedata.makeembed(stageinfo, stageenemies, stagetimed, stagereward, stagerestrictions)
+        await message.channel.send(embed=embedtosend)
 
     elif message.content.startswith('!enemysearch'):  # todo look at enemyculator todos
         if not canSend(3, privilegelevel(message.author), message):
