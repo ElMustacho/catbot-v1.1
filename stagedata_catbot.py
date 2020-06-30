@@ -149,6 +149,24 @@ class Stagedata:
             conn.close()
             return results
 
+    def whereistheenemy(self, enemycode, name):
+        with sqlite3.connect('stagedatanew.db') as conn:
+            cursor = conn.cursor()
+            results = cursor.execute(
+                'SELECT DISTINCT stages.stage from units join stages on units.stageid = stages.stageid where unitcode=?',
+                [str(enemycode)]).fetchall()
+            if len(results) == 0:
+                return name + " wasn't found in current stages."
+            answer = name + ' is found in the following stages: '
+            for stage in results:
+                answer += stage[0] + ' - '
+                if len(answer) > 1950:
+                    answer += ' - *and other stages*  '
+                    break
+            answer = answer[:-3]
+            answer += '.'
+            return answer
+
     def enemytostages(self, unitcode, name):  # todo differ from all stages and meaningful stages
         with sqlite3.connect('stages.db') as conn:
             cursor = conn.cursor()

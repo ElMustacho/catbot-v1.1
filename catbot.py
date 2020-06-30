@@ -75,8 +75,27 @@ async def on_message(message):
             limit = len(message.content)
         catstats = catculator.getUnitCode(message.content[message.content.find(' ')+1:limit].lower(),
                                           6)  # second parameter is number of errors allowed
-        if catstats is None:  # too many errors
-            await message.channel.send(message.content[message.content.find(' ')+1:limit] + '; wasn\'t recognized.')
+        if catstats is None:  # too many errors, maybe they meant an enemy?
+            enemystats = enemyculator.getUnitCode(message.content[message.content.find(' ') + 1:limit].lower(), 3)
+            if enemystats is None:  # too many errors for an enemy
+                await message.channel.send(
+                    message.content[message.content.find(' ') + 1:limit] + '; wasn\'t recognized.')
+                return
+            try:
+                lenght = len(enemystats[0])
+            except TypeError:
+                enemystats[0] = [enemystats[0]]
+            if len(enemystats[0]) > 1:  # name wasn't unique
+                await message.channel.send(
+                    message.content[message.content.find(' ') + 1:limit] + '; wasn\'t recognized.')
+                return
+            enemy = enemyculator.getrow(enemystats[0][0])
+            if enemy is None:
+                await message.channel.send(
+                    message.content[message.content.find(' ') + 1:limit] + '; wasn\'t recognized.')
+                return
+            embedsend = enemyculator.getstatsembed(enemy, 1)
+            await message.channel.send("Did you meant to search an enemy?", embed=embedsend)
             return
         try:
             lenght = len(catstats[0])
@@ -95,7 +114,7 @@ async def on_message(message):
             level = 30
         if level < 0 or level > 130:
             level = 30
-        embedsend = catculator.getstatsEmbed(cat, level, message.content[message.content.find(' '):limit], catstats[0][0])
+        embedsend = catculator.getstatsEmbed(cat, level, catstats[0][0])
         await message.channel.send(embed=embedsend)
 
     elif message.content.startswith('!enemystats') or message.content.startswith('!es'):
@@ -109,8 +128,26 @@ async def on_message(message):
             limit = len(message.content)
         enemystats = enemyculator.getUnitCode(message.content[message.content.find(' ')+1:limit].lower(),
                                           6)  # second parameter is number of errors allowed
-        if enemystats is None:  # too many errors
-            await message.channel.send(message.content[message.content.find(' ')+1:limit] + '; wasn\'t recognized.')
+        if enemystats is None:  # too many errors, maybe they meant a cat
+            limit = message.content.find(';')
+            if limit == -1:
+                limit = len(message.content)
+            catstats = catculator.getUnitCode(message.content[message.content.find(' ') + 1:limit].lower(), 3)
+            if catstats is None:
+                await message.channel.send(message.content[message.content.find(' ')+1:limit] + '; wasn\'t recognized.')
+            try:
+                lenght = len(catstats[0])
+            except TypeError:  # it's a number
+                catstats[0] = [catstats[0]]
+            if len(catstats[0]) > 1:  # name wasn't unique
+                await message.channel.send(message.content[message.content.find(' ')+1:limit] + '; wasn\'t recognized.')
+                return
+            cat = catculator.getrow(catstats[0][0])
+            if cat is None:
+                await message.channel.send(message.content[message.content.find(' ')+1:limit] + '; wasn\'t recognized.')
+                return
+            embedsend = catculator.getstatsEmbed(cat, 30, catstats[0][0])
+            await message.channel.send("Did you meant to search a cat?", embed=embedsend)
             return
         try:
             lenght = len(enemystats[0])
@@ -132,7 +169,7 @@ async def on_message(message):
             magnification = 1
         if magnification < 0 or magnification > 1000000:
             magnification = 1
-        embedsend = enemyculator.getstatsembed(enemy, magnification, message.content[message.content.find(' ')+1:limit])
+        embedsend = enemyculator.getstatsembed(enemy, magnification)
         await message.channel.send(embed=embedsend)
 
     elif message.content.startswith('!renamecat'):
@@ -276,9 +313,11 @@ async def on_message(message):
         else:
             await message.channel.send('No such name to delete')
 
-    elif message.content.startswith('!stage '):
+    elif message.content.startswith('!stage '):  #todo eventually merge this and !stagebeta
         if not canSend(3, privilegelevel(message.author), message):
             return
+        await message.channel.send("Please use `!stagebeta` instaed of this command.")
+        return
         stagestring = message.content[message.content.find(' ')+1: message.content.find(';')]
         stageenemies = stagedata.nametoenemies(stagestring, 5)
         if stageenemies == 0:  # too many errors
@@ -351,8 +390,34 @@ async def on_message(message):
         nameunit = enemyculator.namefromcode(enemystats[0][0])
         await message.channel.send(stagedata.enemytostages(enemystats[0][0], nameunit))
 
+    elif message.content.startswith('!whereis'):
+        if not canSend(2, privilegelevel(message.author), message):
+            return
+        if privilegelevel(message.author) < 3 and message.channel.id not in catbotdata.requireddata['freeforall-channels']:
+            if not isokayifnotclog(message, isADM(message)):
+                return
+        enemystats = enemyculator.getUnitCode(message.content[message.content.find(' ') + 1:].lower(), 4)
+        if enemystats[0] is None:  # too many errors
+            await message.channel.send(message.content[15:] + '; wasn\'t recognized')
+            return
+        try:  # was this a string or a int?
+            if len(enemystats[0]) > 1:  # name wasn't unique
+                await message.channel.send('Couldn\'t discriminate.')
+                return
+        except TypeError:
+            await message.channel.send('I need a name, not a number.')
+            return
+        nameunit = enemyculator.namefromcode(enemystats[0][0])
+        await message.channel.send(stagedata.whereistheenemy(enemystats[0][0], nameunit))
+
 
     elif not catbotdata.requireddata['moderation']:
+        return
+
+    elif message.content == '!token':
+        if canSend(2, privilegelevel(message.author), message):
+            if isInServer(message.author) and isADM(message):
+                await message.channel.send('Your token is: ' + str(int(message.author.id) % 9999998) + '.')
         return
 
     elif message.content == '$password ururun wolf':

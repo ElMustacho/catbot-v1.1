@@ -108,7 +108,7 @@ class Enemyunits:
             locator = self.closeEnough(identifier, errors)
         return locator
 
-    def getstatsembed(self, enemy, magnification, name):
+    def getstatsembed(self, enemy, magnification):
         isinline = True
         title = 'Stats of ' + str(enemy[86])
         enemyEmbed = emb(description=title, color=0x00ff00)

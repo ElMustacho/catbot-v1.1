@@ -5,6 +5,7 @@ import math
 import pickle
 from collections import defaultdict
 
+
 class Catunits:
     def __init__(self):
         self._cats = pd.read_csv('unitdata9.4.tsv', sep='\t')
@@ -32,19 +33,19 @@ class Catunits:
             locator = self.closeEnough(identifier, errors)
         return locator
 
-    def getstatsEmbed(self, cat, level, actualname, unitcode):
+    def getstatsEmbed(self, cat, level, unitcode):
         isinline = True
         title = 'Stats of ' + cat[95]
         if len(cat[-4]) > 1:
             title = 'Stats of ' + cat[97]
-        whichform = unitcode-1 if unitcode > 1019 else unitcode
+        whichform = unitcode - 1 if unitcode > 1019 else unitcode
         if whichform % 3 == 0:
             title += ' - First form'
         elif whichform % 3 == 1:
             title += ' - Evolved form'
         else:
             title += ' - True form'
-        title += ' - Unitcode: '+str(unitcode)
+        title += ' - Unitcode: ' + str(unitcode)
         catEmbed = emb(description=title, color=0xff3300)
         catEmbed.set_author(name='Cat Bot')
         rarity = ''
@@ -81,14 +82,16 @@ class Catunits:
             elif cat[45] < 0:
                 damagekind += ', omnistrike'
         damagetype = 'Damage (' + damagekind + ') - DPS'
-        catEmbed.add_field(name=damagetype, value=dmg+dps, inline=isinline)
-        tba = str(round(int(cat[99])/30, 2))
-        catEmbed.add_field(name='Speed - Attack Frequency', value=str(round(int(cat[2]) ,0)) + ' - ' + tba + 's', inline=isinline)
-        catEmbed.add_field(name='Cost - Respawn', value=str(round(int(cat[6]*1.5), 0)) + ' - ' + str(round(max(((cat[7]*2-254)/30), 2), 2)) + 's', inline=isinline)
+        catEmbed.add_field(name=damagetype, value=dmg + dps, inline=isinline)
+        tba = str(round(int(cat[99]) / 30, 2))
+        catEmbed.add_field(name='Speed - Attack Frequency', value=str(round(int(cat[2]), 0)) + ' - ' + tba + 's',
+                           inline=isinline)
+        catEmbed.add_field(name='Cost - Respawn', value=str(round(int(cat[6] * 1.5), 0)) + ' - ' + str(
+            round(max(((cat[7] * 2 - 254) / 30), 2), 2)) + 's', inline=isinline)
         rangestr = ''
         if ',' in damagekind:  # it's long range or omni
-            leftrange = str(max(round(int(cat[44]), 0), round(int(cat[44]+cat[45]))))
-            rightrange = str(min(round(int(cat[44]), 0), round(int(cat[44]+cat[45]))))
+            leftrange = str(max(round(int(cat[44]), 0), round(int(cat[44] + cat[45]))))
+            rightrange = str(min(round(int(cat[44]), 0), round(int(cat[44] + cat[45]))))
             rangestr += leftrange + ' to ' + rightrange + '; stands at ' + str(round(int(cat[5])))
         else:  # otherwise only range is needed
             rangestr += str(round(int(cat[5])))
@@ -114,9 +117,11 @@ class Catunits:
         if cat[34] > 0:  # base destroyer
             offensivestr += 'Base destroyer, '
         if cat[35] > 0:  # wave attack
-            offensivestr += 'Wave attack ' + str(round(int(cat[35]))) + '% (' + str(333+round(int(cat[36])-1)*200) + ' range), '
+            offensivestr += 'Wave attack ' + str(round(int(cat[35]))) + '% (' + str(
+                333 + round(int(cat[36]) - 1) * 200) + ' range), '
         if cat[37] > 0:  # weaken
-            offensivestr += 'Weaken ' + str(round(int(cat[37]))) + '% (' + str(round(int(cat[39]))) + '% power, ' + str(round(int(cat[38]) / 30, 2)) + 's), '
+            offensivestr += 'Weaken ' + str(round(int(cat[37]))) + '% (' + str(round(int(cat[39]))) + '% power, ' + str(
+                round(int(cat[38]) / 30, 2)) + 's), '
         if cat[40] > 0:  # strengthen
             offensivestr += 'Strengthen +' + str(round(int(cat[41]))) + '% (at ' + str(round(int(cat[40]))) + '% hp), '
         if cat[52] > 0:  # zombie killer
@@ -126,13 +131,17 @@ class Catunits:
         if cat[70] > 0:  # barrier breaks
             offensivestr += 'Barrier breaks ' + str(round(int(cat[70]))) + '%, '
         if cat[71] > 0:  # warp, currently unused
-            offensivestr += 'Warp ' + str(round(int(cat[71]))) + '% (' + str(round(int(cat[73]))) + '-' + str(round(int(cat[74]))) + ', ' + str(round(int(cat[72] / 30, 2))) + 's), '
+            offensivestr += 'Warp ' + str(round(int(cat[71]))) + '% (' + str(round(int(cat[73]))) + '-' + str(
+                round(int(cat[74]))) + ', ' + str(round(int(cat[72] / 30, 2))) + 's), '
         if cat[81] > 0:  # insane damage
             offensivestr += 'Insane damage, '
         if cat[82] > 0:  # savage blow
-            offensivestr += 'Savage Blow ' + str(round(int(cat[82]))) + '% (' + str(round(int(cat[83]))) + '% extra power), '
+            offensivestr += 'Savage Blow ' + str(round(int(cat[82]))) + '% (' + str(
+                round(int(cat[83]))) + '% extra power), '
         if cat[86] > 0:  # surge attack
-            offensivestr += 'Surge Attack ' + str(round(int(cat[86]))) + '% (' + str(round(int(cat[88]/4))) + '-' + str(round(int(cat[87]/4)+int(cat[88]/4))) + ', level ' + str(round(int(cat[89]))) + '), '
+            offensivestr += 'Surge Attack ' + str(round(int(cat[86]))) + '% (' + str(
+                round(int(cat[88] / 4))) + '-' + str(round(int(cat[87] / 4) + int(cat[88] / 4))) + ', level ' + str(
+                round(int(cat[89]))) + '), '
         if cat[92] > 0:  # curse attack
             offensivestr += 'Curses ' + str(round(int(cat[92]))) + '% for ' + str(round(cat[93] / 30, 2)) + 's, '
         offensivestr = offensivestr[:-2]
@@ -203,7 +212,7 @@ class Catunits:
         try:
             customnames = min(distancedict.items())
         except ValueError:  # empty custom names
-            customnames.append(errors+1)
+            customnames.append(errors + 1)
         if min(dss) > errors and customnames[0] > errors:  # both were too bad
             return None
         if min(dss) < customnames[0]:  # normal names were better
@@ -221,31 +230,31 @@ class Catunits:
         else:
             isBahamut = False
         if isBahamut:
-            toret = float(min(30, level)*0.25)
+            toret = float(min(30, level) * 0.25)
             if level > 30:
-                toret += float((level-30)*0.125)
-            return 2+toret*2
+                toret += float((level - 30) * 0.125)
+            return 2 + toret * 2
         if isCrazed:
             toret = float(min(20, level) * 0.25)
             if level > 20:
-                toret += float((level-20)*0.125)
-            return 2+toret*2
-        toret = float(min(60, level)*0.25)
+                toret += float((level - 20) * 0.125)
+            return 2 + toret * 2
+        toret = float(min(60, level) * 0.25)
         if rarity == 2:
             if level > 60:
-                toret += float(min(10, level-60)*0.25)
+                toret += float(min(10, level - 60) * 0.25)
             if level > 70:
-                toret += float(min(20, level-70)*0.125)
+                toret += float(min(20, level - 70) * 0.125)
             if level > 90:
-                toret += float((level-90)*0.0625)
+                toret += float((level - 90) * 0.0625)
         else:
             if level > 60:
-                toret += float(min(20, level-60)*0.125)
+                toret += float(min(20, level - 60) * 0.125)
             if rarity in [5, 4, 3] and level > 80:
-                toret += float((level-80)*0.0625)
+                toret += float((level - 80) * 0.0625)
             if rarity not in [5, 4, 3] and level > 80:
-                toret += float((level-80)*0.125)
-        return 2+toret*2
+                toret += float((level - 80) * 0.125)
+        return 2 + toret * 2
 
     def cattotriaitpics(self, cat):  # for each trait, add '1' to the string if it has the trait, '0' otherwise
         fstr = ''
