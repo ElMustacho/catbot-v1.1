@@ -90,7 +90,12 @@ class Stagedata:
         return
 
     def makeembed(self, stageinfo, stageenemies, stagetimed, stagereward, stagerestrictions):
-        stageEmbed = emb(title=stageinfo[0][3] + ', ' + stageinfo[0][2] + ', ' + stageinfo[0][1], description='Base hp = ' + str(stageinfo[0][4]) +', stage length = ' + str(stageinfo[0][7]) + ', max enemies = ' + str(stageinfo[0][8]) +'\nAmount | First Spawn Frame *(Respawn F)* | Base Health',
+        decsstring='Base hp = ' + str(stageinfo[0][4]) +', stage length = ' + str(stageinfo[0][7]) + ', max enemies = ' + str(stageinfo[0][8]) +'\n'
+        for reward in stagereward:
+            decsstring += str(reward[0])+'% of getting ' + str(reward[1]) + ' ' + reward[2] + ', '
+        if len(stagereward) > 0:
+            decsstring = decsstring[:-2]
+        stageEmbed = emb(title=stageinfo[0][3] + ', ' + stageinfo[0][2] + ', ' + stageinfo[0][1], description=decsstring,
                          color=0x009B77)
         stageEmbed.set_author(name='Cat Bot')
         enemystring = ''
@@ -161,7 +166,7 @@ class Stagedata:
             for stage in results:
                 answer += stage[0] + ' - '
                 if len(answer) > 1950:
-                    answer += ' - *and other stages*  '
+                    answer += '*and other stages*   '
                     break
             answer = answer[:-3]
             answer += '.'
@@ -210,7 +215,7 @@ class Stagedata:
         with sqlite3.connect('stagedatanew.db') as conn:
             cursor = conn.cursor()
             results = cursor.execute(
-                'select rewards.* from rewards JOIN stages on rewards.stage_id=stages.stageid where stages.stageid = ?',
+                "SELECT chance, amount, 'reward-translation'.item from rewards join 'reward-translation' where code = rewards.item and stage_id=?;",
                 [id]).fetchall()
             return results
 
@@ -221,6 +226,8 @@ class Stagedata:
                 'select "restrict".* from "restrict" JOIN stages on "restrict".stageid=stages.stageid where stages.stageid = ?',
                 [id]).fetchall()
             return results
+
+
 
 
 # select units.* from units JOIN stages on units.stageid=stages.stageid where stages.stage = "No Return Flights";

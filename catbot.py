@@ -95,7 +95,7 @@ async def on_message(message):
                     message.content[message.content.find(' ') + 1:limit] + '; wasn\'t recognized.')
                 return
             embedsend = enemyculator.getstatsembed(enemy, 1)
-            await message.channel.send("Did you meant to search an enemy?", embed=embedsend)
+            await message.channel.send("Did you mean to search an enemy?", embed=embedsend)
             return
         try:
             lenght = len(catstats[0])
@@ -147,7 +147,7 @@ async def on_message(message):
                 await message.channel.send(message.content[message.content.find(' ')+1:limit] + '; wasn\'t recognized.')
                 return
             embedsend = catculator.getstatsEmbed(cat, 30, catstats[0][0])
-            await message.channel.send("Did you meant to search a cat?", embed=embedsend)
+            await message.channel.send("Did you mean to search a cat?", embed=embedsend)
             return
         try:
             lenght = len(enemystats[0])
@@ -316,7 +316,7 @@ async def on_message(message):
     elif message.content.startswith('!stage '):  #todo eventually merge this and !stagebeta
         if not canSend(3, privilegelevel(message.author), message):
             return
-        await message.channel.send("Please use `!stagebeta` instaed of this command.")
+        await message.channel.send("Please use `!stagebeta` instead of this command.")
         return
         stagestring = message.content[message.content.find(' ')+1: message.content.find(';')]
         stageenemies = stagedata.nametoenemies(stagestring, 5)
@@ -340,9 +340,10 @@ async def on_message(message):
         await message.channel.send(embed=embtosend)
 
     elif message.content.startswith('!stagebeta'):
-        if not canSend(2, privilegelevel(message.author), message):
+        if not canSend(1, privilegelevel(message.author), message):
             return
-        if privilegelevel(message.author) < 3 and message.channel.id not in catbotdata.requireddata['freeforall-channels']:
+        if privilegelevel(message.author) < 3 and message.channel.id not in catbotdata.requireddata[
+            'freeforall-channels']:
             if not isokayifnotclog(message, isADM(message)):
                 return
         limit = message.content.find(';')
@@ -391,9 +392,10 @@ async def on_message(message):
         await message.channel.send(stagedata.enemytostages(enemystats[0][0], nameunit))
 
     elif message.content.startswith('!whereis'):
-        if not canSend(2, privilegelevel(message.author), message):
+        if not canSend(1, privilegelevel(message.author), message):
             return
-        if privilegelevel(message.author) < 3 and message.channel.id not in catbotdata.requireddata['freeforall-channels']:
+        if privilegelevel(message.author) < 3 and message.channel.id not in catbotdata.requireddata[
+            'freeforall-channels']:
             if not isokayifnotclog(message, isADM(message)):
                 return
         enemystats = enemyculator.getUnitCode(message.content[message.content.find(' ') + 1:].lower(), 4)
