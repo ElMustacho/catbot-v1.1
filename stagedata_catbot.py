@@ -158,12 +158,18 @@ class Stagedata:
         with sqlite3.connect('stagedatanew.db') as conn:
             cursor = conn.cursor()
             results = cursor.execute(
-                'SELECT DISTINCT stages.stage from units join stages on units.stageid = stages.stageid where unitcode=?',
+                'SELECT DISTINCT stages.stage, stages.category from units join stages on units.stageid = stages.stageid where unitcode=? order by stages.category',
                 [str(enemycode)]).fetchall()
             if len(results) == 0:
                 return name + " wasn't found in current stages."
             answer = name + ' is found in the following stages: '
+            category = ''
             for stage in results:
+                if stage[1] != category:
+                    if answer.endswith(' - '):
+                        answer = answer[0:-3]
+                    answer += '\n**' + stage[1] + '**; '
+                category = stage[1]
                 answer += stage[0] + ' - '
                 if len(answer) > 1950:
                     answer += '*and other stages*   '
