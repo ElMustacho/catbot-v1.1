@@ -154,15 +154,35 @@ class Stagedata:
             conn.close()
             return results
 
-    def whereistheenemy(self, enemycode, name):
+    def whereistheenemy(self, enemycode, name, name2="", name3="", enemycode1="", enemycode2=""):
         with sqlite3.connect('stagedatanew.db') as conn:
             cursor = conn.cursor()
-            results = cursor.execute(
-                'SELECT DISTINCT stages.stage, stages.category from units join stages on units.stageid = stages.stageid where unitcode=? order by stages.category',
-                [str(enemycode)]).fetchall()
+            results = None
+            if name2 != '':
+                if name3 != '':
+                    tuple = (str(enemycode[0][0]), str(enemycode1[0][0]), str(enemycode2[0][0]))
+                    results = cursor.execute(
+                        '''SELECT DISTINCT stages.stage, stages.category from units join stages on units.stageid = stages.stageid where unitcode=? 
+INTERSECT
+SELECT DISTINCT stages.stage, stages.category from units join stages on units.stageid = stages.stageid where unitcode=? 
+INTERSECT
+SELECT DISTINCT stages.stage, stages.category from units join stages on units.stageid = stages.stageid where unitcode=? order by stages.category''',
+                        tuple).fetchall()
+                else:
+                    tuple=(str(enemycode[0][0]), str(enemycode1[0][0]))
+                    results = cursor.execute(
+                        '''SELECT DISTINCT stages.stage, stages.category from units join stages on units.stageid = stages.stageid where unitcode=? 
+INTERSECT
+SELECT DISTINCT stages.stage, stages.category from units join stages on units.stageid = stages.stageid where unitcode=? order by stages.category''',
+                        tuple).fetchall()
+            else:
+                results = cursor.execute(
+                    'SELECT DISTINCT stages.stage, stages.category from units join stages on units.stageid = stages.stageid where unitcode=? order by stages.category',
+                    [str(enemycode[0][0])]).fetchall()
+
             if len(results) == 0:
-                return name + " wasn't found in current stages."
-            answer = name + ' is found in the following stages: '
+                return "No stages found."
+            answer = "Stages found: "  #todo make this nicer, text wise, in respect with the number of units
             category = ''
             for stage in results:
                 if stage[1] != category:

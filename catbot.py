@@ -357,7 +357,7 @@ async def on_message(message):
         if message.content.count(';') < 1:
             stagelevel = ''
         if message.content.count(';') > 2:
-            await message.channel.send("Wrong syntax, check again again command usage guide.")
+            await message.channel.send("Wrong syntax, check again command usage guide.")
             return
         stageid = stagedata.getstageid(stagestring, 5, stagelevel, categorystring)
         if stageid == -1:  # too many errors
@@ -398,19 +398,66 @@ async def on_message(message):
             'freeforall-channels']:
             if not isokayifnotclog(message, isADM(message)):
                 return
-        enemystats = enemyculator.getUnitCode(message.content[message.content.find(' ') + 1:].lower(), 4)
-        if enemystats[0] is None:  # too many errors
-            await message.channel.send(message.content[15:] + '; wasn\'t recognized')
+        limit = message.content.find(';')
+        if limit == -1:
+            limit = len(message.content)
+        unit1 = message.content[message.content.find(' ') + 1:limit]
+        unit2 = message.content[
+                     message.content.find(';') + 1:message.content.find(';', message.content.find(';') + 1)]
+        unit3 = message.content[message.content.rfind(';') + 2:]
+        if message.content.count(';') < 2:
+            unit2 = ''
+        if message.content.count(';') < 1:
+            unit3 = ''
+        if message.content.count(';') > 2:
+            await message.channel.send("Wrong syntax, check again command usage guide.")
+            return
+        if unit2 == "" and unit3 != "":
+            unit2=unit3
+            unit3=""
+        enemystats1 = enemyculator.getUnitCode(unit1, 4)
+        enemystats2 = None
+        enemystats3 = None
+        if enemystats1[0] is None:  # too many errors
+            await message.channel.send(message.content[unit1] + '; wasn\'t recognized')
             return
         try:  # was this a string or a int?
-            if len(enemystats[0]) > 1:  # name wasn't unique
+            if len(enemystats1[0]) > 1:  # name wasn't unique
                 await message.channel.send('Couldn\'t discriminate.')
                 return
         except TypeError:
             await message.channel.send('I need a name, not a number.')
             return
-        nameunit = enemyculator.namefromcode(enemystats[0][0])
-        await message.channel.send(stagedata.whereistheenemy(enemystats[0][0], nameunit))
+        nameunit1 = enemyculator.namefromcode(enemystats1[0][0])
+        nameunit2 = ''
+        nameunit3 = ''
+        if unit2 != '':
+            enemystats2 = enemyculator.getUnitCode(unit2.lower(), 4)
+            if enemystats2[0] is None:  # too many errors
+                await message.channel.send(message.content[unit2] + '; wasn\'t recognized')
+                return
+            try:  # was this a string or a int?
+                if len(enemystats2[0]) > 1:  # name wasn't unique
+                    await message.channel.send('Couldn\'t discriminate.')
+                    return
+            except TypeError:
+                await message.channel.send('I need a name, not a number.')
+                return
+            nameunit2 = enemyculator.namefromcode(enemystats2[0][0])
+            if unit3 != '':
+                enemystats3 = enemyculator.getUnitCode(unit3.lower(), 4)
+                if enemystats3[0] is None:  # too many errors
+                    await message.channel.send(message.content[unit3] + '; wasn\'t recognized')
+                    return
+                try:  # was this a string or a int?
+                    if len(enemystats3[0]) > 1:  # name wasn't unique
+                        await message.channel.send('Couldn\'t discriminate.')
+                        return
+                except TypeError:
+                    await message.channel.send('I need a name, not a number.')
+                    return
+                nameunit3 = enemyculator.namefromcode(enemystats3[0][0])
+        await message.channel.send(stagedata.whereistheenemy(enemystats1, nameunit1, nameunit2, nameunit3, enemystats2, enemystats3))
 
 
     elif not catbotdata.requireddata['moderation']:
