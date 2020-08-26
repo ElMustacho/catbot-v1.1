@@ -1,6 +1,13 @@
-from datetime import datetime
-time2 = datetime.now()
-time_elapsed = datetime.now() - time2
-print(time_elapsed.seconds)
+import sqlite3
 
-print(time_elapsed)
+try:
+    conn = sqlite3.connect('file:custom_commands.db?mode=rw', uri=True)
+    cursor = conn.cursor()
+    c = ('!guide if',)
+    results = cursor.execute("SELECT answer FROM commands WHERE command = ?", c).fetchone()
+    if results is None:
+        print(':(')
+    else:
+        print(results[0])
+except(sqlite3.OperationalError):
+    print('oh no I failed')

@@ -61,6 +61,9 @@ class Stagedata:
                         raise Exception('Level could not match anything.')
                     nearestlevelmatch = [i for i, x in enumerate(leveldss) if x == min(leveldss)]
                     intersection1 = [value for value in nearestlevelmatch if value in nearestmatch]
+                    if len(intersection1) == 0:
+                        results = -3
+                        raise Exception('Empty intersection.')
                     if len(intersection1) > 1:  # same level and stage name eg sweet xp
                         if stagecategory == '':
                             results = -2
@@ -73,6 +76,9 @@ class Stagedata:
                                 raise Exception('Category could not match anything.')
                             nearestcategorymatch = [i for i, x in enumerate(categorydss) if x == min(categorydss)]
                             intersection2 = [value for value in intersection1 if value in nearestcategorymatch]
+                            if len(intersection2) == 0:
+                                results = -3
+                                raise Exception('Empty secondary intersection.')
                             if len(intersection2) > 1:
                                 results = -2
                                 raise Exception('Could not discriminate.')
@@ -82,19 +88,19 @@ class Stagedata:
                         results = stage[intersection1[0]][3]
             else:
                 results = stage[nearestmatch[0]][3]
-        except:
-            print('something went wrong')
+        except Exception as e:
+            print(e)
         finally:
             conn.close()
-            return results
-        return
+        return results
 
     def makeembed(self, stageinfo, stageenemies, stagetimed, stagereward, stagerestrictions):
         decsstring='Base hp = ' + str(stageinfo[0][4]) +', stage length = ' + str(stageinfo[0][7]) + ', max enemies = ' + str(stageinfo[0][8]) +'\n'
         for reward in stagereward:
             decsstring += str(reward[0])+'% of getting ' + str(reward[1]) + ' ' + reward[2] + ', '
         if len(stagereward) > 0:
-            decsstring = decsstring[:-2]
+            decsstring = decsstring[:-2] + '\n'
+        decsstring += 'Difficulties ' + stageinfo[0][14]
         stageEmbed = emb(title=stageinfo[0][3] + ', ' + stageinfo[0][2] + ', ' + stageinfo[0][1], description=decsstring,
                          color=0x009B77)
         stageEmbed.set_author(name='Cat Bot')

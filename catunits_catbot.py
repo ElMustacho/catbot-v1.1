@@ -140,7 +140,7 @@ class Catunits:
                 round(int(cat[83]))) + '% extra power), '
         if cat[86] > 0:  # surge attack
             offensivestr += 'Surge Attack ' + str(round(int(cat[86]))) + '% (' + str(
-                round(int(cat[88] / 4))) + '-' + str(round(int(cat[87] / 4) + int(cat[88] / 4))) + ', level ' + str(
+                round(int(cat[87] / 4))) + '-' + str(round(int(cat[87] / 4) + int(cat[88] / 4))) + ', level ' + str(
                 round(int(cat[89]))) + '), '
         if cat[92] > 0:  # curse attack
             offensivestr += 'Curses ' + str(round(int(cat[92]))) + '% for ' + str(round(cat[93] / 30, 2)) + 's, '

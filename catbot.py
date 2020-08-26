@@ -1,26 +1,20 @@
 # todo list
-# give out cat units (to be finished)
-# give out enemy units
 # give out the previous two nicely
 # write/declare/init stuff only once
 # don't upload to git unwanted files
 # get fixed values from a file, like the token
 # make embed function, for each kind of embed
 # tell the user what happens when a report belonging to him is solved or initiated
+import sqlite3
+
 import discord
 from datetime import datetime, timedelta
 from data_catbot import Data_catbot
-import logging
 from modtools import Modtools
 import catunits_catbot
 import enemyunits_catbot
 import stagedata_catbot
 
-# logger = logging.getLogger('discord')
-# logger.setLevel(logging.DEBUG)
-# handler = logging.FileHandler(filename='dsd.log', encoding='utf-8', mode='w')
-# handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
-# logger.addHandler(handler)
 client = discord.Client()
 
 
@@ -73,8 +67,11 @@ async def on_message(message):
         limit = message.content.find(';')
         if limit == -1:
             limit = len(message.content)
-        catstats = catculator.getUnitCode(message.content[message.content.find(' ')+1:limit].lower(),
-                                          6)  # second parameter is number of errors allowed
+        cat = message.content[message.content.find(' ')+1:limit].lower()
+        if cat == '!cs':
+            await message.channel.send('You need to input a cat unit name or code.')
+            return
+        catstats = catculator.getUnitCode(cat, 6)  # second parameter is number of errors allowed
         if catstats is None:  # too many errors, maybe they meant an enemy?
             enemystats = enemyculator.getUnitCode(message.content[message.content.find(' ') + 1:limit].lower(), 3)
             if enemystats is None:  # too many errors for an enemy
@@ -126,15 +123,21 @@ async def on_message(message):
         limit = message.content.find(';')
         if limit == -1:
             limit = len(message.content)
-        enemystats = enemyculator.getUnitCode(message.content[message.content.find(' ')+1:limit].lower(),
-                                          6)  # second parameter is number of errors allowed
+        enemy = message.content[message.content.find(' ')+1:limit].lower()
+        if enemy == '!es':
+            await message.channel.send('You need to provide an enemy unit name.')
+            return
+        enemystats = enemyculator.getUnitCode(enemy, 6)  # second parameter is number of errors allowed
         if enemystats is None:  # too many errors, maybe they meant a cat
             limit = message.content.find(';')
             if limit == -1:
                 limit = len(message.content)
             catstats = catculator.getUnitCode(message.content[message.content.find(' ') + 1:limit].lower(), 3)
+            enemy = message.content[message.content.find(' ')+1:limit]
+            if enemy == '':
+                await message.channel.send('You need to input an enemy name.')
             if catstats is None:
-                await message.channel.send(message.content[message.content.find(' ')+1:limit] + '; wasn\'t recognized.')
+                await message.channel.send(enemy + '; wasn\'t recognized.')
             try:
                 lenght = len(catstats[0])
             except TypeError:  # it's a number
@@ -339,7 +342,7 @@ async def on_message(message):
         embtosend = stagedata.dataToEmbed(stageenemies, 'Currently unavailable', level/100)
         await message.channel.send(embed=embtosend)
 
-    elif message.content.startswith('!stagebeta'):
+    elif message.content.startswith('!stagebeta') or message.content.startswith('!sb'):
         if not canSend(1, privilegelevel(message.author), message):
             return
         if privilegelevel(message.author) < 3 and message.channel.id not in catbotdata.requireddata[
@@ -349,14 +352,17 @@ async def on_message(message):
         limit = message.content.find(';')
         if limit == -1:
             limit = len(message.content)
-        stagestring = message.content[message.content.find(' ')+1:limit]
-        stagelevel = message.content[message.content.find(';')+1:message.content.find(';', message.content.find(';')+1)]
-        categorystring = message.content[message.content.rfind(';')+2:]
-        if message.content.count(';') < 2:
+        s_string = str(message.content)
+        if s_string[len(s_string)-1] != ';':
+            s_string += ';'
+        stagestring = s_string[s_string.find(' ')+1:limit]
+        stagelevel = s_string[s_string.find(';')+2:find_nth(s_string, ';', 2)]
+        categorystring = s_string[find_nth(s_string, ';', 2)+2:-1]
+        if s_string.count(';') < 2:
             categorystring = ''
-        if message.content.count(';') < 1:
+        if s_string.count(';') < 1:
             stagelevel = ''
-        if message.content.count(';') > 2:
+        if s_string.count(';') > 3:
             await message.channel.send("Wrong syntax, check again command usage guide.")
             return
         stageid = stagedata.getstageid(stagestring, 5, stagelevel, categorystring)
@@ -365,6 +371,9 @@ async def on_message(message):
             return
         elif stageid == -2:  # could not tell between more than 1 stage
             await message.channel.send("You need to be more specific.")
+            return
+        elif stageid == -3:  # empty intersection
+            await message.channel.send("The combination of the stage, map and category produces no result.")
             return
         elif stageid is None:
             await message.channel.send("Catbot is confused and doesn't know what happened.")
@@ -459,6 +468,29 @@ async def on_message(message):
                 nameunit3 = enemyculator.namefromcode(enemystats3[0][0])
         await message.channel.send(stagedata.whereistheenemy(enemystats1, nameunit1, nameunit2, nameunit3, enemystats2, enemystats3))
 
+    elif message.content.startswith('!say'):
+        if not canSend(5, privilegelevel(message.author), message):
+            return
+        looking = message.content[message.content.find(' ')+1: find_nth(message.content, ' ', 2)]
+        channel_to_send = client.get_channel(int(looking))
+        message_to_send = message.content[find_nth(message.content, ' ', 2):]
+        await channel_to_send.send(message_to_send)
+        return
+
+    elif message.content.startswith('!'):  # custom commands
+        if not canSend(3, privilegelevel(message.author), message):
+            return
+        try:
+            conn = sqlite3.connect('file:custom_commands.db?mode=rw', uri=True)  # open only if exists
+            cursor = conn.cursor()
+            search = (message.content, )
+            results = cursor.execute("SELECT answer FROM commands WHERE command = ?", search).fetchone()
+            if results is None:
+                return
+            else:
+                await message.channel.send(results[0])
+        except sqlite3.OperationalError:  # database not found
+            return
 
     elif not catbotdata.requireddata['moderation']:
         return
@@ -634,6 +666,13 @@ def isokayifnotclog(message, message_dm):  # if we are here, we know it's not ti
         return toret
     if message_dm:
         return True
+
+def find_nth(haystack, needle, n):
+    start = haystack.find(needle)
+    while start >= 0 and n > 1:
+        start = haystack.find(needle, start+len(needle))
+        n -= 1
+    return start
 
 enemyculator = enemyunits_catbot.Enemyunits()
 modqueue = Modtools('results.tsv', 'archives.tsv')
