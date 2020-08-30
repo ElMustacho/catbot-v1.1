@@ -39,7 +39,7 @@ class Stagedata:
     def getstageid(self, stagename, errors, stagelevel = '', stagecategory = ''):
         results = None
         try:
-            conn = sqlite3.connect('stagedatanew.db')
+            conn = sqlite3.connect('stages9.8-edit.db')
             cursor = conn.cursor()
             query = '''select stages.stage, stages.level, stages.category, stages.stageid from stages;'''
             stage = cursor.execute(query).fetchall()
@@ -105,25 +105,21 @@ class Stagedata:
                          color=0x009B77)
         stageEmbed.set_author(name='Cat Bot')
         enemystring = ''
-        stageenemies = stageenemies[::-1]  # reverses enemies as order matters
         for enemyline in stageenemies:
             title = ''
-            if enemyline[9] == 1:
+            if enemyline[1] == 1:
                 title = '**'
-            title += self._enemydata.namefromcode(enemyline[1]) + ', ' + str(round(enemyline[10])) + '%'
-            if enemyline[9] == 1:
+            title += self._enemydata.namefromcode(enemyline[2]) + ', ' + enemyline[3]
+            if enemyline[1] == 1:
                 title += '**'
-            if enemyline[2] < 1:
+            if enemyline[4] < 1:
                 enemystring += '∞'
             else:
-                enemystring += str(enemyline[2])
-            enemystring += ' | ' + str(enemyline[3]) + 'f'
-            if enemyline[2] != 1:
-                if enemyline[4] == enemyline[5]:
-                    enemystring += ' *(' + str(enemyline[4]) + 'f)*'
-                else:
-                    enemystring += ' *(' + str(enemyline[4]) + '~' + str(enemyline[5]) + 'f)*'
-            enemystring += ' | ' + str(enemyline[6]) + '%'
+                enemystring += str(enemyline[4])
+            enemystring += ' | ' + str(enemyline[6]) + 'f'
+            if enemyline[4] != 1:
+                enemystring += ' *(' + str(enemyline[7]) + 'f)*'
+            enemystring += ' | ' + str(enemyline[5])
             stageEmbed.add_field(name=title, value=enemystring, inline=True)
             enemystring = ''
         try:
@@ -161,7 +157,7 @@ class Stagedata:
             return results
 
     def whereistheenemy(self, enemycode, name, name2="", name3="", enemycode1="", enemycode2=""):
-        with sqlite3.connect('stagedatanew.db') as conn:
+        with sqlite3.connect('stages9.8-edit.db') as conn:
             cursor = conn.cursor()
             results = None
             if name2 != '':
@@ -183,7 +179,7 @@ SELECT DISTINCT stages.stage, stages.category from units join stages on units.st
                         tuple).fetchall()
             else:
                 results = cursor.execute(
-                    'SELECT DISTINCT stages.stage, stages.category from units join stages on units.stageid = stages.stageid where unitcode=? order by stages.category',
+                    'SELECT DISTINCT stages.stage, stages.category from units join stages on units.stageid = stages.stageid where enemycode=? order by stages.category',
                     [str(enemycode[0][0])]).fetchall()
 
             if len(results) == 0:
@@ -223,20 +219,20 @@ SELECT DISTINCT stages.stage, stages.category from units join stages on units.st
             return answer
 
     def idtoenemies(self, id):
-        with sqlite3.connect('stagedatanew.db') as conn:
+        with sqlite3.connect('stages9.8-edit.db') as conn:
             cursor = conn.cursor()
             results = cursor.execute('select units.* from units JOIN stages on units.stageid=stages.stageid where '
                                      'units.stageid = ?', [id]).fetchall()
             return results
 
     def idtostage(self, id):
-        with sqlite3.connect('stagedatanew.db') as conn:
+        with sqlite3.connect('stages9.8-edit.db') as conn:
             cursor = conn.cursor()
             results = cursor.execute('select * from stages where stageid = ?', [id]).fetchall()
             return results
 
     def idtotimed(self, id):
-        with sqlite3.connect('stagedatanew.db') as conn:
+        with sqlite3.connect('stages9.8-edit.db') as conn:
             cursor = conn.cursor()
             results = cursor.execute(
                 'select timed.* from timed JOIN stages on timed.stage_id=stages.stageid where stages.stageid = ?',
@@ -244,7 +240,7 @@ SELECT DISTINCT stages.stage, stages.category from units join stages on units.st
             return results
 
     def idtoreward(self, id):
-        with sqlite3.connect('stagedatanew.db') as conn:
+        with sqlite3.connect('stages9.8-edit.db') as conn:
             cursor = conn.cursor()
             results = cursor.execute(
                 "SELECT chance, amount, 'reward-translation'.item from rewards join 'reward-translation' where code = rewards.item and stage_id=?;",
@@ -252,7 +248,7 @@ SELECT DISTINCT stages.stage, stages.category from units join stages on units.st
             return results
 
     def idtorestrictions(self, id):
-        with sqlite3.connect('stagedatanew.db') as conn:
+        with sqlite3.connect('stages9.8-edit.db') as conn:
             cursor = conn.cursor()
             results = cursor.execute(
                 'select "restrict".* from "restrict" JOIN stages on "restrict".stageid=stages.stageid where stages.stageid = ?',
