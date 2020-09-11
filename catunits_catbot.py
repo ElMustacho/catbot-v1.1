@@ -176,7 +176,7 @@ class Catunits:
             defensivestr += 'Dodge ' + str(round(int(cat[84]))) + '% (' + str(round(int(cat[85]) / 30, 2)) + 's), '
         if cat[90] > 0:  # poison immune
             defensivestr += 'Poison immune, '
-        if cat[9] > 0:  # surge immune
+        if cat[91] > 0:  # surge immune
             defensivestr += 'Surge immune, '
         defensivestr = defensivestr[:-2]
         if len(defensivestr) > 3:
@@ -227,10 +227,23 @@ class Catunits:
             isCrazed = True  # this is a crazed/manic unit
         else:
             isCrazed = False
-        if unitkind == 77:
-            isBahamut = True  # this is awakened bahamut cat
+        if unitkind in [75, 76, 77]:
+            isBahamut = True  # this is bahamut cat
         else:
             isBahamut = False
+        if unitkind in [1672, 1674]:
+            isgatyacat = True
+        else:
+            isgatyacat = False
+        if isgatyacat:
+            toret = float(min(20, level) * 0.25)
+            if level > 20:
+                toret += float(min(10, level - 20) * 0.75)
+                if level > 30:
+                    toret += float(min(10, level - 30) * 1.5)
+                    if level > 40:
+                        toret += float(min(10, level - 40) * 2.25)
+            return 2 + toret * 2
         if isBahamut:
             toret = float(min(30, level) * 0.25)
             if level > 30:

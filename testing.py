@@ -1,13 +1,9 @@
-import sqlite3
+import os
+import shutil
 
-try:
-    conn = sqlite3.connect('file:custom_commands.db?mode=rw', uri=True)
-    cursor = conn.cursor()
-    c = ('!guide if',)
-    results = cursor.execute("SELECT answer FROM commands WHERE command = ?", c).fetchone()
-    if results is None:
-        print(':(')
-    else:
-        print(results[0])
-except(sqlite3.OperationalError):
-    print('oh no I failed')
+for root, dirs, files in os.walk('C:\\Users\\Fabrizio\\Desktop\\imgpics\\unit'):  # replace the . with your starting directory
+    for file in files:
+        path_file = os.path.join(root, file)
+        if path_file[-6:] == '00.png':
+            print(path_file)
+            shutil.copy(path_file, 'C:/Users/Fabrizio/Desktop/imgpics/pics/'+file)
