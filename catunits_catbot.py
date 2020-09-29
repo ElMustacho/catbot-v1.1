@@ -231,7 +231,7 @@ class Catunits:
             isBahamut = True  # this is bahamut cat
         else:
             isBahamut = False
-        if unitkind in [1672, 1674]:
+        if unitkind in [1672, 1673, 1674]:
             isgatyacat = True
         else:
             isgatyacat = False

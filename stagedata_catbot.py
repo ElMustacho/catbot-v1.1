@@ -100,6 +100,10 @@ class Stagedata:
             decsstring += str(reward[0])+'% of getting ' + str(reward[1]) + ' ' + reward[2] + ', '
         if len(stagereward) > 0:
             decsstring = decsstring[:-2] + '\n'
+        for timed in stagetimed:
+            decsstring += "Time score " + str(timed[0]) + " = " + str(timed[1]) + ' ' + str(timed[2]) + ', '
+        if len(stagetimed) > 0:
+            decsstring = decsstring[:-2] + '\n'
         decsstring += 'Difficulties ' + stageinfo[0][14]
         stageEmbed = emb(title=stageinfo[0][3] + ', ' + stageinfo[0][2] + ', ' + stageinfo[0][1], description=decsstring,
                          color=0x009B77)
@@ -235,7 +239,9 @@ SELECT DISTINCT stages.stage, stages.category from units join stages on units.st
         with sqlite3.connect('stages9.8-edit.db') as conn:
             cursor = conn.cursor()
             results = cursor.execute(
-                'select timed.* from timed JOIN stages on timed.stage_id=stages.stageid where stages.stageid = ?',
+                "select time, 'reward-translation'.item, amount from timed JOIN stages on "
+                "timed.stage_id=stages.stageid join 'reward-translation' on timed.item='reward-translation'.code "
+                "where stages.stageid = ?",
                 [id]).fetchall()
             return results
 

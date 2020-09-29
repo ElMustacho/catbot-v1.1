@@ -5,6 +5,7 @@
 # get fixed values from a file, like the token
 # make embed function, for each kind of embed
 # tell the user what happens when a report belonging to him is solved or initiated
+import asyncio
 import sqlite3
 
 import discord
@@ -58,16 +59,17 @@ async def on_message(message):
                 return
         await message.channel.send('Your tier is: ' + str(privilegelevel(message.author)))
 
-    elif message.content.startswith('!catstats') or message.content.startswith('!cs'):
+    elif message.content.startswith('!catstats ') or message.content.startswith('!cs '):
         if not canSend(1, privilegelevel(message.author), message):
             return
-        if privilegelevel(message.author) < 3 and message.channel.id not in catbotdata.requireddata['freeforall-channels']:
+        if privilegelevel(message.author) < 3 and message.channel.id not in catbotdata.requireddata[
+            'freeforall-channels']:
             if not isokayifnotclog(message, isADM(message)):
                 return
         limit = message.content.find(';')
         if limit == -1:
             limit = len(message.content)
-        cat = message.content[message.content.find(' ')+1:limit].lower()
+        cat = message.content[message.content.find(' ') + 1:limit].lower()
         if cat == '!cs':
             await message.channel.send('You need to input a cat unit name or code.')
             return
@@ -111,19 +113,56 @@ async def on_message(message):
             level = 30
         if level < 0 or level > 130:
             level = 30
-        embedsend = catculator.getstatsEmbed(cat, level, catstats[0][0])
-        await message.channel.send(embed=embedsend)
+        try:
+            embedsend = catculator.getstatsEmbed(cat, level, catstats[0][0])
+        except TypeError:
+            await message.channel.send("That code doesn't provide any result.")
+            return
+        sent_message = await message.channel.send(embed=embedsend)
+        if isADM(message):
+            return
+        await sent_message.add_reaction('👍')
+        await sent_message.add_reaction('◀️')
+        await sent_message.add_reaction('⏩')
+        await sent_message.add_reaction('⏪')
+
+        def check(reaction_received, user_that_sent):
+            return user_that_sent == message.author and str(reaction_received.emoji) in ['👍', '◀️', '⏩', '⏪']
+        try:
+            reaction, user = await client.wait_for('reaction_add', timeout=15.0, check=check)
+        except asyncio.TimeoutError:
+            pass
+        else:
+            offset = 0
+            txtreaction = str(reaction)
+            if txtreaction == '👍':
+                offset += 1
+            elif txtreaction == '⏩':
+                offset += 2
+            elif txtreaction == '⏪':
+                offset -= 2
+            else:
+                offset -= 1
+            try:
+                await sent_message.edit(
+                    embed=catculator.getstatsEmbed(catculator.getrow(catstats[0][0] + offset), level,
+                                                   catstats[0][0] + offset))
+            except TypeError:
+                await sent_message.edit(content="That form doesn't exists.")
+        await sent_message.clear_reactions()
+        return
 
     elif message.content.startswith('!enemystats') or message.content.startswith('!es'):
         if not canSend(1, privilegelevel(message.author), message):
             return
-        if privilegelevel(message.author) < 3 and message.channel.id not in catbotdata.requireddata['freeforall-channels']:
+        if privilegelevel(message.author) < 3 and message.channel.id not in catbotdata.requireddata[
+            'freeforall-channels']:
             if not isokayifnotclog(message, isADM(message)):
                 return
         limit = message.content.find(';')
         if limit == -1:
             limit = len(message.content)
-        enemy = message.content[message.content.find(' ')+1:limit].lower()
+        enemy = message.content[message.content.find(' ') + 1:limit].lower()
         if enemy == '!es':
             await message.channel.send('You need to provide an enemy unit name.')
             return
@@ -133,7 +172,7 @@ async def on_message(message):
             if limit == -1:
                 limit = len(message.content)
             catstats = catculator.getUnitCode(message.content[message.content.find(' ') + 1:limit].lower(), 3)
-            enemy = message.content[message.content.find(' ')+1:limit]
+            enemy = message.content[message.content.find(' ') + 1:limit]
             if enemy == '':
                 await message.channel.send('You need to input an enemy name.')
             if catstats is None:
@@ -143,11 +182,13 @@ async def on_message(message):
             except TypeError:  # it's a number
                 catstats[0] = [catstats[0]]
             if len(catstats[0]) > 1:  # name wasn't unique
-                await message.channel.send(message.content[message.content.find(' ')+1:limit] + '; wasn\'t recognized.')
+                await message.channel.send(
+                    message.content[message.content.find(' ') + 1:limit] + '; wasn\'t recognized.')
                 return
             cat = catculator.getrow(catstats[0][0])
             if cat is None:
-                await message.channel.send(message.content[message.content.find(' ')+1:limit] + '; wasn\'t recognized.')
+                await message.channel.send(
+                    message.content[message.content.find(' ') + 1:limit] + '; wasn\'t recognized.')
                 return
             embedsend = catculator.getstatsEmbed(cat, 30, catstats[0][0])
             await message.channel.send("Did you mean to search a cat?", embed=embedsend)
@@ -167,7 +208,7 @@ async def on_message(message):
             border = message.content.find('%')
             if border == -1:
                 border = len(message.content)
-            magnification = float(int(message.content[message.content.find(';') + 1:border])/100)
+            magnification = float(int(message.content[message.content.find(';') + 1:border]) / 100)
         except:
             magnification = 1
         if magnification < 0 or magnification > 1000000:
@@ -194,9 +235,9 @@ async def on_message(message):
         if catcode[0][0] is None:
             await message.channel.send('Invalid code for cat unit')
             return
-        response = catculator.givenewname(catcode[0][0], message.content[limit+2:])
+        response = catculator.givenewname(catcode[0][0], message.content[limit + 2:])
         if response:
-            await message.channel.send('The name ' + message.content[limit+2:] + ' is now assigned.')
+            await message.channel.send('The name ' + message.content[limit + 2:] + ' is now assigned.')
         else:
             await message.channel.send('Name was already used.')
 
@@ -219,9 +260,9 @@ async def on_message(message):
         if enemycode[0][0] is None:
             await message.channel.send('Invalid code for cat unit')
             return
-        response = enemyculator.givenewname(enemycode[0][0], message.content[limit+2:])
+        response = enemyculator.givenewname(enemycode[0][0], message.content[limit + 2:])
         if response:
-            await message.channel.send('The name ' + message.content[limit+2:] + ' is now assigned.')
+            await message.channel.send('The name ' + message.content[limit + 2:] + ' is now assigned.')
         else:
             await message.channel.send('Name was already used.')
 
@@ -258,7 +299,7 @@ async def on_message(message):
             if not isokayifnotclog(message, isADM(message)):
                 return
         enemystats = enemyculator.getUnitCode(message.content[14:].lower(),
-                                          6)  # second parameter is number of errors allowed
+                                              6)  # second parameter is number of errors allowed
         if enemystats[0] is None:  # too many errors
             await message.channel.send(message.content[15:] + '; wasn\'t recognized')
             return
@@ -286,7 +327,7 @@ async def on_message(message):
         if catcode[0][0] is None:
             await message.channel.send('Invalid code for cat unit')
             return
-        operationsuccess = catculator.removename(catcode[0][0], message.content[limit+2:])
+        operationsuccess = catculator.removename(catcode[0][0], message.content[limit + 2:])
         if operationsuccess:
             await message.channel.send('Name was deleted successfully.')
         else:
@@ -316,12 +357,12 @@ async def on_message(message):
         else:
             await message.channel.send('No such name to delete')
 
-    elif message.content.startswith('!stage '):  #todo eventually merge this and !stagebeta
+    elif message.content.startswith('!stage '):  # todo eventually merge this and !stagebeta
         if not canSend(3, privilegelevel(message.author), message):
             return
         await message.channel.send("Please use `!stagebeta` instead of this command.")
         return
-        stagestring = message.content[message.content.find(' ')+1: message.content.find(';')]
+        stagestring = message.content[message.content.find(' ') + 1: message.content.find(';')]
         stageenemies = stagedata.nametoenemies(stagestring, 5)
         if stageenemies == 0:  # too many errors
             await message.channel.send("That stage doesn't exists.")
@@ -339,7 +380,7 @@ async def on_message(message):
             level = 100
         if level < 100 or level > 400:
             level = 100
-        embtosend = stagedata.dataToEmbed(stageenemies, 'Currently unavailable', level/100)
+        embtosend = stagedata.dataToEmbed(stageenemies, 'Currently unavailable', level / 100)
         await message.channel.send(embed=embtosend)
 
     elif message.content.startswith('!stagebeta') or message.content.startswith('!sb'):
@@ -353,11 +394,11 @@ async def on_message(message):
         if limit == -1:
             limit = len(message.content)
         s_string = str(message.content)
-        if s_string[len(s_string)-1] != ';':
+        if s_string[len(s_string) - 1] != ';':
             s_string += ';'
-        stagestring = s_string[s_string.find(' ')+1:limit]
-        stagelevel = s_string[s_string.find(';')+2:find_nth(s_string, ';', 2)]
-        categorystring = s_string[find_nth(s_string, ';', 2)+2:-1]
+        stagestring = s_string[s_string.find(' ') + 1:limit]
+        stagelevel = s_string[s_string.find(';') + 2:find_nth(s_string, ';', 2)]
+        categorystring = s_string[find_nth(s_string, ';', 2) + 2:-1]
         if s_string.count(';') < 2:
             categorystring = ''
         if s_string.count(';') < 1:
@@ -412,7 +453,7 @@ async def on_message(message):
             limit = len(message.content)
         unit1 = message.content[message.content.find(' ') + 1:limit]
         unit2 = message.content[
-                     message.content.find(';') + 1:message.content.find(';', message.content.find(';') + 1)]
+                message.content.find(';') + 1:message.content.find(';', message.content.find(';') + 1)]
         unit3 = message.content[message.content.rfind(';') + 2:]
         if message.content.count(';') < 2:
             unit2 = ''
@@ -422,8 +463,8 @@ async def on_message(message):
             await message.channel.send("Wrong syntax, check again command usage guide.")
             return
         if unit2 == "" and unit3 != "":
-            unit2=unit3
-            unit3=""
+            unit2 = unit3
+            unit3 = ""
         enemystats1 = enemyculator.getUnitCode(unit1, 4)
         enemystats2 = None
         enemystats3 = None
@@ -466,12 +507,13 @@ async def on_message(message):
                     await message.channel.send('I need a name, not a number.')
                     return
                 nameunit3 = enemyculator.namefromcode(enemystats3[0][0])
-        await message.channel.send(stagedata.whereistheenemy(enemystats1, nameunit1, nameunit2, nameunit3, enemystats2, enemystats3))
+        await message.channel.send(
+            stagedata.whereistheenemy(enemystats1, nameunit1, nameunit2, nameunit3, enemystats2, enemystats3))
 
     elif message.content.startswith('!say'):
         if not canSend(5, privilegelevel(message.author), message):
             return
-        looking = message.content[message.content.find(' ')+1: find_nth(message.content, ' ', 2)]
+        looking = message.content[message.content.find(' ') + 1: find_nth(message.content, ' ', 2)]
         channel_to_send = client.get_channel(int(looking))
         message_to_send = message.content[find_nth(message.content, ' ', 2):]
         await channel_to_send.send(message_to_send)
@@ -483,7 +525,7 @@ async def on_message(message):
         try:
             conn = sqlite3.connect('file:custom_commands.db?mode=rw', uri=True)  # open only if exists
             cursor = conn.cursor()
-            search = (message.content, )
+            search = (message.content,)
             results = cursor.execute("SELECT answer FROM commands WHERE command = ?", search).fetchone()
             if results is None:
                 return
@@ -505,9 +547,11 @@ async def on_message(message):
         if message.channel.id == catbotdata.requireddata['welcome-channel']:
             member = serveruser(message.author)
             await member.add_roles(discord.utils.get(client.get_guild(catbotdata.requireddata['server-id']).roles,
-                                                     id=catbotdata.requireddata['tier-2-roles'][0]), reason='Entering server')
+                                                     id=catbotdata.requireddata['tier-2-roles'][0]),
+                                   reason='Entering server')
             await message.delete()
-            await client.get_channel(catbotdata.requireddata['log-channel-id']).send(message.author.mention + ' has used the password.')
+            await client.get_channel(catbotdata.requireddata['log-channel-id']).send(
+                message.author.mention + ' has used the password.')
 
     elif message.content.startswith('!solve'):
         if not canSend(4, privilegelevel(message.author), message):
@@ -622,7 +666,8 @@ def privilegelevel(member):
 
 
 def canAnswer(message):
-    if not isADM(message) and catbotdata.timelastmessage > datetime.now():  # second condition is asking if silence is active
+    if not isADM(
+            message) and catbotdata.timelastmessage > datetime.now():  # second condition is asking if silence is active
         if privilegelevel(serveruser(message.author)) < 3:  # if you are important you can skip the silence
             return False
     return True
@@ -667,12 +712,14 @@ def isokayifnotclog(message, message_dm):  # if we are here, we know it's not ti
     if message_dm:
         return True
 
+
 def find_nth(haystack, needle, n):
     start = haystack.find(needle)
     while start >= 0 and n > 1:
-        start = haystack.find(needle, start+len(needle))
+        start = haystack.find(needle, start + len(needle))
         n -= 1
     return start
+
 
 enemyculator = enemyunits_catbot.Enemyunits()
 modqueue = Modtools('results.tsv', 'archives.tsv')
