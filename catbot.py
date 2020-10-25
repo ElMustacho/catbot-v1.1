@@ -121,13 +121,14 @@ async def on_message(message):
         sent_message = await message.channel.send(embed=embedsend)
         if isADM(message):
             return
-        await sent_message.add_reaction('👍')
+        await sent_message.add_reaction('▶')
         await sent_message.add_reaction('◀️')
         await sent_message.add_reaction('⏩')
         await sent_message.add_reaction('⏪')
+        await sent_message.add_reaction('❌')
 
         def check(reaction_received, user_that_sent):
-            return user_that_sent == message.author and str(reaction_received.emoji) in ['👍', '◀️', '⏩', '⏪']
+            return user_that_sent == message.author and str(reaction_received.emoji) in ['▶', '◀️', '⏩', '⏪', '❌'] and reaction_received.message.id == sent_message.id
         try:
             reaction, user = await client.wait_for('reaction_add', timeout=15.0, check=check)
         except asyncio.TimeoutError:
@@ -135,14 +136,17 @@ async def on_message(message):
         else:
             offset = 0
             txtreaction = str(reaction)
-            if txtreaction == '👍':
+            if txtreaction == '▶':
                 offset += 1
             elif txtreaction == '⏩':
                 offset += 2
             elif txtreaction == '⏪':
                 offset -= 2
-            else:
+            elif txtreaction == '◀️':
                 offset -= 1
+            else:
+                await sent_message.clear_reactions()
+                return
             try:
                 await sent_message.edit(
                     embed=catculator.getstatsEmbed(catculator.getrow(catstats[0][0] + offset), level,

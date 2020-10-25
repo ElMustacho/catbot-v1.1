@@ -113,7 +113,12 @@ class Stagedata:
             title = ''
             if enemyline[1] == 1:
                 title = '**'
-            title += self._enemydata.namefromcode(enemyline[2]) + ', ' + enemyline[3]
+            magstring = enemyline[3]
+            if magstring.count(magstring[1:magstring.find(',')]) > 1:
+                magstring = magstring[1:magstring.find(',')] + '%'
+            else:
+                magstring = magstring + '%'
+            title += self._enemydata.namefromcode(enemyline[2]) + ', ' + magstring
             if enemyline[1] == 1:
                 title += '**'
             if enemyline[4] < 1:
