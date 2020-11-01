@@ -474,8 +474,8 @@ async def on_message(message):
         enemystats1 = enemyculator.getUnitCode(unit1, 4)
         enemystats2 = None
         enemystats3 = None
-        if enemystats1[0] is None:  # too many errors
-            await message.channel.send(message.content[unit1] + '; wasn\'t recognized')
+        if enemystats1 is None:  # too many errors
+            await message.channel.send("The first unit does not exist.")
             return
         try:  # was this a string or a int?
             if len(enemystats1[0]) > 1:  # name wasn't unique
@@ -489,8 +489,8 @@ async def on_message(message):
         nameunit3 = ''
         if unit2 != '':
             enemystats2 = enemyculator.getUnitCode(unit2.lower(), 4)
-            if enemystats2[0] is None:  # too many errors
-                await message.channel.send(message.content[unit2] + '; wasn\'t recognized')
+            if enemystats2 is None:  # too many errors
+                await message.channel.send("The second unit does not exist.")
                 return
             try:  # was this a string or a int?
                 if len(enemystats2[0]) > 1:  # name wasn't unique
@@ -502,8 +502,8 @@ async def on_message(message):
             nameunit2 = enemyculator.namefromcode(enemystats2[0][0])
             if unit3 != '':
                 enemystats3 = enemyculator.getUnitCode(unit3.lower(), 4)
-                if enemystats3[0] is None:  # too many errors
-                    await message.channel.send(message.content[unit3] + '; wasn\'t recognized')
+                if enemystats3 is None:  # too many errors
+                    await message.channel.send("The third unit does not exist.")
                     return
                 try:  # was this a string or a int?
                     if len(enemystats3[0]) > 1:  # name wasn't unique
