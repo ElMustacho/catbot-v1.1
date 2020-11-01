@@ -16,7 +16,9 @@ import catunits_catbot
 import enemyunits_catbot
 import stagedata_catbot
 
-client = discord.Client()
+intents = discord.Intents.all()
+
+client = discord.Client(intents = intents)
 
 
 @client.event
