@@ -223,7 +223,7 @@ async def on_message(message):
         await message.channel.send(embed=embedsend)
 
     elif message.content.startswith('!renamecat'):
-        if not canSend(3, privilegelevel(message.author), message):
+        if not canSend(4, privilegelevel(message.author), message):
             return
         limit = message.content.find(';')
         if limit < 0:
@@ -248,7 +248,7 @@ async def on_message(message):
             await message.channel.send('Name was already used.')
 
     elif message.content.startswith('!renameenemy'):
-        if not canSend(3, privilegelevel(message.author), message):
+        if not canSend(4, privilegelevel(message.author), message):
             return
         limit = message.content.find(';')
         if limit < 0:
@@ -316,7 +316,7 @@ async def on_message(message):
         await message.channel.send(enemyculator.getnames(enemy, enemystats[0][0]))
 
     elif message.content.startswith('!deletecatname'):
-        if not canSend(3, privilegelevel(message.author), message):
+        if not canSend(4, privilegelevel(message.author), message):
             return
         limit = message.content.find(';')
         if limit < 0:
@@ -340,7 +340,7 @@ async def on_message(message):
             await message.channel.send('No such name to delete')
 
     elif message.content.startswith('!deleteenemyname'):
-        if not canSend(3, privilegelevel(message.author), message):
+        if not canSend(4, privilegelevel(message.author), message):
             return
         limit = message.content.find(';')
         if limit < 0:

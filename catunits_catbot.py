@@ -36,7 +36,7 @@ class Catunits:
     def getstatsEmbed(self, cat, level, unitcode):
         isinline = True
         title = 'Stats of ' + cat[95]
-        if len(cat[-4]) > 1:
+        if len(cat[97]) > 1:
             title = 'Stats of ' + cat[97]
         whichform = unitcode - 1 if unitcode > 1019 else unitcode
         if whichform % 3 == 0:
@@ -66,11 +66,12 @@ class Catunits:
         hpv = str(math.ceil(int(cat[0]) * lvmult)) + ' HP - ' + str(round(int(cat[1]), 0)) + ' KB'
         catEmbed.add_field(name='HP - Knockbacks', value=hpv, inline=isinline)
         dmg = str(math.ceil(int(cat[3]) * lvmult))
+        tba = round(int(cat[99]) / 30, 2)
         if int(cat[59]) > 0:
             dmg += '/' + str(math.ceil(int(cat[59]) * lvmult))
         if int(cat[60]) > 0:
             dmg += '/' + str(math.ceil(int(cat[60]) * lvmult))
-        dps = ' Damage - ' + str(int(float(cat[100].replace(',', '.')) * lvmult)) + ' DPS'
+        dps = ' Damage - ' + str(round((cat[3] + cat[59] + cat[60])*lvmult/tba)) + ' DPS'
         damagekind = ''
         if cat[12] == 1:
             damagekind += 'area'
@@ -83,8 +84,7 @@ class Catunits:
                 damagekind += ', omnistrike'
         damagetype = 'Damage (' + damagekind + ') - DPS'
         catEmbed.add_field(name=damagetype, value=dmg + dps, inline=isinline)
-        tba = str(round(int(cat[99]) / 30, 2))
-        catEmbed.add_field(name='Speed - Attack Frequency', value=str(round(int(cat[2]), 0)) + ' - ' + tba + 's',
+        catEmbed.add_field(name='Speed - Attack Frequency', value=str(round(int(cat[2]), 0)) + ' - ' + str(tba) + 's',
                            inline=isinline)
         catEmbed.add_field(name='Cost - Respawn', value=str(round(int(cat[6] * 1.5), 0)) + ' - ' + str(
             round(max(((cat[7] * 2 - 254) / 30), 2), 2)) + 's', inline=isinline)
@@ -312,7 +312,7 @@ class Catunits:
         return 'https://raw.githubusercontent.com/ElMustacho/catbot-v1.1/master/traitpics/' + fstr + '.png'
 
     def getnames(self, cat, catcode):
-        name = cat[95]
+        name = cat[97]
         allnames = 'The custom names of ' + name + ' are: '
         for key, value in self._customnames.items():
             if value == catcode:
