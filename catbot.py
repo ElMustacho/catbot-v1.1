@@ -7,7 +7,7 @@
 # tell the user what happens when a report belonging to him is solved or initiated
 import asyncio
 import sqlite3
-
+from discord.ext import commands
 import discord
 from datetime import datetime, timedelta
 from data_catbot import Data_catbot
@@ -15,16 +15,17 @@ from modtools import Modtools
 import catunits_catbot
 import enemyunits_catbot
 import stagedata_catbot
+import catcomboes
 
 intents = discord.Intents.all()
 
 client = discord.Client(intents = intents)
 
 
+
 @client.event
 async def on_ready():
     print('Ready to go')
-
 
 @client.event
 async def on_message(message):
@@ -127,10 +128,11 @@ async def on_message(message):
         await sent_message.add_reaction('◀️')
         await sent_message.add_reaction('⏩')
         await sent_message.add_reaction('⏪')
-        await sent_message.add_reaction('❌')
+        await sent_message.add_reaction('\U00002705')
+        await sent_message.add_reaction('\U0001F5D1')
 
         def check(reaction_received, user_that_sent):
-            return user_that_sent == message.author and str(reaction_received.emoji) in ['▶', '◀️', '⏩', '⏪', '❌'] and reaction_received.message.id == sent_message.id
+            return user_that_sent == message.author and str(reaction_received.emoji) in ['▶', '◀️', '⏩', '⏪', '\U00002705', '\U0001F5D1'] and reaction_received.message.id == sent_message.id
         try:
             reaction, user = await client.wait_for('reaction_add', timeout=15.0, check=check)
         except asyncio.TimeoutError:
@@ -146,6 +148,10 @@ async def on_message(message):
                 offset -= 2
             elif txtreaction == '◀️':
                 offset -= 1
+            elif txtreaction == '\U0001F5D1':
+                await message.delete()
+                await sent_message.delete()
+                return
             else:
                 await sent_message.clear_reactions()
                 return
@@ -516,6 +522,17 @@ async def on_message(message):
         await message.channel.send(
             stagedata.whereistheenemy(enemystats1, nameunit1, nameunit2, nameunit3, enemystats2, enemystats3))
 
+    elif message.content.startswith('!comboname'):
+        if not canSend(3, privilegelevel(message.author), message):
+            return
+        await message.channel.send(catcomboes.Comboes.name_to_combo(message.content[message.content.find(' ') + 1:], catculator))
+
+    elif message.content.startswith('!combowith'):
+        if not canSend(3, privilegelevel(message.author), message):
+            return
+        await message.channel.send(catcomboes.Comboes.search_by_unit(message.content[message.content.find(' ') + 1:], catculator))
+
+
     elif message.content.startswith('!say'):
         if not canSend(5, privilegelevel(message.author), message):
             return
@@ -537,7 +554,9 @@ async def on_message(message):
                 return
             else:
                 await message.channel.send(results[0])
+                await message.delete()
         except sqlite3.OperationalError:  # database not found
+            print("Database for custom commands not found.")
             return
 
     elif not catbotdata.requireddata['moderation']:

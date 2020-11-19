@@ -25,6 +25,15 @@ class Catunits:
             returned = None
         return returned
 
+    def getnamebycode(self, id):
+        returned = None
+        try:
+            returned = self._cats.iloc[id][97]
+        except IndexError:
+            pass
+        return returned
+
+
     def getUnitCode(self, identifier, errors):
         locator = None
         try:  # was this a string or a int?
