@@ -112,7 +112,7 @@ class Stagedata:
         for enemyline in stageenemies:
             title = ''
             if enemyline[1] == 1:
-                title = '**'
+                title = '__**'
             magstring = enemyline[3]
             if magstring.count(magstring[1:magstring.find(',')]) > 1:
                 magstring = magstring[1:magstring.find(',')] + '%'
@@ -120,7 +120,7 @@ class Stagedata:
                 magstring = magstring + '%'
             title += self._enemydata.namefromcode(enemyline[2]) + ', ' + magstring
             if enemyline[1] == 1:
-                title += '**'
+                title += '**__'
             if enemyline[4] < 1:
                 enemystring += '∞'
             else:

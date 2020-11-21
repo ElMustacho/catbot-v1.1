@@ -108,20 +108,24 @@ class Enemyunits:
             locator = self.closeEnough(identifier, errors)
         return locator
 
-    def getstatsembed(self, enemy, magnification):
-        isinline = True
+    def getstatsembed(self, enemy, magnification, mag2=None):
+        if mag2 == None:
+            mag2 = magnification
         title = 'Stats of ' + str(enemy[86])
         enemyEmbed = emb(description=title, color=0x00ff00)
         enemyEmbed.set_author(name='Cat Bot')
-        enemyEmbed.add_field(name='Magnification', value=str(int(magnification*100)) + '%', inline=isinline)
+        magstring = str(int(magnification*100)) + '%'
+        if mag2 != magnification:
+            magstring = magstring + ' HP, ' + str(int(mag2*100)) + '% Damage'
+        enemyEmbed.add_field(name='Magnification', value=magstring, inline=True)
         hpv = str(math.ceil(int(enemy[0]) * magnification)) + ' HP - ' + str(round(int(enemy[1]), 0)) + ' KB'
-        enemyEmbed.add_field(name='HP - Knockbacks', value=hpv, inline=isinline)
-        dmg = str(math.ceil(int(enemy[3]) * magnification))
+        enemyEmbed.add_field(name='HP - Knockbacks', value=hpv, inline=True)
+        dmg = str(math.ceil(int(enemy[3]) * mag2))
         if int(enemy[55]) > 0:
-            dmg += '/' + str(math.ceil(int(enemy[55]) * magnification))
+            dmg += '/' + str(math.ceil(int(enemy[55]) * mag2))
         if int(enemy[56]) > 0:
-            dmg += '/' + str(math.ceil(int(enemy[56]) * magnification))
-        dps = ' Damage - ' + str(math.ceil(int(enemy[3]+enemy[55]+enemy[56])*magnification*30/enemy[90])) + ' DPS'
+            dmg += '/' + str(math.ceil(int(enemy[56]) * mag2))
+        dps = ' Damage - ' + str(math.ceil(int(enemy[3]+enemy[55]+enemy[56])*mag2*30/enemy[90])) + ' DPS'
         damagekind = ''
         if enemy[11] == 1:
             damagekind += 'area'
@@ -133,11 +137,11 @@ class Enemyunits:
             elif enemy[36] < 0:
                 damagekind += ', omnistrike'
         damagetype = 'Damage (' + damagekind + ') - DPS'
-        enemyEmbed.add_field(name=damagetype, value=dmg + dps, inline=isinline)
+        enemyEmbed.add_field(name=damagetype, value=dmg + dps, inline=True)
         tba = str(round(int(enemy[90]) / 30, 2))
         enemyEmbed.add_field(name='Speed - Attack Frequency', value=str(round(int(enemy[2]), 0)) + ' - ' + tba + 's',
-                           inline=isinline)
-        enemyEmbed.add_field(name='Cash Awarded', value=str(round(int(enemy[6]*3.95), 0)), inline=isinline)
+                           inline=True)
+        enemyEmbed.add_field(name='Cash Awarded', value=str(round(int(enemy[6]*3.95), 0)), inline=True)
         rangestr = ''
         if ',' in damagekind:  # it's long range or omni
             leftrange = str(max(round(int(enemy[35]), 0), round(int(enemy[35] + enemy[36]))))
@@ -145,7 +149,7 @@ class Enemyunits:
             rangestr += leftrange + ' to ' + rightrange + '; stands at ' + str(round(int(enemy[5])))
         else:  # otherwise only range is needed
             rangestr += str(round(int(enemy[5])))
-        enemyEmbed.add_field(name='Range', value=rangestr, inline=isinline)
+        enemyEmbed.add_field(name='Range', value=rangestr, inline=True)
         enemyEmbed.set_thumbnail(url=self.enemytraitstopic(enemy))
         offensive = ''
         if enemy[20] > 0:  # knockback
@@ -187,7 +191,7 @@ class Enemyunits:
             offensive += 'Surge Attack ' + str(round(int(enemy[81]))) + '% (' + str(round(int(enemy[82]/4))) + '-' + str(round(int(enemy[82]/4)+int(enemy[83]/4))) + ', level ' + str(round(int(enemy[84]))) + '), '
         offensive = offensive[:-2]
         if len(offensive) > 3:
-            enemyEmbed.add_field(name='Offensive abilities', value=offensive, inline=isinline)
+            enemyEmbed.add_field(name='Offensive abilities', value=offensive, inline=True)
         defensive = ''
         if enemy[34] > 0:  # survive
             defensive += 'Survive ' + str(round(int(enemy[34]))) + '%, '
@@ -219,7 +223,7 @@ class Enemyunits:
             defensive += 'Dodge ' + str(round(int(enemy[77]))) + '% (' + str(round(int(enemy[78]) / 30, 2)) + 's), '
         defensive = defensive[:-2]
         if len(defensive) > 3:
-            enemyEmbed.add_field(name='Defensive abilities', value=defensive, inline=isinline)
+            enemyEmbed.add_field(name='Defensive abilities', value=defensive, inline=True)
         if int(enemy[59]) > 0:
             atkroutine = '**' + str(round(int(enemy[12]))) + '**'
         else:
@@ -235,7 +239,7 @@ class Enemyunits:
             else:
                 atkroutine += 'f / ' + str(round(int(enemy[58])))
         atkroutine += 'f / ' + str(round(int(enemy[89]))) + 'f'
-        enemyEmbed.add_field(name='Attack timings', value=atkroutine, inline=isinline)
+        enemyEmbed.add_field(name='Attack timings', value=atkroutine, inline=True)
         return enemyEmbed
 
     def givenewname(self, enemycode, newname):

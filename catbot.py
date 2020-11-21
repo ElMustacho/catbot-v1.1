@@ -219,13 +219,24 @@ async def on_message(message):
         try:
             border = message.content.find('%')
             if border == -1:
-                border = len(message.content)
+                border = find_nth(str(message.content),';',2)
+                if border == -1:
+                    border = len(message.content)
             magnification = float(int(message.content[message.content.find(';') + 1:border]) / 100)
+            mag2=magnification
+            if message.content.count(';')==2:
+                mag2 = float(int(message.content[find_nth(str(message.content),';',2)+1:]) / 100)
+            elif message.content.count(';')>2:
+                await message.channel.send("Wrong syntax, you passed too many arguments.")
+                return
         except:
             magnification = 1
+            mag2 = magnification
         if magnification < 0 or magnification > 1000000:
             magnification = 1
-        embedsend = enemyculator.getstatsembed(enemy, magnification)
+        if mag2 < 0 or mag2 > 1000000:
+            mag2 = 1
+        embedsend = enemyculator.getstatsembed(enemy, magnification, mag2)
         await message.channel.send(embed=embedsend)
 
     elif message.content.startswith('!renamecat'):
