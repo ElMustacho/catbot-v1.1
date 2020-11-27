@@ -77,7 +77,7 @@ async def on_message(message):
             await message.channel.send('You need to input a cat unit name or code.')
             return
         catstats = catculator.getUnitCode(cat, 6)  # second parameter is number of errors allowed
-        if catstats is None:  # too many errors, maybe they meant an enemy?
+        if catstats == "no result":  # too many errors, maybe they meant an enemy?
             enemystats = enemyculator.getUnitCode(message.content[message.content.find(' ') + 1:limit].lower(), 3)
             if enemystats is None:  # too many errors for an enemy
                 await message.channel.send(
@@ -99,14 +99,10 @@ async def on_message(message):
             embedsend = enemyculator.getstatsembed(enemy, 1)
             await message.channel.send("Did you mean to search an enemy?", embed=embedsend)
             return
-        try:
-            lenght = len(catstats[0])
-        except TypeError:  # it's a number
-            catstats[0] = [catstats[0]]
-        if len(catstats[0]) > 1:  # name wasn't unique
+        if catstats == "name not unique":  # name wasn't unique
             await message.channel.send('Couldn\'t discriminate.')
             return
-        cat = catculator.getrow(catstats[0][0])
+        cat = catculator.getrow(catstats[0])
         if cat is None:
             await message.channel.send('Invalid code for cat unit.')
             return
@@ -117,7 +113,7 @@ async def on_message(message):
         if level < 0 or level > 130:
             level = 30
         try:
-            embedsend = catculator.getstatsEmbed(cat, level, catstats[0][0])
+            embedsend = catculator.getstatsEmbed(cat, level, catstats[0])
         except TypeError:
             await message.channel.send("That code doesn't provide any result.")
             return
@@ -157,8 +153,8 @@ async def on_message(message):
                 return
             try:
                 await sent_message.edit(
-                    embed=catculator.getstatsEmbed(catculator.getrow(catstats[0][0] + offset), level,
-                                                   catstats[0][0] + offset))
+                    embed=catculator.getstatsEmbed(catculator.getrow(catstats[0] + offset), level,
+                                                   catstats[0] + offset))
             except TypeError:
                 await sent_message.edit(content="That form doesn't exists.")
         await sent_message.clear_reactions()
@@ -187,22 +183,18 @@ async def on_message(message):
             enemy = message.content[message.content.find(' ') + 1:limit]
             if enemy == '':
                 await message.channel.send('You need to input an enemy name.')
-            if catstats is None:
+            if catstats == "no result":
                 await message.channel.send(enemy + '; wasn\'t recognized.')
-            try:
-                lenght = len(catstats[0])
-            except TypeError:  # it's a number
-                catstats[0] = [catstats[0]]
-            if len(catstats[0]) > 1:  # name wasn't unique
+            if catstats == "name not unique":  # name wasn't unique
                 await message.channel.send(
                     message.content[message.content.find(' ') + 1:limit] + '; wasn\'t recognized.')
                 return
-            cat = catculator.getrow(catstats[0][0])
+            cat = catculator.getrow(catstats[0])
             if cat is None:
                 await message.channel.send(
                     message.content[message.content.find(' ') + 1:limit] + '; wasn\'t recognized.')
                 return
-            embedsend = catculator.getstatsEmbed(cat, 30, catstats[0][0])
+            embedsend = catculator.getstatsEmbed(cat, 30, catstats[0])
             await message.channel.send("Did you mean to search a cat?", embed=embedsend)
             return
         try:
@@ -248,17 +240,13 @@ async def on_message(message):
             return
         realnameunit = message.content[11: limit]
         catcode = catculator.getUnitCode(realnameunit.lower(), 0)
-        if catcode is None:  # too many errors
+        if catcode == "no result":  # too many errors
             await message.channel.send('That was gibberish.')
             return
-        if len(catcode[0]) > 1:  # name wasn't unique
+        if catcode == "name not unique":  # name wasn't unique
             await message.channel.send('Couldn\'t discriminate.')
             return
-
-        if catcode[0][0] is None:
-            await message.channel.send('Invalid code for cat unit')
-            return
-        response = catculator.givenewname(catcode[0][0], message.content[limit + 2:])
+        response = catculator.givenewname(catcode[0], message.content[limit + 2:])
         if response:
             await message.channel.send('The name ' + message.content[limit + 2:] + ' is now assigned.')
         else:
@@ -308,14 +296,14 @@ async def on_message(message):
                 return
         catstats = catculator.getUnitCode(message.content[12:].lower(),
                                           6)  # second parameter is number of errors allowed
-        if catstats[0] is None:  # too many errors
+        if catstats == "no result":  # too many errors
             await message.channel.send(message.content[12:] + '; wasn\'t recognized')
             return
         if len(catstats[0]) > 1:  # name wasn't unique
             await message.channel.send('Couldn\'t discriminate.')
             return
-        cat = catculator.getrow(catstats[0][0])
-        await message.channel.send(catculator.getnames(cat, catstats[0][0]))
+        cat = catculator.getrow(catstats[0])
+        await message.channel.send(catculator.getnames(cat, catstats[0]))
 
     elif message.content.startswith('!enemynamesof'):
         if not canSend(2, privilegelevel(message.author), message):
@@ -341,16 +329,13 @@ async def on_message(message):
             return
         realnameunit = message.content[15: limit]
         catcode = catculator.getUnitCode(realnameunit.lower(), 0)
-        if catcode is None:  # too many errors
+        if catcode == "no result":  # too many errors
             await message.channel.send('That was gibberish.')
             return
-        if len(catcode[0]) > 1:  # name wasn't unique
+        if catcode == "name not unique":  # name wasn't unique
             await message.channel.send('Couldn\'t discriminate.')
             return
-        if catcode[0][0] is None:
-            await message.channel.send('Invalid code for cat unit')
-            return
-        operationsuccess = catculator.removename(catcode[0][0], message.content[limit + 2:])
+        operationsuccess = catculator.removename(catcode[0], message.content[limit + 2:])
         if operationsuccess:
             await message.channel.send('Name was deleted successfully.')
         else:
@@ -379,32 +364,6 @@ async def on_message(message):
             await message.channel.send('Name was deleted successfully.')
         else:
             await message.channel.send('No such name to delete')
-
-    elif message.content.startswith('!stage '):  # todo eventually merge this and !stagebeta
-        if not canSend(3, privilegelevel(message.author), message):
-            return
-        await message.channel.send("Please use `!stagebeta` instead of this command.")
-        return
-        stagestring = message.content[message.content.find(' ') + 1: message.content.find(';')]
-        stageenemies = stagedata.nametoenemies(stagestring, 5)
-        if stageenemies == 0:  # too many errors
-            await message.channel.send("That stage doesn't exists.")
-            return
-        elif stageenemies == 1:  # could not tell between more than 1 stage
-            await message.channel.send("You need to be more specific.")
-            return
-        elif stageenemies is None:
-            await message.channel.send("Catbot is confused and doesn't know what happened.")
-            return
-        level = 0
-        try:
-            level = int(message.content[message.content.find(';') + 1:])
-        except:
-            level = 100
-        if level < 100 or level > 400:
-            level = 100
-        embtosend = stagedata.dataToEmbed(stageenemies, 'Currently unavailable', level / 100)
-        await message.channel.send(embed=embtosend)
 
     elif message.content.startswith('!stagebeta') or message.content.startswith('!sb'):
         if not canSend(1, privilegelevel(message.author), message):
@@ -553,6 +512,22 @@ async def on_message(message):
         await channel_to_send.send(message_to_send)
         return
 
+    elif message.content.startswith('!rawtalents'):
+        if not canSend(3, privilegelevel(message.author), message):
+            return
+        cat = catculator.getUnitCode(message.content[message.content.find(' ') + 1:].lower(),6)
+
+        if cat == "no result":
+            await message.channel.send("Gibberish.")
+            return
+        if cat == "name not unique":  # name wasn't unique
+            await message.channel.send('Couldn\'t discriminate.')
+            return
+
+        answer = catculator.get_talents_by_id(cat[0]-2)  # offset by 2 maybe
+        await message.channel.send(str(answer))
+        return
+
     elif message.content.startswith('!'):  # custom commands
         if not canSend(3, privilegelevel(message.author), message):
             return
@@ -579,7 +554,7 @@ async def on_message(message):
                 await message.channel.send('Your token is: ' + str(int(message.author.id) % 9999998) + '.')
         return
 
-    elif message.content == '$password ururun wolf':
+    elif message.content == '$password manic lion cat':
         if message.channel.id == catbotdata.requireddata['welcome-channel']:
             member = serveruser(message.author)
             await member.add_roles(discord.utils.get(client.get_guild(catbotdata.requireddata['server-id']).roles,

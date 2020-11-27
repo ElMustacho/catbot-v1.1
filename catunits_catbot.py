@@ -1,3 +1,5 @@
+import sqlite3
+
 import pandas as pd
 import nltk as nl
 from discord import Embed as emb
@@ -35,14 +37,18 @@ class Catunits:
 
 
     def getUnitCode(self, identifier, errors):
-        locator = None
         try:  # was this a string or a int?
             locator = [int(identifier), 0]
         except ValueError:
             locator = self.closeEnough(identifier, errors)
+            if locator == None:
+                return "no result"
+            if len(locator[0]) > 1:
+                return "name not unique"
+            locator[0] = locator[0][0]
         return locator
 
-    def getstatsEmbed(self, cat, level, unitcode):
+    def getstatsEmbed(self, cat, level, unitcode, extraparam = None):
         isinline = True
         title = 'Stats of ' + cat[95]
         if len(cat[97]) > 1:
@@ -349,3 +355,195 @@ class Catunits:
     def storedict(self):
         with open('catCustomUnits.pkl', 'wb') as f:
             pickle.dump(self._customnames, f, pickle.DEFAULT_PROTOCOL)
+
+    @staticmethod
+    def apply_talent(unit, talent, level, extra_param):
+        if level < 1 or level > talent[3]:  # invalid level for talent
+            if talent[3] == 0:  # ponos sometimes sets to 0 the max level, when it really meant 1
+                level = 1
+            else:
+                return
+        first_param = talent[4] + (level - 1) * ((talent[5] - talent[4]) / max(talent[3] - 1, 1))
+        second_param = talent[6] + (level - 1) * ((talent[7] - talent[6]) / max(talent[3] - 1, 1))
+        third_param = talent[8] + (level - 1) * ((talent[9] - talent[8]) / max(talent[3] - 1, 1))
+        fourth_param = talent[10] + (level - 1) * ((talent[11] - talent[10]) / max(talent[3] - 1, 1))
+        if talent[2] == 1:  # weaken
+            unit[37] += first_param
+            unit[38] += second_param
+            unit[39] += second_param
+        elif talent[2] == 2:  # freeze
+            unit[25] += first_param
+            unit[26] += second_param
+        elif talent[2] == 3:  # slow
+            unit[27] += first_param
+            unit[28] += second_param
+        elif talent[2] == 4:  # target only
+            unit[32] |= 1
+        elif talent[2] == 5:  # strong
+            unit[23] |= 1
+        elif talent[2] == 6:  # resist
+            unit[29] |= 1
+        elif talent[2] == 7:  # massive damage
+            unit[30] |= 1
+        elif talent[2] == 8:  # knockback
+            unit[24] += first_param
+        elif talent[2] == 9:  # warp (unused)
+            pass
+        elif talent[2] == 10:  # strengthen
+            unit[40] += first_param
+            unit[41] += second_param
+        elif talent[2] == 11:  # survive
+            unit[42] += first_param
+        elif talent[2] == 12:  # base destroyer
+            unit[34] |= 1
+        elif talent[2] == 13:  # critical (unused)
+            pass
+        elif talent[2] == 14:  # zombie killer
+            unit[52] |= 1
+        elif talent[2] == 15:  # barrier breaker
+            unit[70] += first_param
+        elif talent[2] == 16:  # double cash
+            unit[33] |= 1
+        elif talent[2] == 17:  # wave attack
+            unit[35] += first_param
+            unit[36] += second_param
+        elif talent[2] == 18:  # resists weaken
+            extra_param[0] = first_param
+        elif talent[2] == 19:  # resists freeze
+            extra_param[1] = first_param
+        elif talent[2] == 20:  # resists slow
+            extra_param[2] = first_param
+        elif talent[2] == 21:  # resists knockback
+            extra_param[3] = first_param
+        elif talent[2] == 22:  # resists waves
+            extra_param[4] = first_param
+        elif talent[2] == 23:  # wave immune (unused)
+            pass
+        elif talent[2] == 24:  # warp block (unused)
+            pass
+        elif talent[2] == 25:  # curse immunity
+            unit[79] |= 1
+        elif talent[2] == 26:  # resist curse
+            extra_param[5] = first_param
+        elif talent[2] == 27:  # hp up
+            unit[0] *= (1+first_param/100)
+        elif talent[2] == 28:  # atk up
+            unit[3] *= (1+first_param/100)
+        elif talent[2] == 29:  # speed up
+            unit[2] *= (1+first_param/100)
+        elif talent[2] == 30:  # knockback chance up (unused)
+            pass
+        elif talent[2] == 31:  # cost down
+            unit[6] -= first_param
+        elif talent[2] == 32:  # recharge down
+            unit[7] -= first_param
+        elif talent[2] == 33:  # target red
+            unit[10] |= 1
+        elif talent[2] == 34:  # target floating
+            unit[16] |= 1
+        elif talent[2] == 35:  # target black
+            unit[17] |= 1
+        elif talent[2] == 36:  # target metal
+            unit[18] |= 1
+        elif talent[2] == 37:  # target angel
+            unit[20] |= 1
+        elif talent[2] == 38:  # target alien
+            unit[21] |= 1
+        elif talent[2] == 39:  # target zombies
+            unit[22] |= 1
+        elif talent[2] == 40:  # target relic
+            unit[78] |= 1
+        elif talent[2] == 41:  # target traitless
+            unit[19] |= 1
+        elif talent[2] == 42:  # weaken duration up
+            unit[38] += first_param
+        elif talent[2] == 43:  # freeze duration up
+            unit[26] += first_param
+        elif talent[2] == 44:  # slow duration up
+            unit[28] += first_param
+        elif talent[2] == 45:  # knockback chance up
+            unit[24] += first_param
+        elif talent[2] == 46:  # strengthen power up
+            unit[41] += first_param
+        elif talent[2] == 47:  # survive chance
+            unit[42] += first_param
+        elif talent[2] == 48:  # critical chance
+            unit[31] += first_param
+        elif talent[2] == 49:  # barrier breaker chance
+            unit[70] += first_param
+        elif talent[2] == 50:  # wave chance
+            pass
+        elif talent[2] == 51:  # warp duration (unused)
+            pass
+        elif talent[2] == 52:  # critical
+            talent[31] += first_param
+        elif talent[2] == 53:  # weaken immune
+            unit[51] |= 1
+        elif talent[2] == 54:  # freeze immune
+            unit[49] |= 1
+        elif talent[2] == 55:  # slow immune
+            unit[50] |= 1
+        elif talent[2] == 56:  # knockback immune
+            unit[48] |= 1
+        elif talent[2] == 57:  # wave immune
+            unit[46] |= 1
+        elif talent[2] == 58:  # warp block
+            pass
+        elif talent[2] == 59:  # savage blow
+            unit[82] += first_param
+            unit[83] += second_param
+        elif talent[2] == 60:  # dodge
+            unit[84] += first_param
+            unit[85] += second_param
+        elif talent[2] == 61:  # savage blow chance
+            pass
+        elif talent[2] == 62:  # dodge duration
+            pass
+        elif talent[2] == 63:  # slow chance
+            unit[27] += first_param
+        elif talent[2] == 64:  # resist toxic
+            extra_param[6] = first_param
+        elif talent[2] == 65:  # toxic immune
+            unit[90] |= 1
+        elif talent[2] == 66:  # resist surge
+            extra_param[7] = first_param
+        elif talent[2] == 67:  # surge immune
+            unit[92] |= 1
+        elif talent[2] == 68:  # surge attack
+            unit[86] += first_param
+            unit[87] += second_param
+            unit[88] += third_param
+            unit[89] += fourth_param
+        elif talent[2] == 69:  # slow relic
+            unit[27] += first_param
+            unit[28] += second_param
+            unit[78] |= 1
+        elif talent[2] == 70:  # weaken relic
+            unit[37] += first_param
+            unit[38] += second_param
+            unit[39] += second_param
+            unit[78] |= 1
+        elif talent[2] == 71:  # weaken alien
+            unit[37] += first_param
+            unit[38] += second_param
+            unit[39] += second_param
+            unit[21] |= 1
+        elif talent[2] == 72:  # slow metal
+            unit[27] += first_param
+            unit[28] += second_param
+            unit[18] |= 1
+        elif talent[2] == 73:  # knockback zombies
+            unit[24] += first_param
+            unit[22] |= 1
+        return [unit, extra_param]
+
+    def get_talents_by_id(self, unit_id):
+        try:
+            conn = sqlite3.connect('file:talents.db?mode=rw', uri=True)  # open only if exists
+            cursor = conn.cursor()
+            results = cursor.execute("select * from talents where unit_id = ?/3.0", (unit_id,)).fetchall()
+        except sqlite3.OperationalError:  # database not found
+            return "Database for cat comboes not found."
+        if len(results) == 0:
+            return str(self.getnamebycode(unit_id+2)) + " doesn't have talents."
+        return results

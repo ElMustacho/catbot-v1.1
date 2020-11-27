@@ -26,7 +26,8 @@ class Comboes:
             return "That combo doesn't exists."
         else:
             results = cursor.execute(
-                "select distinct required_id,combo_effect from names_effects join units_in_combo on names_effects.combo_name = units_in_combo.combo_name where names_effects.combo_name = ?",
+                "select distinct required_id,combo_effect from names_effects join units_in_combo on "
+                "names_effects.combo_name = units_in_combo.combo_name where names_effects.combo_name = ?",
                 (array[closest[0]],)).fetchall()
             toret = "The catcombo named **" + array[closest[0]] + "** with the effect **" + results[0][
                 1] + "** requires the following units; "
