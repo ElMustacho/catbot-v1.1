@@ -182,9 +182,9 @@ SELECT DISTINCT stages.stage, stages.category from units join stages on units.st
                 else:
                     tuple=(str(enemycode[0][0]), str(enemycode1[0][0]))
                     results = cursor.execute(
-                        '''SELECT DISTINCT stages.stage, stages.level from units join stages on units.stageid = stages.stageid where enemycode=? 
+                        '''SELECT DISTINCT stages.stage, stages.category from units join stages on units.stageid = stages.stageid where enemycode=? 
 INTERSECT
-SELECT DISTINCT stages.stage, stages.level from units join stages on units.stageid = stages.stageid where enemycode=?''',
+SELECT DISTINCT stages.stage, stages.category from units join stages on units.stageid = stages.stageid where enemycode=? order by stages.category''',
                         tuple).fetchall()
             else:
                 results = cursor.execute(

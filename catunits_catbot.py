@@ -10,7 +10,7 @@ from collections import defaultdict
 
 class Catunits:
     def __init__(self):
-        self._cats = pd.read_csv('unitdata9.9.tsv', sep='\t')
+        self._cats = pd.read_csv('unitdata10.1.tsv', sep='\t')
         self._customnames = None
         try:
             self._customnames = pickle.load(open('catCustomUnits.pkl', 'rb'))  # this is a dictionary
@@ -48,11 +48,11 @@ class Catunits:
             locator[0] = locator[0][0]
         return locator
 
-    def getstatsEmbed(self, cat, level, unitcode, extraparam = None):
+    def getstatsEmbed(self, cat, level, unitcode, extraparam = []):
         isinline = True
-        title = 'Stats of ' + cat[95]
-        if len(cat[97]) > 1:
-            title = 'Stats of ' + cat[97]
+        title = 'Stats of ' + cat[96]
+        if len(cat[98]) > 1:
+            title = 'Stats of ' + cat[98]
         whichform = unitcode - 1 if unitcode > 1019 else unitcode
         if whichform % 3 == 0:
             title += ' - First form'
@@ -64,24 +64,24 @@ class Catunits:
         catEmbed = emb(description=title, color=0xff3300)
         catEmbed.set_author(name='Cat Bot')
         rarity = ''
-        if cat[96] == 0:
+        if cat[97] == 0:
             rarity = 'Normal Rare'
-        elif cat[96] == 1:
+        elif cat[97] == 1:
             rarity = 'Special Rare'
-        elif cat[96] == 2:
+        elif cat[97] == 2:
             rarity = 'Rare'
-        elif cat[96] == 3:
+        elif cat[97] == 3:
             rarity = 'Super Rare'
-        elif cat[96] == 4:
+        elif cat[97] == 4:
             rarity = 'Uber Super Rare'
-        elif cat[96] == 5:
+        elif cat[97] == 5:
             rarity = 'Legend Rare'
         catEmbed.add_field(name='Level - Rarity', value=str(level) + ' - ' + rarity, inline=isinline)
-        lvmult = float(self.levelMultiplier(cat[96], unitcode, level))
+        lvmult = float(self.levelMultiplier(cat[97], unitcode, level))
         hpv = str(math.ceil(int(cat[0]) * lvmult)) + ' HP - ' + str(round(int(cat[1]), 0)) + ' KB'
         catEmbed.add_field(name='HP - Knockbacks', value=hpv, inline=isinline)
         dmg = str(math.ceil(int(cat[3]) * lvmult))
-        tba = round(int(cat[99]) / 30, 2)
+        tba = round(int(cat[100]) / 30, 2)
         if int(cat[59]) > 0:
             dmg += '/' + str(math.ceil(int(cat[59]) * lvmult))
         if int(cat[60]) > 0:
@@ -132,7 +132,11 @@ class Catunits:
         if cat[34] > 0:  # base destroyer
             offensivestr += 'Base destroyer, '
         if cat[35] > 0:  # wave attack
-            offensivestr += 'Wave attack ' + str(round(int(cat[35]))) + '% (' + str(
+            if cat[94] > 0:  # alternative wave
+                offensivestr += "Smallwave"
+            else:  # regular
+                offensivestr += "Wave"
+            offensivestr += ' attack ' + str(round(int(cat[35]))) + '% (' + str(
                 333 + round(int(cat[36]) - 1) * 200) + ' range), '
         if cat[37] > 0:  # weaken
             offensivestr += 'Weaken ' + str(round(int(cat[37]))) + '% (' + str(round(int(cat[39]))) + '% power, ' + str(
@@ -193,6 +197,23 @@ class Catunits:
             defensivestr += 'Poison immune, '
         if cat[91] > 0:  # surge immune
             defensivestr += 'Surge immune, '
+        if len(extraparam)>0:
+            if extraparam[0] > 0:
+                defensivestr += 'Resist weaken ' + str(extraparam[0]) + '%, '
+            if extraparam[1] > 0:
+                defensivestr += 'Resist freeze ' + str(extraparam[1]) + '%, '
+            if extraparam[2] > 0:
+                defensivestr += 'Resist slow ' + str(extraparam[2]) + '%, '
+            if extraparam[3] > 0:
+                defensivestr += 'Resist knockback ' + str(extraparam[3]) + '%, '
+            if extraparam[4] > 0:
+                defensivestr += 'Resist waves' + str(extraparam[4]) + '%, '
+            if extraparam[5] > 0:
+                defensivestr += 'Resist curse' + str(extraparam[5]) + '%, '
+            if extraparam[6] > 0:
+                defensivestr += 'Resist toxic' + str(extraparam[6]) + '%, '
+            if extraparam[7] > 0:
+                defensivestr += 'Resist surge' + str(extraparam[7]) + '%, '
         defensivestr = defensivestr[:-2]
         if len(defensivestr) > 3:
             catEmbed.add_field(name='Defensive abilities', value=defensivestr, inline=isinline)
@@ -209,7 +230,7 @@ class Catunits:
                 atkroutine += 'f / **' + str(round(int(cat[62]))) + '**'
             else:
                 atkroutine += 'f / ' + str(round(int(cat[62])))
-        atkroutine += 'f / ' + str(round(int(cat[98]))) + 'f'  # backswing
+        atkroutine += 'f / ' + str(round(int(cat[99]))) + 'f'  # backswing
         catEmbed.add_field(name='Attack timings', value=atkroutine, inline=isinline)
         return catEmbed
 
@@ -356,13 +377,13 @@ class Catunits:
         with open('catCustomUnits.pkl', 'wb') as f:
             pickle.dump(self._customnames, f, pickle.DEFAULT_PROTOCOL)
 
-    @staticmethod
+    @staticmethod  # TODO fix the warning, try to use .loc, also fix last talents
     def apply_talent(unit, talent, level, extra_param):
         if level < 1 or level > talent[3]:  # invalid level for talent
             if talent[3] == 0:  # ponos sometimes sets to 0 the max level, when it really meant 1
                 level = 1
             else:
-                return
+                level = talent[3]
         first_param = talent[4] + (level - 1) * ((talent[5] - talent[4]) / max(talent[3] - 1, 1))
         second_param = talent[6] + (level - 1) * ((talent[7] - talent[6]) / max(talent[3] - 1, 1))
         third_param = talent[8] + (level - 1) * ((talent[9] - talent[8]) / max(talent[3] - 1, 1))
@@ -434,9 +455,9 @@ class Catunits:
         elif talent[2] == 30:  # knockback chance up (unused)
             pass
         elif talent[2] == 31:  # cost down
-            unit[6] -= first_param
+            unit[6] = unit[6] - first_param
         elif talent[2] == 32:  # recharge down
-            unit[7] -= first_param
+            unit[7] = unit[7] - first_param
         elif talent[2] == 33:  # target red
             unit[10] |= 1
         elif talent[2] == 34:  # target floating
@@ -511,9 +532,9 @@ class Catunits:
             unit[92] |= 1
         elif talent[2] == 68:  # surge attack
             unit[86] += first_param
-            unit[87] += second_param
-            unit[88] += third_param
-            unit[89] += fourth_param
+            unit[87] += third_param
+            unit[88] += fourth_param
+            unit[89] += second_param
         elif talent[2] == 69:  # slow relic
             unit[27] += first_param
             unit[28] += second_param

@@ -388,7 +388,7 @@ async def on_message(message):
         if s_string.count(';') > 3:
             await message.channel.send("Wrong syntax, check again command usage guide.")
             return
-        stageid = stagedata.getstageid(stagestring, 5, stagelevel, categorystring)
+        stageid = stagedata.getstageid(stagestring.lower(), 5, stagelevel.lower(), categorystring.lower())
         if stageid == -1:  # too many errors
             await message.channel.send("That stage doesn't exist.")
             return
@@ -515,7 +515,7 @@ async def on_message(message):
     elif message.content.startswith('!rawtalents'):
         if not canSend(3, privilegelevel(message.author), message):
             return
-        cat = catculator.getUnitCode(message.content[message.content.find(' ') + 1:].lower(),6)
+        cat = catculator.getUnitCode(message.content[message.content.find(' ') + 1:].lower(), 6)
 
         if cat == "no result":
             await message.channel.send("Gibberish.")
@@ -523,9 +523,23 @@ async def on_message(message):
         if cat == "name not unique":  # name wasn't unique
             await message.channel.send('Couldn\'t discriminate.')
             return
-
-        answer = catculator.get_talents_by_id(cat[0]-2)  # offset by 2 maybe
+        answer = catculator.get_talents_by_id(cat[0]-2)  # offset by 2 to fix unitcodes
         await message.channel.send(str(answer))
+        return
+
+    elif message.content.startswith('!eta'):  # experimental talents assignment
+        if not canSend(5, privilegelevel(message.author), message):
+            return
+        shingen = catculator.getrow(32)
+        shingen_talents = catculator.get_talents_by_id(30)  # offset by 2 required
+        ep=[]
+        shingen = shingen.array
+        for line in shingen_talents:
+            ret = catculator.apply_talent(shingen, line, 10, ep)
+            ep = ret[1]
+            shingen = ret[0]
+        emb = catculator.getstatsEmbed(shingen, 30, 32, ep)
+        await message.channel.send(embed=emb)
         return
 
     elif message.content.startswith('!'):  # custom commands
