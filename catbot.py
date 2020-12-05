@@ -7,7 +7,6 @@
 # tell the user what happens when a report belonging to him is solved or initiated
 import asyncio
 import sqlite3
-from discord.ext import commands
 import discord
 from datetime import datetime, timedelta
 from data_catbot import Data_catbot
@@ -19,13 +18,13 @@ import catcomboes
 
 intents = discord.Intents.all()
 
-client = discord.Client(intents = intents)
-
+client = discord.Client(intents=intents)
 
 
 @client.event
 async def on_ready():
     print('Ready to go')
+
 
 @client.event
 async def on_message(message):
@@ -128,7 +127,10 @@ async def on_message(message):
         await sent_message.add_reaction('\U0001F5D1')
 
         def check(reaction_received, user_that_sent):
-            return user_that_sent == message.author and str(reaction_received.emoji) in ['▶', '◀️', '⏩', '⏪', '\U00002705', '\U0001F5D1'] and reaction_received.message.id == sent_message.id
+            return user_that_sent == message.author and str(reaction_received.emoji) in ['▶', '◀️', '⏩', '⏪',
+                                                                                         '\U00002705',
+                                                                                         '\U0001F5D1'] and reaction_received.message.id == sent_message.id
+
         try:
             reaction, user = await client.wait_for('reaction_add', timeout=15.0, check=check)
         except asyncio.TimeoutError:
@@ -211,14 +213,14 @@ async def on_message(message):
         try:
             border = message.content.find('%')
             if border == -1:
-                border = find_nth(str(message.content),';',2)
+                border = find_nth(str(message.content), ';', 2)
                 if border == -1:
                     border = len(message.content)
             magnification = float(int(message.content[message.content.find(';') + 1:border]) / 100)
-            mag2=magnification
-            if message.content.count(';')==2:
-                mag2 = float(int(message.content[find_nth(str(message.content),';',2)+1:]) / 100)
-            elif message.content.count(';')>2:
+            mag2 = magnification
+            if message.content.count(';') == 2:
+                mag2 = float(int(message.content[find_nth(str(message.content), ';', 2) + 1:]) / 100)
+            elif message.content.count(';') > 2:
                 await message.channel.send("Wrong syntax, you passed too many arguments.")
                 return
         except:
@@ -427,7 +429,7 @@ async def on_message(message):
         if not canSend(1, privilegelevel(message.author), message):
             return
         if privilegelevel(message.author) < 3 and message.channel.id not in catbotdata.requireddata[
-            'freeforall-channels']:
+                'freeforall-channels']:
             if not isokayifnotclog(message, isADM(message)):
                 return
         limit = message.content.find(';')
@@ -495,13 +497,14 @@ async def on_message(message):
     elif message.content.startswith('!comboname'):
         if not canSend(3, privilegelevel(message.author), message):
             return
-        await message.channel.send(catcomboes.Comboes.name_to_combo(message.content[message.content.find(' ') + 1:], catculator))
+        await message.channel.send(
+            catcomboes.Comboes.name_to_combo(message.content[message.content.find(' ') + 1:], catculator))
 
     elif message.content.startswith('!combowith'):
         if not canSend(3, privilegelevel(message.author), message):
             return
-        await message.channel.send(catcomboes.Comboes.search_by_unit(message.content[message.content.find(' ') + 1:], catculator))
-
+        await message.channel.send(
+            catcomboes.Comboes.search_by_unit(message.content[message.content.find(' ') + 1:], catculator))
 
     elif message.content.startswith('!say'):
         if not canSend(5, privilegelevel(message.author), message):
@@ -523,22 +526,54 @@ async def on_message(message):
         if cat == "name not unique":  # name wasn't unique
             await message.channel.send('Couldn\'t discriminate.')
             return
-        answer = catculator.get_talents_by_id(cat[0]-2)  # offset by 2 to fix unitcodes
+        ironwallsucks = 0
+        if cat[0] > 1017:
+            ironwallsucks = 2
+        answer = catculator.get_talents_by_id(cat[0] - 2 + ironwallsucks)  # offset by 2 to fix unitcodes
         await message.channel.send(str(answer))
         return
 
-    elif message.content.startswith('!eta'):  # experimental talents assignment
-        if not canSend(5, privilegelevel(message.author), message):
+    elif message.content.startswith('!cst'):  # experimental talents assignment
+        if not canSend(3, privilegelevel(message.author), message):
             return
-        shingen = catculator.getrow(32)
-        shingen_talents = catculator.get_talents_by_id(30)  # offset by 2 required
-        ep=[]
-        shingen = shingen.array
-        for line in shingen_talents:
-            ret = catculator.apply_talent(shingen, line, 10, ep)
+        limit = message.content.find(';')
+        if limit == -1:
+            limit = len(message.content)
+        cat = catculator.getUnitCode(message.content[message.content.find(' ') + 1:limit].lower(), 6)
+        if cat == "no result":
+            await message.channel.send("Gibberish.")
+            return
+        if cat == "name not unique":  # name wasn't unique
+            await message.channel.send('Couldn\'t discriminate.')
+            return
+        ironwallsucks = 0
+        if cat[0] > 1017:
+            ironwallsucks = 2
+        unit_talents = catculator.get_talents_by_id(cat[0] - 2 + ironwallsucks)  # offset by 2 required
+        cat_row = catculator.getrow(cat[0])
+        if cat_row is None or unit_talents[:3] == 'nan':
+            await message.channel.send("Invalid unitcode.")
+            return
+        cat_unit = cat_row.tolist()
+        if unit_talents[-2:] == 'd.':  # no db found
+            await message.channel.send(unit_talents)
+            return
+        if unit_talents[-2:] == 's.':  # no talents for unit
+            await message.channel.send(unit_talents)
+            return
+        ep = [0, 0, 0, 0, 0, 0, 0, 0]
+        unit_talents = [list(ele) for ele in unit_talents]
+        for line in unit_talents:
+            ret = catculator.apply_talent(cat_unit, line, 10, ep)
             ep = ret[1]
-            shingen = ret[0]
-        emb = catculator.getstatsEmbed(shingen, 30, 32, ep)
+            cat_unit = ret[0]
+        try:
+            level = int(message.content[message.content.find(';') + 1:])
+        except:
+            level = 30
+        if level < 0 or level > 130:
+            level = 30
+        emb = catculator.getstatsEmbed(cat_unit, level, int(cat[0]), ep)
         await message.channel.send(embed=emb)
         return
 

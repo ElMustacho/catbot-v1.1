@@ -40,22 +40,21 @@ class Comboes:
     @staticmethod
     def search_by_unit(unit, catculator):  #needs tests
         unit_id = catculator.getUnitCode(unit.lower(), 6)
-        if unit_id is None:  # too many errors
+        if unit_id == "no result":  # too many errors
             return "That unit doesn't exists."
-        if len(unit_id[0]) > 1:  # name wasn't unique
+        if unit_id == "name not unique":  # name wasn't unique
             return "Couldn't discriminate the unit."
-        if unit_id[0][0] is None:
+        if catculator.getrow(unit_id[0]) is None:
             return "Your unitcode was invalid."
-        unit_id = unit_id[0][0]
         try:
             conn = sqlite3.connect('file:catcomboes.db?mode=rw', uri=True)  # open only if exists
             cursor = conn.cursor()
-            results = cursor.execute("select DISTINCT uic.combo_name, combo_effect, uic.required_id from names_effects join units_in_combo on names_effects.combo_name = units_in_combo.combo_name join units_in_combo as uic on uic.combo_name = names_effects.combo_name where units_in_combo.accepted_id = ?",(unit_id,)).fetchall()
+            results = cursor.execute("select DISTINCT uic.combo_name, combo_effect, uic.required_id from names_effects join units_in_combo on names_effects.combo_name = units_in_combo.combo_name join units_in_combo as uic on uic.combo_name = names_effects.combo_name where units_in_combo.accepted_id = ?",(unit_id[0],)).fetchall()
         except sqlite3.OperationalError:  # database not found
             return "Database for cat comboes not found."
         if len(results) == 0:
-            return "**" + catculator.getnamebycode(unit_id) + "** isn't part of any combo."
-        answer = "**" + catculator.getnamebycode(unit_id) + "** belongs to the following comboes:"
+            return "**" + catculator.getnamebycode(unit_id[0]) + "** isn't part of any combo."
+        answer = "**" + catculator.getnamebycode(unit_id[0]) + "** belongs to the following comboes:"
         lastcombo = None
         for line in results:
             if line[1] != lastcombo:

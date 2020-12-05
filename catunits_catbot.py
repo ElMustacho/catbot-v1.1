@@ -30,7 +30,7 @@ class Catunits:
     def getnamebycode(self, id):
         returned = None
         try:
-            returned = self._cats.iloc[id][97]
+            returned = self._cats.iloc[id][98]
         except IndexError:
             pass
         return returned
@@ -193,27 +193,27 @@ class Catunits:
             defensivestr += 'Insanely resists, '
         if cat[84] > 0:  # dodge
             defensivestr += 'Dodge ' + str(round(int(cat[84]))) + '% (' + str(round(int(cat[85]) / 30, 2)) + 's), '
-        if cat[90] > 0:  # poison immune
-            defensivestr += 'Poison immune, '
+        if cat[90] > 0:  # toxic immune
+            defensivestr += 'Toxic immune, '
         if cat[91] > 0:  # surge immune
             defensivestr += 'Surge immune, '
         if len(extraparam)>0:
             if extraparam[0] > 0:
-                defensivestr += 'Resist weaken ' + str(extraparam[0]) + '%, '
+                defensivestr += 'Resist weaken ' + str(int(extraparam[0])) + '%, '
             if extraparam[1] > 0:
-                defensivestr += 'Resist freeze ' + str(extraparam[1]) + '%, '
+                defensivestr += 'Resist freeze ' + str(int(extraparam[1])) + '%, '
             if extraparam[2] > 0:
-                defensivestr += 'Resist slow ' + str(extraparam[2]) + '%, '
+                defensivestr += 'Resist slow ' + str(int(extraparam[2])) + '%, '
             if extraparam[3] > 0:
-                defensivestr += 'Resist knockback ' + str(extraparam[3]) + '%, '
+                defensivestr += 'Resist knockback ' + str(int(extraparam[3])) + '%, '
             if extraparam[4] > 0:
-                defensivestr += 'Resist waves' + str(extraparam[4]) + '%, '
+                defensivestr += 'Resist waves ' + str(int(extraparam[4])) + '%, '
             if extraparam[5] > 0:
-                defensivestr += 'Resist curse' + str(extraparam[5]) + '%, '
+                defensivestr += 'Resist curse ' + str(int(extraparam[5])) + '%, '
             if extraparam[6] > 0:
-                defensivestr += 'Resist toxic' + str(extraparam[6]) + '%, '
+                defensivestr += 'Resist toxic ' + str(int(extraparam[6])) + '%, '
             if extraparam[7] > 0:
-                defensivestr += 'Resist surge' + str(extraparam[7]) + '%, '
+                defensivestr += 'Resist surge ' + str(int(extraparam[7])) + '%, '
         defensivestr = defensivestr[:-2]
         if len(defensivestr) > 3:
             catEmbed.add_field(name='Defensive abilities', value=defensivestr, inline=isinline)
@@ -391,7 +391,7 @@ class Catunits:
         if talent[2] == 1:  # weaken
             unit[37] += first_param
             unit[38] += second_param
-            unit[39] += second_param
+            unit[39] += third_param
         elif talent[2] == 2:  # freeze
             unit[25] += first_param
             unit[26] += second_param
@@ -449,9 +449,11 @@ class Catunits:
         elif talent[2] == 27:  # hp up
             unit[0] *= (1+first_param/100)
         elif talent[2] == 28:  # atk up
-            unit[3] *= (1+first_param/100)
+            unit[3] *= (1 + first_param / 100)
+            unit[59] *= (1 + first_param / 100)
+            unit[60] *= (1 + first_param / 100)
         elif talent[2] == 29:  # speed up
-            unit[2] *= (1+first_param/100)
+            unit[2] += first_param
         elif talent[2] == 30:  # knockback chance up (unused)
             pass
         elif talent[2] == 31:  # cost down
@@ -479,13 +481,13 @@ class Catunits:
         elif talent[2] == 42:  # weaken duration up
             unit[38] += first_param
         elif talent[2] == 43:  # freeze duration up
-            unit[26] += first_param
+            unit[26] += second_param
         elif talent[2] == 44:  # slow duration up
-            unit[28] += first_param
+            unit[28] += second_param
         elif talent[2] == 45:  # knockback chance up
             unit[24] += first_param
         elif talent[2] == 46:  # strengthen power up
-            unit[41] += first_param
+            unit[41] += second_param
         elif talent[2] == 47:  # survive chance
             unit[42] += first_param
         elif talent[2] == 48:  # critical chance
@@ -497,7 +499,7 @@ class Catunits:
         elif talent[2] == 51:  # warp duration (unused)
             pass
         elif talent[2] == 52:  # critical
-            talent[31] += first_param
+            unit[31] += first_param
         elif talent[2] == 53:  # weaken immune
             unit[51] |= 1
         elif talent[2] == 54:  # freeze immune
@@ -509,7 +511,7 @@ class Catunits:
         elif talent[2] == 57:  # wave immune
             unit[46] |= 1
         elif talent[2] == 58:  # warp block
-            pass
+            unit[75] |= 1
         elif talent[2] == 59:  # savage blow
             unit[82] += first_param
             unit[83] += second_param
@@ -529,7 +531,7 @@ class Catunits:
         elif talent[2] == 66:  # resist surge
             extra_param[7] = first_param
         elif talent[2] == 67:  # surge immune
-            unit[92] |= 1
+            unit[91] |= 1
         elif talent[2] == 68:  # surge attack
             unit[86] += first_param
             unit[87] += third_param
@@ -566,5 +568,8 @@ class Catunits:
         except sqlite3.OperationalError:  # database not found
             return "Database for cat comboes not found."
         if len(results) == 0:
-            return str(self.getnamebycode(unit_id+2)) + " doesn't have talents."
+            if unit_id>1017:
+                return str(self.getnamebycode(unit_id)) + " doesn't have talents."
+            else:
+                return str(self.getnamebycode(unit_id+2)) + " doesn't have talents."
         return results
