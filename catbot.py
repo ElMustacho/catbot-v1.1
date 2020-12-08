@@ -533,13 +533,18 @@ async def on_message(message):
         await message.channel.send(str(answer))
         return
 
-    elif message.content.startswith('!cst'):  # experimental talents assignment
+    elif message.content.startswith('!cst '):  # experimental talents assignment
         if not canSend(3, privilegelevel(message.author), message):
             return
         limit = message.content.find(';')
         if limit == -1:
             limit = len(message.content)
         cat = catculator.getUnitCode(message.content[message.content.find(' ') + 1:limit].lower(), 6)
+        levelparams = message.content[find_nth(message.content, ';', 2)+1:].split(';')
+        attempt = [catch(lambda: int(talent_level)) if isinstance(catch(lambda: int(talent_level)), int) else 10 for talent_level in levelparams]
+        attempt = attempt[:5]
+        while len(attempt) < 5:
+            attempt.append(10)
         if cat == "no result":
             await message.channel.send("Gibberish.")
             return
@@ -550,6 +555,7 @@ async def on_message(message):
         if cat[0] > 1017:
             ironwallsucks = 2
         unit_talents = catculator.get_talents_by_id(cat[0] - 2 + ironwallsucks)  # offset by 2 required
+        talents_expl = catculator.get_talent_explanation(cat[0] - 2 + ironwallsucks)  # offset by 2 required
         cat_row = catculator.getrow(cat[0])
         if cat_row is None or unit_talents[:3] == 'nan':
             await message.channel.send("Invalid unitcode.")
@@ -563,17 +569,26 @@ async def on_message(message):
             return
         ep = [0, 0, 0, 0, 0, 0, 0, 0]
         unit_talents = [list(ele) for ele in unit_talents]
-        for line in unit_talents:
-            ret = catculator.apply_talent(cat_unit, line, 10, ep)
-            ep = ret[1]
-            cat_unit = ret[0]
+        talents_expl = [list(ele) for ele in talents_expl]
+        for line, lv in zip(unit_talents, attempt):
+            if lv > 0:
+                ret = catculator.apply_talent(cat_unit, line, lv, ep)
+                ep = ret[1]
+                cat_unit = ret[0]
         try:
-            level = int(message.content[message.content.find(';') + 1:])
-        except:
+            level_limit = find_nth(message.content,';',2)
+            if message.content.count(';') < 2:
+                level_limit = len(message.content)
+            level = int(message.content[message.content.find(';') + 1:level_limit])
+        except ValueError:
             level = 30
         if level < 0 or level > 130:
             level = 30
         emb = catculator.getstatsEmbed(cat_unit, level, int(cat[0]), ep)
+        str_expl = ''
+        for talent, lv in zip(talents_expl, attempt):
+            str_expl += talent[0] + ' (' + str(lv) + '), '
+        emb.add_field(name="Talents applied", value=str(str_expl[:-2]), inline=True)
         await message.channel.send(embed=emb)
         return
 
@@ -610,8 +625,12 @@ async def on_message(message):
                                                      id=catbotdata.requireddata['tier-2-roles'][0]),
                                    reason='Entering server')
             await message.delete()
-            await client.get_channel(catbotdata.requireddata['log-channel-id']).send(
-                message.author.mention + ' has used the password.')
+            try:
+                await client.get_channel(catbotdata.requireddata['log-channel-id']).send(
+                    message.author.mention + ' has used the password.')
+            except discord.errors.NotFound:
+                 await client.get_channel(catbotdata.requireddata['log-channel-id']).send(
+                    message.author.mention + ' has used the password, but yag did this faster.')
 
     elif message.content.startswith('!solve'):
         if not canSend(4, privilegelevel(message.author), message):
@@ -780,6 +799,11 @@ def find_nth(haystack, needle, n):
         n -= 1
     return start
 
+def catch(func, handle=lambda e : e, *args, **kwargs):
+    try:
+        return func(*args, **kwargs)
+    except Exception as e:
+        return handle(e)
 
 enemyculator = enemyunits_catbot.Enemyunits()
 modqueue = Modtools('results.tsv', 'archives.tsv')

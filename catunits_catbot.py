@@ -411,7 +411,7 @@ class Catunits:
         elif talent[2] == 9:  # warp (unused)
             pass
         elif talent[2] == 10:  # strengthen
-            unit[40] += first_param
+            unit[40] += 100 - first_param
             unit[41] += second_param
         elif talent[2] == 11:  # survive
             unit[42] += first_param
@@ -569,6 +569,20 @@ class Catunits:
             return "Database for cat comboes not found."
         if len(results) == 0:
             if unit_id>1017:
+                return str(self.getnamebycode(unit_id)) + " doesn't have talents."
+            else:
+                return str(self.getnamebycode(unit_id+2)) + " doesn't have talents."
+        return results
+
+    def get_talent_explanation(self, unit_id):
+        try:
+            conn = sqlite3.connect('file:talents.db?mode=rw', uri=True)  # open only if exists
+            cursor = conn.cursor()
+            results = cursor.execute("select talents_explanation.description_text from talents join talents_explanation on talents.description=talents_explanation.description_id where unit_id = ?/3.0", (unit_id,)).fetchall()
+        except sqlite3.OperationalError:  # database not found
+            return "Database for cat comboes not found."
+        if len(results) == 0:
+            if unit_id > 1017:
                 return str(self.getnamebycode(unit_id)) + " doesn't have talents."
             else:
                 return str(self.getnamebycode(unit_id+2)) + " doesn't have talents."
