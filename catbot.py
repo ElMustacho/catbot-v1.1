@@ -540,9 +540,12 @@ async def on_message(message):
         if limit == -1:
             limit = len(message.content)
         cat = catculator.getUnitCode(message.content[message.content.find(' ') + 1:limit].lower(), 6)
-        levelparams = message.content[find_nth(message.content, ';', 2)+1:].split(';')
-        attempt = [catch(lambda: int(talent_level)) if isinstance(catch(lambda: int(talent_level)), int) else 10 for talent_level in levelparams]
-        attempt = attempt[:5]
+        if message.content.count(';') == 1:
+            attempt = [10, 10, 10, 10, 10]
+        else:
+            levelparams = message.content[find_nth(message.content, ';', 2)+1:].split(';')
+            attempt = [catch(lambda: int(talent_level)) if isinstance(catch(lambda: int(talent_level)), int) else 10 for talent_level in levelparams]
+            attempt = attempt[:5]
         while len(attempt) < 5:
             attempt.append(10)
         if cat == "no result":
@@ -551,6 +554,7 @@ async def on_message(message):
         if cat == "name not unique":  # name wasn't unique
             await message.channel.send('Couldn\'t discriminate.')
             return
+
         ironwallsucks = 0
         if cat[0] > 1017:
             ironwallsucks = 2
@@ -586,8 +590,13 @@ async def on_message(message):
             level = 30
         emb = catculator.getstatsEmbed(cat_unit, level, int(cat[0]), ep)
         str_expl = ''
-        for talent, lv in zip(talents_expl, attempt):
-            str_expl += talent[0] + ' (' + str(lv) + '), '
+        for talent_ex, lv, talent in zip(talents_expl, attempt, unit_talents):
+            level_applied = lv
+            if lv > talent[3]:
+                level_applied = talent[3]
+                if level_applied == 0:
+                    level_applied = 1
+            str_expl += talent_ex[0] + ' (' + str(level_applied) + '), '
         emb.add_field(name="Talents applied", value=str(str_expl[:-2]), inline=True)
         await message.channel.send(embed=emb)
         return
@@ -601,7 +610,7 @@ async def on_message(message):
             search = (message.content,)
             results = cursor.execute("SELECT answer FROM commands WHERE command = ?", search).fetchone()
             if results is None:
-                return
+                pass
             else:
                 await message.channel.send(results[0])
                 await message.delete()
@@ -609,23 +618,39 @@ async def on_message(message):
             print("Database for custom commands not found.")
             return
 
-    elif not catbotdata.requireddata['moderation']:
+    if not catbotdata.requireddata['moderation']:
         return
 
-    elif message.content == '!token':
+    if message.content == '!token':
         if canSend(2, privilegelevel(message.author), message):
             if isInServer(message.author) and isADM(message):
                 await message.channel.send('Your token is: ' + str(int(message.author.id) % 9999998) + '.')
         return
 
-    elif message.content == '$password manic lion cat':
+    elif message.content == '!muted':
+        if not canSend(4, privilegelevel(message.author), message):
+            return
+        msgtosend = '''This channel is here so you can talk about the specifics of your mute with moderators. Follow the server's rules as if you were in any other channel, being here doesn’t exempt you from them. 
+**You may:** 
+- Ask as many questions as you'd like, provided it's about your mute 
+- Ping a moderator (ideally the one who muted you, if you know who it is) to get their attention 
+**Don't:** 
+- Spam ping or mass ping moderators 
+- Ramble about things that aren’t connected to your mute, or shitpost / spam 
+- Uselessly and/or aggressively argue with moderators 
+- Attempt to bypass the mute by leaving and rejoining, using alternative accounts, etc. **This will result in a permanent and unappealable ban.**'''
+        await message.channel.send(msgtosend)
+        await message.delete()
+        return
+
+    elif message.content == '$password ritual saint kasli':
         if message.channel.id == catbotdata.requireddata['welcome-channel']:
             member = serveruser(message.author)
             await member.add_roles(discord.utils.get(client.get_guild(catbotdata.requireddata['server-id']).roles,
                                                      id=catbotdata.requireddata['tier-2-roles'][0]),
                                    reason='Entering server')
-            await message.delete()
             try:
+                await message.delete()
                 await client.get_channel(catbotdata.requireddata['log-channel-id']).send(
                     message.author.mention + ' has used the password.')
             except discord.errors.NotFound:
