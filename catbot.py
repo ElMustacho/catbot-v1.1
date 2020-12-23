@@ -15,6 +15,7 @@ import catunits_catbot
 import enemyunits_catbot
 import stagedata_catbot
 import catcomboes
+import random
 
 intents = discord.Intents.all()
 
@@ -45,13 +46,17 @@ async def on_message(message):
             await message.channel.send('Greetings, user.')
             return
         if level == 5:
-            await message.channel.send('Hi dad!')
+            lv5answers = ['Hi dad!', 'Salutations, father!', 'Greetings, creator!']
+            await message.channel.send(random.choice(lv5answers))
         elif level == 4:
-            await message.channel.send("Hi moderator, how you doin'?")
+            lv4answers = ["Hi moderator, how you doin'?", "Pay attention everyone, cops are here!", "You gotta pay respect to mods!"]
+            await message.channel.send(random.choice(lv4answers))
         elif level == 3:
-            await message.channel.send("Wow, you are important, that's cool!")
+            lv3answers = ["Wow, you are important, that's cool!", "OMG! Senpai noticed me!", "I'm happy that you are here!"]
+            await message.channel.send(random.choice(lv3answers))
         elif level == 2:
-            await message.channel.send('Well, at least you are here.')
+            lv2answers = ['Well, at least you are here.', 'You are a cat. How about that.', 'Look, an user said hi to me!']
+            await message.channel.send(random.choice(lv2answers))
         else:
             await message.channel.send('You can do better than this.')
 
@@ -534,8 +539,12 @@ async def on_message(message):
         return
 
     elif message.content.startswith('!cst '):  # experimental talents assignment
-        if not canSend(3, privilegelevel(message.author), message):
+        if not canSend(2, privilegelevel(message.author), message):
             return
+        if privilegelevel(message.author) < 3 and message.channel.id not in catbotdata.requireddata[
+            'freeforall-channels']:
+            if not isokayifnotclog(message, isADM(message)):
+                return
         limit = message.content.find(';')
         if limit == -1:
             limit = len(message.content)

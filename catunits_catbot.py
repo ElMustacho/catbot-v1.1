@@ -133,7 +133,7 @@ class Catunits:
             offensivestr += 'Base destroyer, '
         if cat[35] > 0:  # wave attack
             if cat[94] > 0:  # alternative wave
-                offensivestr += "Smallwave"
+                offensivestr += "Mini-wave"
             else:  # regular
                 offensivestr += "Wave"
             offensivestr += ' attack ' + str(round(int(cat[35]))) + '% (' + str(
