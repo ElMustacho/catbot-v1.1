@@ -135,4 +135,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 archives.tsv
+thin_ice.csv
+sketches.py
 !/catbotrun.bat

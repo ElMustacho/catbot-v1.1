@@ -11,6 +11,7 @@ import discord
 from datetime import datetime, timedelta
 from data_catbot import Data_catbot
 from modtools import Modtools
+from thin_ice import thin_ice
 import catunits_catbot
 import enemyunits_catbot
 import stagedata_catbot
@@ -25,6 +26,19 @@ client = discord.Client(intents=intents)
 @client.event
 async def on_ready():
     print('Ready to go')
+
+@client.event
+async def on_member_update(before, after):
+    role_difference = [x for x in after.roles if x not in before.roles]  # the new role, if any
+    if len(role_difference) == 0:
+        return  # roles didn't change
+    if role_difference[0].id == 602057565378969601:  # the new role is muted
+        check_for_ice = icing.is_on_thin_ice(before.id)
+        if check_for_ice is not None:
+            yagchannel = client.get_channel(702592607703924776)
+            thin_iced = client.get_user(int(check_for_ice[0]))
+            await yagchannel.send(thin_iced.mention + " is on thin ice because: `" + check_for_ice[2] + '`')
+    return
 
 
 @client.event
@@ -49,13 +63,13 @@ async def on_message(message):
             lv5answers = ['Hi dad!', 'Salutations, father!', 'Greetings, creator!']
             await message.channel.send(random.choice(lv5answers))
         elif level == 4:
-            lv4answers = ["Hi moderator, how you doin'?", "Pay attention everyone, cops are here!", "You gotta pay respect to mods!"]
+            lv4answers = ["Hi moderator, how you doin'?", "Pay attention everyone, cops are here!", "You gotta pay respect to mods!", "Mods are moderating in 2021 too!"]
             await message.channel.send(random.choice(lv4answers))
         elif level == 3:
-            lv3answers = ["Wow, you are important, that's cool!", "OMG! Senpai noticed me!", "I'm happy that you are here!"]
+            lv3answers = ["Wow, you are important, that's cool!", "OMG! Senpai noticed me!", "I'm happy that you are here!", "It's epic to have an user so cool as you in 2021!"]
             await message.channel.send(random.choice(lv3answers))
         elif level == 2:
-            lv2answers = ['Well, at least you are here.', 'You are a cat. How about that.', 'Look, an user said hi to me!']
+            lv2answers = ['Well, at least you are here.', 'You are a cat. How about that.', 'Look, an user said hi to me!', "A battle catter in 2021, hi to you."]
             await message.channel.send(random.choice(lv2answers))
         else:
             await message.channel.send('You can do better than this.')
@@ -652,8 +666,8 @@ async def on_message(message):
         await message.delete()
         return
 
-    elif message.content == '$password ritual saint kasli':
-        if message.channel.id == catbotdata.requireddata['welcome-channel']:
+    elif message.channel.id == catbotdata.requireddata['welcome-channel']:
+        if message.content == '$password ritual saint kasli':
             member = serveruser(message.author)
             await member.add_roles(discord.utils.get(client.get_guild(catbotdata.requireddata['server-id']).roles,
                                                      id=catbotdata.requireddata['tier-2-roles'][0]),
@@ -665,6 +679,77 @@ async def on_message(message):
             except discord.errors.NotFound:
                  await client.get_channel(catbotdata.requireddata['log-channel-id']).send(
                     message.author.mention + ' has used the password, but yag did this faster.')
+        else:
+            textsent = str(message.content)
+            try:
+                await message.delete()
+                await client.get_channel(catbotdata.requireddata['log-channel-id']).send(message.author.mention + ' failed to use the password. They tried this: ' + textsent)
+            except discord.errors.NotFound:
+                await client.get_channel(catbotdata.requireddata['log-channel-id']).send(
+                    message.author.mention + ' failed to use the password, but yag deleted the message faster. They tried this: ' + textsent)
+
+    elif message.content.startswith('!thin_ice '):
+        if not canSend(4, privilegelevel(message.author), message):
+            return
+        user_id = message.content[message.content.find(' ')+1:message.content.find(';')]
+        reason = message.content[message.content.find(';')+1:]
+        if len(reason) < 10:
+            await message.channel.send("Reason is too short, be more specific.")
+            return
+        if len(user_id)<10:
+            await message.channel.send("User ID isn't correct.")
+            return
+        answer = icing.add_entry(user_id, message.author.id, reason, str(datetime.now()))
+        if answer != 'not again':
+            await message.channel.send("Added to thin ice.")
+        else:
+            await message.channel.send("User was already on thin ice!")
+        return
+
+    elif message.content.startswith('!remove_thin_ice '):
+        if not canSend(4, privilegelevel(message.author), message):
+            return
+        user_id = message.content[message.content.find(' ') + 1:]
+        if len(user_id) < 10:
+            await message.channel.send("User ID isn't correct.")
+            return
+        result = icing.remove_entry(user_id)
+        if result == 'Removed :)':
+            await message.channel.send("User has been pardoned.")
+        else:
+            await message.channel.send("User wasn't on thin ice.")
+        return
+
+    elif message.content.startswith('!on_thin_ice'):
+        if not canSend(4, privilegelevel(message.author), message):
+            return
+        user_id = message.content[message.content.find(' ') + 1:]
+        if len(user_id)<10:
+            await message.channel.send("User ID isn't correct.")
+            return
+        checkthin = icing.is_on_thin_ice(user_id)
+        if checkthin is None:
+            await message.channel.send("User isn't on thin ice.")
+        else:
+            thin_emb = discord.Embed(description="Report of thin ice", color=0xff3300).set_author(name="Mod that issued: " + str(checkthin[1]))
+            thin_emb.add_field(name="User", value=str(checkthin[0]))
+            thin_emb.add_field(name='Reason', value=str(checkthin[2]))
+            thin_emb.add_field(name='Date', value=str(checkthin[3]))
+            await message.channel.send("User is on thin ice!", embed=thin_emb)
+            return
+
+    elif message.content.startswith('!list_thin_ice'):
+        if not canSend(4, privilegelevel(message.author), message):
+            return
+        answer = ""
+        data = icing.get_data()
+        for line in data:
+            answer += "User: " + str(line[0]) + "; Mod: " + str(line[1]) + "; Reason: `" + str(line[2]) + "`; In date: " + str(line[3])
+        if len(answer) > 2000:
+            await message.channel.send("You need to ask reddid 'cause the list is too long to by typed in discord.")
+        else:
+            await message.channel.send(answer)
+        return
 
     elif message.content.startswith('!solve'):
         if not canSend(4, privilegelevel(message.author), message):
@@ -839,6 +924,7 @@ def catch(func, handle=lambda e : e, *args, **kwargs):
     except Exception as e:
         return handle(e)
 
+icing = thin_ice()
 enemyculator = enemyunits_catbot.Enemyunits()
 modqueue = Modtools('results.tsv', 'archives.tsv')
 catculator = catunits_catbot.Catunits()
