@@ -428,7 +428,29 @@ async def on_message(message):
         stagereward = stagedata.idtoreward(stageid)
         stagerestrictions = stagedata.idtorestrictions(stageid)
         embedtosend = stagedata.makeembed(stageinfo, stageenemies, stagetimed, stagereward, stagerestrictions)
-        await message.channel.send(embed=embedtosend)
+        if len(stageenemies) > 25:  # embed won't show everything
+            sending = "First 25 enemies / " + str(embedtosend.footer.text)
+            embedtosend.set_footer(text=sending)
+        else:
+            sending = "All enemies / " + str(embedtosend.footer.text)
+            embedtosend.set_footer(text=sending)
+        sent_message = await message.channel.send(embed=embedtosend)
+        if len(stageenemies) < 26 or isADM(message):  # no point in showing more enemies, can't react in dms
+            return
+        await sent_message.add_reaction('▶')
+        def check(reaction_received, user_that_sent):
+            return user_that_sent == message.author and str(reaction_received.emoji) == '▶' and reaction_received.message.id == sent_message.id
+        try:
+            reaction, user = await client.wait_for('reaction_add', timeout=15.0, check=check)
+        except asyncio.TimeoutError:
+            pass
+        else:
+            embedtosend = stagedata.makeembed(stageinfo, stageenemies[25:], stagetimed, stagereward, stagerestrictions)
+            sending = "Other enemies / " + str(embedtosend.footer.text)
+            embedtosend.set_footer(text=sending)
+            await sent_message.edit(embed=embedtosend)
+        await sent_message.clear_reactions()
+        return
 
     elif message.content.startswith('!enemysearch'):  # todo look at enemyculator todos
         if not canSend(3, privilegelevel(message.author), message):
