@@ -348,14 +348,14 @@ class Catunits:
         return 'https://raw.githubusercontent.com/ElMustacho/catbot-v1.1/master/traitpics/' + fstr + '.png'
 
     def getnames(self, cat, catcode):
-        name = cat[97]
+        name = cat[-3]
         allnames = 'The custom names of ' + name + ' are: '
         for key, value in self._customnames.items():
             if value == catcode:
                 allnames += key + '; '
         if allnames[-2:] == ': ':
             allnames = name + ' has no custom name.'
-        return allnames
+        return allnames[:-1]
 
     def removename(self, catcode, nametoremove):
         for key, value in self._customnames.items():

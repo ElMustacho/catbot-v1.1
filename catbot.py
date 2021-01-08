@@ -320,7 +320,7 @@ async def on_message(message):
         if catstats == "no result":  # too many errors
             await message.channel.send(message.content[12:] + '; wasn\'t recognized')
             return
-        if len(catstats[0]) > 1:  # name wasn't unique
+        if catstats == "name not unique":  # name wasn't unique
             await message.channel.send('Couldn\'t discriminate.')
             return
         cat = catculator.getrow(catstats[0])
@@ -341,7 +341,7 @@ async def on_message(message):
         enemy = enemyculator.getrow(enemystats[0][0])
         await message.channel.send(enemyculator.getnames(enemy, enemystats[0][0]))
 
-    elif message.content.startswith('!deletecatname'):
+    elif message.content.startswith('!deletecatname') or message.content.startswith('!removecatname'):
         if not canSend(4, privilegelevel(message.author), message):
             return
         limit = message.content.find(';')
