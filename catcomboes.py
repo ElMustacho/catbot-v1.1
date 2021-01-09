@@ -60,8 +60,11 @@ class Comboes:
         answer = "**" + catculator.getnamebycode(unit_id[0]) + "** belongs to the following comboes:"
         lastcombo = None
         for line in results:
+            ironwallsucks = 0
+            if line[2] > 1017:
+                ironwallsucks = 2
             if line[0] != lastcombo:
                 lastcombo = line[0]
                 answer = answer + "\n**" + line[1] + " (" + line[0] + ")**: "
-            answer = answer + str(catculator.getnamebycode(line[2])) + ', '
+            answer = answer + str(catculator.getnamebycode(line[2]-ironwallsucks)) + ', '
         return answer.replace(', \n', '.\n')[:-2] + "."
