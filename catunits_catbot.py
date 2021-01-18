@@ -38,13 +38,17 @@ class Catunits:
 
     def getUnitCode(self, identifier, errors):
         try:  # was this a string or a int?
+            if int(identifier) > 1016:
+                identifier = int(identifier) + 1
             locator = [int(identifier), 0]
-        except ValueError:
+        except (ValueError, TypeError):
             locator = self.closeEnough(identifier, errors)
             if locator == None:
                 return "no result"
             if len(locator[0]) > 1:
                 return "name not unique"
+            if locator[2] == 'custom' and locator[0][0] > 1016:
+                locator[0][0]+=3
             locator[0] = locator[0][0]
         return locator
 
@@ -53,14 +57,14 @@ class Catunits:
         title = 'Stats of ' + cat[96]
         if len(cat[98]) > 1:
             title = 'Stats of ' + cat[98]
-        whichform = unitcode - 1 if unitcode > 1019 else unitcode
+        whichform = unitcode - 1 if unitcode > 1017 else unitcode
         if whichform % 3 == 0:
             title += ' - First form'
         elif whichform % 3 == 1:
             title += ' - Evolved form'
         else:
             title += ' - True form'
-        title += ' - Unitcode: ' + str(unitcode)
+        title += ' - Unitcode: ' + str(whichform) + ' (' + str(int(whichform/3)) + '-' + str(int(whichform%3)) + ')'
         catEmbed = emb(description=title, color=0xff3300)
         catEmbed.set_author(name='Cat Bot')
         rarity = ''
@@ -254,9 +258,9 @@ class Catunits:
         if min(dss) > errors and customnames[0] > errors:  # both were too bad
             return None
         if min(dss) < customnames[0]:  # normal names were better
-            return [closest, min(dss)]  # all of the closest and the distance of the closests
+            return [closest, min(dss), 'original']  # all of the closest and the distance of the closests
         else:  # custom names were better
-            return [customnames[1], customnames[0]]  # the best matches of all custom names
+            return [customnames[1], customnames[0], 'custom']  # the best matches of all custom names
 
     def levelMultiplier(self, rarity, unitkind, level=0):
         if unitkind in range(273, 300):
@@ -351,6 +355,8 @@ class Catunits:
         name = cat[-3]
         allnames = 'The custom names of ' + name + ' are: '
         for key, value in self._customnames.items():
+            if value > 1016:
+                value += 3
             if value == catcode:
                 allnames += key + '; '
         if allnames[-2:] == ': ':
@@ -377,7 +383,7 @@ class Catunits:
         with open('catCustomUnits.pkl', 'wb') as f:
             pickle.dump(self._customnames, f, pickle.DEFAULT_PROTOCOL)
 
-    @staticmethod  # TODO fix the warning, try to use .loc, also fix last talents
+    @staticmethod
     def apply_talent(unit, talent, level, extra_param):
         if level < 1 or level > talent[3]:  # invalid level for talent
             if talent[3] == 0:  # ponos sometimes sets to 0 the max level, when it really meant 1

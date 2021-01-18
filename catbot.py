@@ -173,9 +173,17 @@ async def on_message(message):
                 await sent_message.clear_reactions()
                 return
             try:
+                newcode = catstats[0] + offset
+                if newcode == 1017:
+                    if offset>0:
+                        newcode += 1
+                    else:
+                        newcode -= 1
+                elif newcode > 1015 and newcode < 1019:
+                    newcode += 1
                 await sent_message.edit(
-                    embed=catculator.getstatsEmbed(catculator.getrow(catstats[0] + offset), level,
-                                                   catstats[0] + offset))
+                    embed=catculator.getstatsEmbed(catculator.getrow(newcode), level,
+                                                   newcode))
             except TypeError:
                 await sent_message.edit(content="That form doesn't exists.")
         await sent_message.clear_reactions()
@@ -689,7 +697,7 @@ async def on_message(message):
         return
 
     elif message.channel.id == catbotdata.requireddata['welcome-channel']:
-        if message.content == '$password ritual saint kasli':
+        if message.content == '$password super galaxy cosmo':
             member = serveruser(message.author)
             await member.add_roles(discord.utils.get(client.get_guild(catbotdata.requireddata['server-id']).roles,
                                                      id=catbotdata.requireddata['tier-2-roles'][0]),

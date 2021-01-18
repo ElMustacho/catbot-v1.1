@@ -16,7 +16,7 @@ class Enemyunits:
 
     def namefromcode(self, enemycode):
         returnthis = self._enemies.iloc[enemycode]
-        returnthis = returnthis.iat[86]
+        returnthis = returnthis.iat[88]
         return returnthis
 
     def getrow(self, row):
@@ -111,7 +111,7 @@ class Enemyunits:
     def getstatsembed(self, enemy, magnification, mag2=None):
         if mag2 == None:
             mag2 = magnification
-        title = 'Stats of ' + str(enemy[86])
+        title = 'Stats of ' + str(enemy[88])
         enemyEmbed = emb(description=title, color=0x00ff00)
         enemyEmbed.set_author(name='Cat Bot')
         magstring = str(int(magnification*100)) + '%'
@@ -125,7 +125,7 @@ class Enemyunits:
             dmg += '/' + str(math.ceil(int(enemy[55]) * mag2))
         if int(enemy[56]) > 0:
             dmg += '/' + str(math.ceil(int(enemy[56]) * mag2))
-        dps = ' Damage - ' + str(math.ceil(int(enemy[3]+enemy[55]+enemy[56])*mag2*30/enemy[90])) + ' DPS'
+        dps = ' Damage - ' + str(math.ceil(int(enemy[3]+enemy[55]+enemy[56])*mag2*30/enemy[92])) + ' DPS'
         damagekind = ''
         if enemy[11] == 1:
             damagekind += 'area'
@@ -138,7 +138,7 @@ class Enemyunits:
                 damagekind += ', omnistrike'
         damagetype = 'Damage (' + damagekind + ') - DPS'
         enemyEmbed.add_field(name=damagetype, value=dmg + dps, inline=True)
-        tba = str(round(int(enemy[90]) / 30, 2))
+        tba = str(round(int(enemy[92]) / 30, 2))
         enemyEmbed.add_field(name='Speed - Attack Frequency', value=str(round(int(enemy[2]), 0)) + ' - ' + tba + 's',
                            inline=True)
         enemyEmbed.add_field(name='Cash Awarded', value=str(round(int(enemy[6]*3.95), 0)), inline=True)
@@ -163,7 +163,10 @@ class Enemyunits:
         if enemy[26] > 0:  # base destroyer
             offensive += 'Base Destroyer, '
         if enemy[27] > 0:  # wave attack
-            offensive += 'Wave attack ' + str(round(int(enemy[27]))) + '% (' + str(467 + round(int(enemy[28]) - 1) * 200) + ' range), '
+            typewave = "Wave attack "
+            if enemy[86] > 0:  # it's a small wave
+                typewave = "Mini-Wave "
+            offensive += typewave + str(round(int(enemy[27]))) + '% (' + str(467 + round(int(enemy[28]) - 1) * 200) + ' range), '
         if enemy[29] > 0:  # weaken
             offensive += 'Weaken ' + str(round(int(enemy[29]))) + '% (' + str(round(int(enemy[31]))) + '% power, ' + str(
                 round(int(enemy[30]) / 30, 2)) + 's), '
@@ -238,7 +241,7 @@ class Enemyunits:
                 atkroutine += 'f / **' + str(round(int(enemy[58]))) + '**'
             else:
                 atkroutine += 'f / ' + str(round(int(enemy[58])))
-        atkroutine += 'f / ' + str(round(int(enemy[89]))) + 'f'
+        atkroutine += 'f / ' + str(round(int(enemy[91]))) + 'f'
         enemyEmbed.add_field(name='Attack timings', value=atkroutine, inline=True)
         return enemyEmbed
 
