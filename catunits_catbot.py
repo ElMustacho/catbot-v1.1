@@ -47,8 +47,6 @@ class Catunits:
                 return "no result"
             if len(locator[0]) > 1:
                 return "name not unique"
-            if locator[2] == 'custom' and locator[0][0] > 1016:
-                locator[0][0]+=3
             locator[0] = locator[0][0]
         return locator
 
@@ -394,176 +392,182 @@ class Catunits:
         second_param = talent[6] + (level - 1) * ((talent[7] - talent[6]) / max(talent[3] - 1, 1))
         third_param = talent[8] + (level - 1) * ((talent[9] - talent[8]) / max(talent[3] - 1, 1))
         fourth_param = talent[10] + (level - 1) * ((talent[11] - talent[10]) / max(talent[3] - 1, 1))
-        if talent[2] == 1:  # weaken
+        talent_to_apply = talent[-2]
+        if talent_to_apply == 1:  # weaken
             unit[37] += first_param
             unit[38] += second_param
             unit[39] += third_param
-        elif talent[2] == 2:  # freeze
+        elif talent_to_apply == 2:  # freeze
             unit[25] += first_param
             unit[26] += second_param
-        elif talent[2] == 3:  # slow
+        elif talent_to_apply == 3:  # slow
             unit[27] += first_param
             unit[28] += second_param
-        elif talent[2] == 4:  # target only
+        elif talent_to_apply == 4:  # target only
             unit[32] |= 1
-        elif talent[2] == 5:  # strong
+        elif talent_to_apply == 5:  # strong
             unit[23] |= 1
-        elif talent[2] == 6:  # resist
+        elif talent_to_apply == 6:  # resist
             unit[29] |= 1
-        elif talent[2] == 7:  # massive damage
+        elif talent_to_apply == 7:  # massive damage
             unit[30] |= 1
-        elif talent[2] == 8:  # knockback
+        elif talent_to_apply == 8:  # knockback
             unit[24] += first_param
-        elif talent[2] == 9:  # warp (unused)
+        elif talent_to_apply == 9:  # warp (unused)
             pass
-        elif talent[2] == 10:  # strengthen
+        elif talent_to_apply == 10:  # strengthen
             unit[40] += 100 - first_param
             unit[41] += second_param
-        elif talent[2] == 11:  # survive
+        elif talent_to_apply == 11:  # survive
             unit[42] += first_param
-        elif talent[2] == 12:  # base destroyer
+        elif talent_to_apply == 12:  # base destroyer
             unit[34] |= 1
-        elif talent[2] == 13:  # critical (unused)
+        elif talent_to_apply == 13:  # critical (unused)
             pass
-        elif talent[2] == 14:  # zombie killer
+        elif talent_to_apply == 14:  # zombie killer
             unit[52] |= 1
-        elif talent[2] == 15:  # barrier breaker
+        elif talent_to_apply == 15:  # barrier breaker
             unit[70] += first_param
-        elif talent[2] == 16:  # double cash
+        elif talent_to_apply == 16:  # double cash
             unit[33] |= 1
-        elif talent[2] == 17:  # wave attack
+        elif talent_to_apply == 17:  # wave attack
             unit[35] += first_param
             unit[36] += second_param
-        elif talent[2] == 18:  # resists weaken
+        elif talent_to_apply == 18:  # resists weaken
             extra_param[0] = first_param
-        elif talent[2] == 19:  # resists freeze
+        elif talent_to_apply == 19:  # resists freeze
             extra_param[1] = first_param
-        elif talent[2] == 20:  # resists slow
+        elif talent_to_apply == 20:  # resists slow
             extra_param[2] = first_param
-        elif talent[2] == 21:  # resists knockback
+        elif talent_to_apply == 21:  # resists knockback
             extra_param[3] = first_param
-        elif talent[2] == 22:  # resists waves
+        elif talent_to_apply == 22:  # resists waves
             extra_param[4] = first_param
-        elif talent[2] == 23:  # wave immune (unused)
+        elif talent_to_apply == 23:  # wave immune (unused)
             pass
-        elif talent[2] == 24:  # warp block (unused)
+        elif talent_to_apply == 24:  # warp block (unused)
             pass
-        elif talent[2] == 25:  # curse immunity
+        elif talent_to_apply == 25:  # curse immunity
             unit[79] |= 1
-        elif talent[2] == 26:  # resist curse
+        elif talent_to_apply == 26:  # resist curse
             extra_param[5] = first_param
-        elif talent[2] == 27:  # hp up
+        elif talent_to_apply == 27:  # hp up
             unit[0] *= (1+first_param/100)
-        elif talent[2] == 28:  # atk up
+        elif talent_to_apply == 28:  # atk up
             unit[3] *= (1 + first_param / 100)
             unit[59] *= (1 + first_param / 100)
             unit[60] *= (1 + first_param / 100)
-        elif talent[2] == 29:  # speed up
+        elif talent_to_apply == 29:  # speed up
             unit[2] += first_param
-        elif talent[2] == 30:  # knockback chance up (unused)
+        elif talent_to_apply == 30:  # knockback chance up (unused)
             pass
-        elif talent[2] == 31:  # cost down
+        elif talent_to_apply == 31:  # cost down
             unit[6] = unit[6] - first_param
-        elif talent[2] == 32:  # recharge down
+        elif talent_to_apply == 32:  # recharge down
             unit[7] = unit[7] - first_param
-        elif talent[2] == 33:  # target red
+        elif talent_to_apply == 33:  # target red
             unit[10] |= 1
-        elif talent[2] == 34:  # target floating
+        elif talent_to_apply == 34:  # target floating
             unit[16] |= 1
-        elif talent[2] == 35:  # target black
+        elif talent_to_apply == 35:  # target black
             unit[17] |= 1
-        elif talent[2] == 36:  # target metal
+        elif talent_to_apply == 36:  # target metal
             unit[18] |= 1
-        elif talent[2] == 37:  # target angel
+        elif talent_to_apply == 37:  # target angel
             unit[20] |= 1
-        elif talent[2] == 38:  # target alien
+        elif talent_to_apply == 38:  # target alien
             unit[21] |= 1
-        elif talent[2] == 39:  # target zombies
+        elif talent_to_apply == 39:  # target zombies
             unit[22] |= 1
-        elif talent[2] == 40:  # target relic
+        elif talent_to_apply == 40:  # target relic
             unit[78] |= 1
-        elif talent[2] == 41:  # target traitless
+        elif talent_to_apply == 41:  # target traitless
             unit[19] |= 1
-        elif talent[2] == 42:  # weaken duration up
+        elif talent_to_apply == 42:  # weaken duration up
             unit[38] += first_param
-        elif talent[2] == 43:  # freeze duration up
+        elif talent_to_apply == 43:  # freeze duration up
             unit[26] += second_param
-        elif talent[2] == 44:  # slow duration up
+        elif talent_to_apply == 44:  # slow duration up
             unit[28] += second_param
-        elif talent[2] == 45:  # knockback chance up
+        elif talent_to_apply == 45:  # knockback chance up
             unit[24] += first_param
-        elif talent[2] == 46:  # strengthen power up
+        elif talent_to_apply == 46:  # strengthen power up
             unit[41] += second_param
-        elif talent[2] == 47:  # survive chance
+        elif talent_to_apply == 47:  # survive chance
             unit[42] += first_param
-        elif talent[2] == 48:  # critical chance
+        elif talent_to_apply == 48:  # critical chance
             unit[31] += first_param
-        elif talent[2] == 49:  # barrier breaker chance
+        elif talent_to_apply == 49:  # barrier breaker chance
             unit[70] += first_param
-        elif talent[2] == 50:  # wave chance
+        elif talent_to_apply == 50:  # wave chance
             pass
-        elif talent[2] == 51:  # warp duration (unused)
+        elif talent_to_apply == 51:  # warp duration (unused)
             pass
-        elif talent[2] == 52:  # critical
+        elif talent_to_apply == 52:  # critical
             unit[31] += first_param
-        elif talent[2] == 53:  # weaken immune
+        elif talent_to_apply == 53:  # weaken immune
             unit[51] |= 1
-        elif talent[2] == 54:  # freeze immune
+        elif talent_to_apply == 54:  # freeze immune
             unit[49] |= 1
-        elif talent[2] == 55:  # slow immune
+        elif talent_to_apply == 55:  # slow immune
             unit[50] |= 1
-        elif talent[2] == 56:  # knockback immune
+        elif talent_to_apply == 56:  # knockback immune
             unit[48] |= 1
-        elif talent[2] == 57:  # wave immune
+        elif talent_to_apply == 57:  # wave immune
             unit[46] |= 1
-        elif talent[2] == 58:  # warp block
+        elif talent_to_apply == 58:  # warp block
             unit[75] |= 1
-        elif talent[2] == 59:  # savage blow
+        elif talent_to_apply == 59:  # savage blow
             unit[82] += first_param
             unit[83] += second_param
-        elif talent[2] == 60:  # dodge
+        elif talent_to_apply == 60:  # dodge
             unit[84] += first_param
             unit[85] += second_param
-        elif talent[2] == 61:  # savage blow chance
+        elif talent_to_apply == 61:  # savage blow chance
             pass
-        elif talent[2] == 62:  # dodge duration
+        elif talent_to_apply == 62:  # dodge duration
             pass
-        elif talent[2] == 63:  # slow chance
+        elif talent_to_apply == 63:  # slow chance
             unit[27] += first_param
-        elif talent[2] == 64:  # resist toxic
+        elif talent_to_apply == 64:  # resist toxic
             extra_param[6] = first_param
-        elif talent[2] == 65:  # toxic immune
+        elif talent_to_apply == 65:  # toxic immune
             unit[90] |= 1
-        elif talent[2] == 66:  # resist surge
+        elif talent_to_apply == 66:  # resist surge
             extra_param[7] = first_param
-        elif talent[2] == 67:  # surge immune
+        elif talent_to_apply == 67:  # surge immune
             unit[91] |= 1
-        elif talent[2] == 68:  # surge attack
+        elif talent_to_apply == 68:  # surge attack
             unit[86] += first_param
             unit[87] += third_param
             unit[88] += fourth_param
             unit[89] += second_param
-        elif talent[2] == 69:  # slow relic
+        elif talent_to_apply == 69:  # slow relic
             unit[27] += first_param
             unit[28] += second_param
             unit[78] |= 1
-        elif talent[2] == 70:  # weaken relic
+        elif talent_to_apply == 70:  # weaken relic
             unit[37] += first_param
             unit[38] += second_param
             unit[39] += second_param
             unit[78] |= 1
-        elif talent[2] == 71:  # weaken alien
+        elif talent_to_apply == 71:  # weaken alien
             unit[37] += first_param
             unit[38] += second_param
             unit[39] += second_param
             unit[21] |= 1
-        elif talent[2] == 72:  # slow metal
+        elif talent_to_apply == 72:  # slow metal
             unit[27] += first_param
             unit[28] += second_param
             unit[18] |= 1
-        elif talent[2] == 73:  # knockback zombies
+        elif talent_to_apply == 73:  # knockback zombies
             unit[24] += first_param
             unit[22] |= 1
+        elif talent_to_apply == 74:  # freeze chance up
+            unit[25] += first_param
+        elif talent_to_apply == 75:  # knockback alien
+            unit[24] += first_param
+            unit[21] |= 1
         return [unit, extra_param]
 
     def get_talents_by_id(self, unit_id):
