@@ -30,6 +30,7 @@ class Enemyunits:
         return returned
 
     def closeEnough(self, strToCmp, errors):
+        strToCmp = strToCmp.lower()
         names = self._enemies.loc[:, 'en names'].to_list()
         names = [str(x).lower() for x in names]
         # edit distance of everything in the tsv
@@ -116,7 +117,7 @@ class Enemyunits:
         enemyEmbed.set_author(name='Cat Bot')
         magstring = str(int(magnification*100)) + '%'
         if mag2 != magnification:
-            magstring = magstring + ' HP, ' + str(int(mag2*100)) + '% Damage'
+            magstring = magstring + ' HP, ' + str(int(round(mag2*100,0))) + '% Damage'
         enemyEmbed.add_field(name='Magnification', value=magstring, inline=True)
         hpv = str(math.ceil(int(enemy[0]) * magnification)) + ' HP - ' + str(round(int(enemy[1]), 0)) + ' KB'
         enemyEmbed.add_field(name='HP - Knockbacks', value=hpv, inline=True)

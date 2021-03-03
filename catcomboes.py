@@ -32,10 +32,7 @@ class Comboes:
             toret = "The catcombo named **" + array[closest[0]] + "** with the effect **" + results[0][
                 1] + "** requires the following units; "
             for r in results:
-                ironwallsucks = 0
-                if r[0] > 1017:
-                    ironwallsucks = 2
-                toret = toret + str(catculator.getnamebycode(r[0]-ironwallsucks)) + ", "
+                toret = toret + str(catculator.getnamebycode(r[0])) + ", "
             conn.close()
             return toret[:-2] + "."
 
@@ -60,11 +57,9 @@ class Comboes:
         answer = "**" + catculator.getnamebycode(unit_id[0]) + "** belongs to the following comboes:"
         lastcombo = None
         for line in results:
-            ironwallsucks = 0
-            if line[2] > 1017:
-                ironwallsucks = 2
+
             if line[0] != lastcombo:
                 lastcombo = line[0]
                 answer = answer + "\n**" + line[1] + " (" + line[0] + ")**: "
-            answer = answer + str(catculator.getnamebycode(line[2]-ironwallsucks)) + ', '
+            answer = answer + str(catculator.getnamebycode(line[2])) + ', '
         return answer.replace(', \n', '.\n')[:-2] + "."

@@ -38,8 +38,6 @@ class Catunits:
 
     def getUnitCode(self, identifier, errors):
         try:  # was this a string or a int?
-            if int(identifier) > 1016:
-                identifier = int(identifier) + 1
             locator = [int(identifier), 0]
         except (ValueError, TypeError):
             locator = self.closeEnough(identifier, errors)
@@ -55,7 +53,7 @@ class Catunits:
         title = 'Stats of ' + cat[96]
         if len(cat[98]) > 1:
             title = 'Stats of ' + cat[98]
-        whichform = unitcode - 1 if unitcode > 1017 else unitcode
+        whichform = unitcode
         if whichform % 3 == 0:
             title += ' - First form'
         elif whichform % 3 == 1:
@@ -237,6 +235,7 @@ class Catunits:
         return catEmbed
 
     def closeEnough(self, strToCmp, errors):
+        strToCmp = strToCmp.lower()
         names = self._cats.loc[:, 'enname'].to_list()
         names = [str(x).lower() for x in names]
         # edit distance of everything in the tsv
@@ -269,7 +268,7 @@ class Catunits:
             isBahamut = True  # this is bahamut cat
         else:
             isBahamut = False
-        if unitkind in [1672, 1673, 1674]:
+        if unitkind in [1674, 1675, 1676]:
             isgatyacat = True
         else:
             isgatyacat = False
@@ -353,12 +352,10 @@ class Catunits:
         name = cat[-3]
         allnames = 'The custom names of ' + name + ' are: '
         for key, value in self._customnames.items():
-            if value > 1016:
-                value += 3
             if value == catcode:
                 allnames += key + '; '
         if allnames[-2:] == ': ':
-            allnames = name + ' has no custom name.'
+            allnames = name + ' has no custom name. '
         return allnames[:-1]
 
     def removename(self, catcode, nametoremove):
@@ -578,10 +575,8 @@ class Catunits:
         except sqlite3.OperationalError:  # database not found
             return "Database for cat comboes not found."
         if len(results) == 0:
-            if unit_id>1017:
-                return str(self.getnamebycode(unit_id)) + " doesn't have talents."
-            else:
-                return str(self.getnamebycode(unit_id+2)) + " doesn't have talents."
+            return str(self.getnamebycode(unit_id+2)) + " doesn't have talents."
+            
         return results
 
     def get_talent_explanation(self, unit_id):
@@ -592,8 +587,6 @@ class Catunits:
         except sqlite3.OperationalError:  # database not found
             return "Database for cat comboes not found."
         if len(results) == 0:
-            if unit_id > 1017:
-                return str(self.getnamebycode(unit_id)) + " doesn't have talents."
-            else:
-                return str(self.getnamebycode(unit_id+2)) + " doesn't have talents."
+            return str(self.getnamebycode(unit_id)) + " doesn't have talents."
+            
         return results

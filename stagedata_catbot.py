@@ -209,6 +209,50 @@ SELECT DISTINCT stages.stage, stages.category, stages.level from units join stag
             answer += '.'
             return answer
 
+    def whereisthenemymonthly(self, enemycode, name, name2="", name3="", enemycode1="", enemycode2=""):
+        with sqlite3.connect('stages10.2.db') as conn:
+            cursor = conn.cursor()
+            results = None
+            if name2 != '':
+                if name3 != '':
+                    tuple = (str(enemycode[0][0]), str(enemycode1[0][0]), str(enemycode2[0][0]))
+                    results = cursor.execute(
+                        '''SELECT DISTINCT stages.stage, stages.category, stages.level, stages.energy from units join stages on units.stageid = stages.stageid where level not like '%Zombie%' and enemycode=? and category in ('SoL', 'CH') 
+INTERSECT
+SELECT DISTINCT stages.stage, stages.category, stages.level, stages.energy from units join stages on units.stageid = stages.stageid where level not like '%Zombie%' and enemycode=? and category in ('SoL', 'CH') 
+INTERSECT
+SELECT DISTINCT stages.stage, stages.category, stages.level, stages.energy from units join stages on units.stageid = stages.stageid where level not like '%Zombie%' and enemycode=? and category in ('SoL', 'CH') order by stages.energy''',
+                        tuple).fetchall()
+                else:
+                    tuple = (str(enemycode[0][0]), str(enemycode1[0][0]))
+                    results = cursor.execute(
+                        '''SELECT DISTINCT stages.stage, stages.category, stages.level, stages.energy from units join stages on units.stageid = stages.stageid where level not like '%Zombie%' and enemycode=? and category in ('SoL', 'CH') 
+INTERSECT
+SELECT DISTINCT stages.stage, stages.category, stages.level, stages.energy from units join stages on units.stageid = stages.stageid where level not like '%Zombie%' and enemycode=? and category in ('SoL', 'CH') order by stages.energy''',
+                        tuple).fetchall()
+            else:
+                results = cursor.execute(
+                    '''SELECT DISTINCT stages.stage, stages.category, stages.level, stages.energy from units join stages on units.stageid = stages.stageid where level not like '%Zombie%' and enemycode=? and category in ('SoL', 'CH') order by stages.energy''',
+                    [str(enemycode[0][0])]).fetchall()
+
+            if len(results) == 0:
+                return "No stages found."
+            answer = "(Beta) Stages found (sorted by energy price): "  # todo make this nicer, text wise, in respect with the number of units
+            category = ''
+            for stage in results:
+                if stage[1] != category:
+                    if answer.endswith(' - '):
+                        answer = answer[0:-3]
+                    answer += '\n**' + stage[1] + '**; '
+                category = stage[1]
+                answer += stage[0] + ' - '
+                if len(answer) > 1950:
+                    answer += '*and other stages*   '
+                    break
+            answer = answer[:-3]
+            answer += '.'
+            return answer
+
     def enemytostages(self, unitcode, name):  # todo differ from all stages and meaningful stages
         with sqlite3.connect('stages.db') as conn:
             cursor = conn.cursor()
