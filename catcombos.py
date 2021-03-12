@@ -1,16 +1,16 @@
 import sqlite3
 import nltk as nl
 import catunits_catbot
-class Comboes:
+class combos:
 
     @staticmethod
     def name_to_combo(name, catculator):
         try:
-            conn = sqlite3.connect('file:catcomboes.db?mode=rw', uri=True)  # open only if exists
+            conn = sqlite3.connect('file:catcombos.db?mode=rw', uri=True)  # open only if exists
             cursor = conn.cursor()
             results = cursor.execute("SELECT DISTINCT combo_name FROM units_in_combo").fetchall()
         except sqlite3.OperationalError:  # database not found
-            return "Database for cat comboes not found."
+            return "Database for cat combos not found."
 
         array = []
         for r in results:
@@ -47,14 +47,14 @@ class Comboes:
         if catculator.getrow(unit_id[0]) is None:
             return "Your unitcode was invalid."
         try:
-            conn = sqlite3.connect('file:catcomboes.db?mode=rw', uri=True)  # open only if exists
+            conn = sqlite3.connect('file:catcombos.db?mode=rw', uri=True)  # open only if exists
             cursor = conn.cursor()
             results = cursor.execute("select DISTINCT uic.combo_name, combo_effect, uic.required_id from names_effects join units_in_combo on names_effects.combo_name = units_in_combo.combo_name join units_in_combo as uic on uic.combo_name = names_effects.combo_name where units_in_combo.accepted_id = ?",(unit_id[0],)).fetchall()
         except sqlite3.OperationalError:  # database not found
-            return "Database for cat comboes not found."
+            return "Database for cat combos not found."
         if len(results) == 0:
             return "**" + catculator.getnamebycode(unit_id[0]) + "** isn't part of any combo."
-        answer = "**" + catculator.getnamebycode(unit_id[0]) + "** belongs to the following comboes:"
+        answer = "**" + catculator.getnamebycode(unit_id[0]) + "** belongs to the following combos:"
         lastcombo = None
         for line in results:
 

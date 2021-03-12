@@ -15,7 +15,7 @@ from thin_ice import thin_ice
 import catunits_catbot
 import enemyunits_catbot
 import stagedata_catbot
-import catcomboes
+import catcombos
 import random
 
 intents = discord.Intents.all()
@@ -542,6 +542,7 @@ async def on_message(message):
                 nameunit3 = enemyculator.namefromcode(enemystats3[0][0])
         await message.channel.send(
             stagedata.whereistheenemy(enemystats1, nameunit1, nameunit2, nameunit3, enemystats2, enemystats3))
+        return
 
     elif message.content.startswith('!whereismonthly'):
         if not canSend(1, privilegelevel(message.author), message):
@@ -616,13 +617,13 @@ async def on_message(message):
         if not canSend(2, privilegelevel(message.author), message):
             return
         await message.channel.send(
-            catcomboes.Comboes.name_to_combo(message.content[message.content.find(' ') + 1:], catculator))
+            catcombos.combos.name_to_combo(message.content[message.content.find(' ') + 1:], catculator))
 
     elif message.content.startswith('!combowith'):
         if not canSend(2, privilegelevel(message.author), message):
             return
         await message.channel.send(
-            catcomboes.Comboes.search_by_unit(message.content[message.content.find(' ') + 1:], catculator))
+            catcombos.combos.search_by_unit(message.content[message.content.find(' ') + 1:], catculator))
 
     elif message.content.startswith('!say'):
         if not canSend(5, privilegelevel(message.author), message):
