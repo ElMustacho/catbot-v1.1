@@ -1,3 +1,5 @@
+import math
+
 from discord import Embed as emb
 import sqlite3
 import nltk as nl
@@ -46,8 +48,11 @@ class Stagedata:
             stagenames = [x[0].lower() for x in stage]
             dss = list(map(lambda x: nl.edit_distance(x, stagename), stagenames))
             if min(dss) > errors:
-                results = -1
-                raise Exception('String could not match anything.')
+                stagenames = [x[:x.find('(')-1] for x in stagenames] # check if we can drop the difficulty in text
+                dss = list(map(lambda x: nl.edit_distance(x, stagename), stagenames))
+                if min(dss) > errors:  # if we ignore the difficulty, can we find the stage?
+                    results = -1
+                    raise Exception('String could not match anything.')  # didn't find stage anyway
             nearestmatch = [i for i, x in enumerate(dss) if x == min(dss)]
             if len(nearestmatch) > 1:
                 if stagelevel == '':
@@ -165,7 +170,7 @@ class Stagedata:
             conn.close()
             return results
 
-    def whereistheenemy(self, enemycode, name, name2="", name3="", enemycode1="", enemycode2=""):
+    def whereistheenemy(self, enemycode, name, name2="", name3="", enemycode1="", enemycode2=""): # todo refactor to ignore name
         with sqlite3.connect('stages10.2.db') as conn:
             cursor = conn.cursor()
             results = None
@@ -209,7 +214,7 @@ SELECT DISTINCT stages.stage, stages.category, stages.level from units join stag
             answer += '.'
             return answer
 
-    def whereisthenemymonthly(self, enemycode, name, name2="", name3="", enemycode1="", enemycode2=""):
+    def whereisthenemymonthly(self, enemycode, name, name2="", name3="", enemycode1="", enemycode2=""): # todo refactor to ignore name
         with sqlite3.connect('stages10.2.db') as conn:
             cursor = conn.cursor()
             results = None
@@ -252,6 +257,44 @@ SELECT DISTINCT stages.stage, stages.category, stages.level, stages.energy from 
             answer = answer[:-3]
             answer += '.'
             return answer
+
+    def listofstagesfromenemies(self, enemycode, name2="", name3="", enemycode1="", enemycode2=""):
+        with sqlite3.connect('stages10.2.db') as conn:
+            cursor = conn.cursor()
+            results = None
+            if name2 != '':
+                if name3 != '':
+                    tuple = (str(enemycode[0][0]), str(enemycode1[0][0]), str(enemycode2[0][0]))
+                    results = cursor.execute(
+                        '''SELECT DISTINCT stages.stage, stages.category, stages.level from units join stages on units.stageid = stages.stageid where enemycode=? 
+INTERSECT
+SELECT DISTINCT stages.stage, stages.category, stages.level from units join stages on units.stageid = stages.stageid where enemycode=? 
+INTERSECT
+SELECT DISTINCT stages.stage, stages.category, stages.level from units join stages on units.stageid = stages.stageid where enemycode=? order by stages.category''',
+                        tuple).fetchall()
+                else:
+                    tuple = (str(enemycode[0][0]), str(enemycode1[0][0]))
+                    results = cursor.execute(
+                        '''SELECT DISTINCT stages.stage, stages.category, stages.level from units join stages on units.stageid = stages.stageid where enemycode=? 
+INTERSECT
+SELECT DISTINCT stages.stage, stages.category, stages.level from units join stages on units.stageid = stages.stageid where enemycode=? order by stages.category''',
+                        tuple).fetchall()
+            else:
+                results = cursor.execute(
+                    'SELECT DISTINCT stages.stage, stages.category from units join stages on units.stageid = stages.stageid where enemycode=? order by stages.category',
+                    [str(enemycode[0][0])]).fetchall()
+
+            if len(results) == 0:
+                return "No stages found."
+            return results
+
+    def showstagesinembed(self, stages, index=0, showcost=False):  # todo implement showcost
+        embedtoret = emb(description='test', color=0xf43967)
+        embedtoret.set_author(name='Cat Bot')
+        embedtoret.set_footer(text='Beta feature; showing page ' + str(math.ceil((index+1)/25)) + ' out of ' + str(math.ceil(len(stages)/25)))
+        for stage in stages[index:index+24]:
+            embedtoret.add_field(name=stage[1] + ' - ' + stage[2], value=stage[3], inline=True)
+        return embedtoret
 
     def enemytostages(self, unitcode, name):  # todo differ from all stages and meaningful stages
         with sqlite3.connect('stages.db') as conn:

@@ -110,7 +110,9 @@ class Enemyunits:
         return locator
 
     def getstatsembed(self, enemy, magnification, mag2=None):
-        if mag2 == None:
+        backswing = enemy[87]-max(enemy[12],enemy[57],enemy[58])
+        real_tba = max(enemy[12], enemy[57], enemy[58]) + max(backswing, enemy[4]*2-1)
+        if mag2 is None:
             mag2 = magnification
         title = 'Stats of ' + str(enemy[88])
         enemyEmbed = emb(description=title, color=0x00ff00)
@@ -126,7 +128,7 @@ class Enemyunits:
             dmg += '/' + str(math.ceil(int(enemy[55]) * mag2))
         if int(enemy[56]) > 0:
             dmg += '/' + str(math.ceil(int(enemy[56]) * mag2))
-        dps = ' Damage - ' + str(math.ceil(int(enemy[3]+enemy[55]+enemy[56])*mag2*30/enemy[92])) + ' DPS'
+        dps = ' Damage - ' + str(math.ceil(int(enemy[3]+enemy[55]+enemy[56])*mag2*30/real_tba)) + ' DPS'
         damagekind = ''
         if enemy[11] == 1:
             damagekind += 'area'
@@ -139,7 +141,7 @@ class Enemyunits:
                 damagekind += ', omnistrike'
         damagetype = 'Damage (' + damagekind + ') - DPS'
         enemyEmbed.add_field(name=damagetype, value=dmg + dps, inline=True)
-        tba = str(round(int(enemy[92]) / 30, 2))
+        tba = str(round(int(real_tba) / 30, 2))
         enemyEmbed.add_field(name='Speed - Attack Frequency', value=str(round(int(enemy[2]), 0)) + ' - ' + tba + 's',
                            inline=True)
         enemyEmbed.add_field(name='Cash Awarded', value=str(round(int(enemy[6]*3.95), 0)), inline=True)
@@ -229,20 +231,20 @@ class Enemyunits:
         if len(defensive) > 3:
             enemyEmbed.add_field(name='Defensive abilities', value=defensive, inline=True)
         if int(enemy[59]) > 0:
-            atkroutine = '**' + str(round(int(enemy[12]))) + '**'
+            atkroutine = '__**' + str(round(int(enemy[12]))) + '**__'
         else:
             atkroutine = str(round(int(enemy[12])))
         if int(enemy[57]) > 0:
             if int(enemy[60]) > 0:
-                atkroutine += 'f / **' + str(round(int(enemy[57]))) + '**'
+                atkroutine += 'f / __**' + str(round(int(enemy[57]))) + '**__'
             else:
                 atkroutine += 'f / ' + str(round(int(enemy[57])))
         if int(enemy[58]) > 0:
             if int(enemy[61]) > 0:
-                atkroutine += 'f / **' + str(round(int(enemy[58]))) + '**'
+                atkroutine += 'f / __**' + str(round(int(enemy[58]))) + '**__'
             else:
                 atkroutine += 'f / ' + str(round(int(enemy[58])))
-        atkroutine += 'f / ' + str(round(int(enemy[91]))) + 'f'
+        atkroutine += 'f / ' + str(backswing) + 'f'
         enemyEmbed.add_field(name='Attack timings', value=atkroutine, inline=True)
         return enemyEmbed
 

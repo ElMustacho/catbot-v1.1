@@ -219,15 +219,15 @@ class Catunits:
             catEmbed.add_field(name='Defensive abilities', value=defensivestr, inline=isinline)
         atkroutine = str(round(int(cat[13])))
         if cat[63] > 0:  # first attack applies effects
-            atkroutine = '**' + atkroutine + '**'
+            atkroutine = '__**' + atkroutine + '**__'
         if int(cat[61]) > 0:  # has a second attack
             if cat[64] > 0:  # second attack applies effect
-                atkroutine += 'f / **' + str(round(int(cat[61]))) + '**'
+                atkroutine += 'f / __**' + str(round(int(cat[61]))) + '**__'
             else:
                 atkroutine += 'f / ' + str(round(int(cat[61])))
         if int(cat[62]) > 0:
             if cat[65] > 0:  # third attack has effect
-                atkroutine += 'f / **' + str(round(int(cat[62]))) + '**'
+                atkroutine += 'f / __**' + str(round(int(cat[62]))) + '**__'
             else:
                 atkroutine += 'f / ' + str(round(int(cat[62])))
         atkroutine += 'f / ' + str(round(int(cat[99]))) + 'f'  # backswing
@@ -565,6 +565,10 @@ class Catunits:
         elif talent_to_apply == 75:  # knockback alien
             unit[24] += first_param
             unit[21] |= 1
+        elif talent_to_apply == 76:
+            unit[25] += first_param
+            unit[26] += second_param
+            unit[18] |= 1
         return [unit, extra_param]
 
     def get_talents_by_id(self, unit_id):
