@@ -45,10 +45,11 @@ class Stagedata:
             cursor = conn.cursor()
             query = '''select stages.stage, stages.level, stages.category, stages.stageid from stages;'''
             stage = cursor.execute(query).fetchall()
-            stagenames = [x[0].lower() for x in stage]
-            dss = list(map(lambda x: nl.edit_distance(x, stagename), stagenames))
+            stagenames_nodiff = [x[0].lower() for x in stage]
+            stagenames_nodiff = [x[:x.find('(')-1] for x in stagenames_nodiff]
+            dss = list(map(lambda x: nl.edit_distance(x, stagename), stagenames_nodiff))
             if min(dss) > errors:
-                stagenames = [x[:x.find('(')-1] for x in stagenames] # check if we can drop the difficulty in text
+                stagenames = [x[0].lower() for x in stage]
                 dss = list(map(lambda x: nl.edit_distance(x, stagename), stagenames))
                 if min(dss) > errors:  # if we ignore the difficulty, can we find the stage?
                     results = -1

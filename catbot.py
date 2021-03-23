@@ -61,12 +61,16 @@ async def on_message(message):
         if isADM(message):
             await message.channel.send('Greetings, user.')
             return
-        if level == 5:
-            lv5answers = ['Hi dad!', 'Salutations, father!', 'Greetings, creator!']
+        if level == 6:
+            lv6answers = ['Hi dad!', 'Salutations, father!', 'Greetings, creator!']
+            await message.channel.send(random.choice(lv6answers))
+        elif level == 5:
+            lv5answers = ["Hi moderator, how you doin'?", "Pay attention everyone, cops are here!",
+                          "You gotta pay respect to mods!", "Mods are moderating in 2021 too!"]
             await message.channel.send(random.choice(lv5answers))
         elif level == 4:
-            lv4answers = ["Hi moderator, how you doin'?", "Pay attention everyone, cops are here!",
-                          "You gotta pay respect to mods!", "Mods are moderating in 2021 too!"]
+            lv4answers = ["It's a power user, it's overwhelming!", "Almost a mod for all I care.",
+                          "I'm gonna listen to names changed from this user.", "My friend :)."]
             await message.channel.send(random.choice(lv4answers))
         elif level == 3:
             lv3answers = ["Wow, you are important, that's cool!", "OMG! Senpai noticed me!",
@@ -306,7 +310,7 @@ async def on_message(message):
             await message.channel.send('Name was already used.')
 
     elif message.content.startswith('!silence'):
-        if not canSend(4, privilegelevel(message.author), message):
+        if not canSend(5, privilegelevel(message.author), message):
             return
         timestop = min(60, int(message.content[9:]))
         catbotdata.timelastmessage = datetime.now() + timedelta(minutes=timestop)
@@ -728,7 +732,7 @@ async def on_message(message):
         return
 
     elif message.content.startswith('!say'):
-        if not canSend(5, privilegelevel(message.author), message):
+        if not canSend(6, privilegelevel(message.author), message):
             return
         looking = message.content[message.content.find(' ') + 1: find_nth(message.content, ' ', 2)]
         channel_to_send = client.get_channel(int(looking))
@@ -737,7 +741,7 @@ async def on_message(message):
         return
 
     elif message.content.startswith('!rawtalents'):
-        if not canSend(3, privilegelevel(message.author), message):
+        if not canSend(4, privilegelevel(message.author), message):
             return
         cat = catculator.getUnitCode(message.content[message.content.find(' ') + 1:].lower(), 6)
 
@@ -847,7 +851,7 @@ async def on_message(message):
         return
 
     elif message.content == '!muted':
-        if not canSend(4, privilegelevel(message.author), message):
+        if not canSend(5, privilegelevel(message.author), message):
             return
         msgtosend = '''This channel is here so you can talk about the specifics of your mute with moderators. Follow the server's rules as if you were in any other channel, being here doesn’t exempt you from them. 
 **You may:** 
@@ -886,7 +890,7 @@ async def on_message(message):
                     message.author.mention + ' failed to use the password, but yag deleted the message faster. They tried this: ' + textsent)
 
     elif message.content.startswith('!thin_ice '):
-        if not canSend(4, privilegelevel(message.author), message):
+        if not canSend(5, privilegelevel(message.author), message):
             return
         user_id = message.content[message.content.find(' ') + 1:message.content.find(';')]
         reason = message.content[message.content.find(';') + 1:]
@@ -904,7 +908,7 @@ async def on_message(message):
         return
 
     elif message.content.startswith('!remove_thin_ice '):
-        if not canSend(4, privilegelevel(message.author), message):
+        if not canSend(5, privilegelevel(message.author), message):
             return
         user_id = message.content[message.content.find(' ') + 1:]
         if len(user_id) < 10:
@@ -918,7 +922,7 @@ async def on_message(message):
         return
 
     elif message.content.startswith('!on_thin_ice'):
-        if not canSend(4, privilegelevel(message.author), message):
+        if not canSend(5, privilegelevel(message.author), message):
             return
         user_id = message.content[message.content.find(' ') + 1:]
         if len(user_id) < 10:
@@ -937,7 +941,7 @@ async def on_message(message):
             return
 
     elif message.content.startswith('!list_thin_ice'):
-        if not canSend(4, privilegelevel(message.author), message):
+        if not canSend(5, privilegelevel(message.author), message):
             return
         answer = ""
         data = icing.get_data()
@@ -951,7 +955,7 @@ async def on_message(message):
         return
 
     elif message.content.startswith('!embed_list_thin_ice'):
-        if not canSend(4, privilegelevel(message.author), message):
+        if not canSend(5, privilegelevel(message.author), message):
             return
         embedded_list = discord.embeds.Embed(description='List of users on thin ice.', color=0x000000)
         data = icing.get_data()
@@ -965,7 +969,7 @@ async def on_message(message):
         return
 
     elif message.content.startswith('!solve'):
-        if not canSend(4, privilegelevel(message.author), message):
+        if not canSend(5, privilegelevel(message.author), message):
             return
         channel_mod = client.get_channel(catbotdata.requireddata['mod-channel-id'])
         if modqueue.setsolvedbyindex(int(message.content[7:])):  # if true it was solved successfully
@@ -974,7 +978,7 @@ async def on_message(message):
             await channel_mod.send('Invalid report code')
 
     elif message.content.startswith('!assignto'):
-        if not canSend(4, privilegelevel(message.author), message):
+        if not canSend(5, privilegelevel(message.author), message):
             return
         if message.content.startswith('!assigntome'):
             modqueue.setassigned(int(message.content[11:]), message.author.mention)
@@ -1002,11 +1006,11 @@ async def on_message(message):
             'Your request has been sent successfully. Your report code is ' + str(reportcode) + '.')
 
     elif message.content.startswith('!saverequests'):
-        if canSend(4, privilegelevel(message.author), message):
+        if canSend(5, privilegelevel(message.author), message):
             modqueue.savereportsusual()
 
     elif message.content.startswith('!unsolved'):
-        if not canSend(4, privilegelevel(message.author), message):
+        if not canSend(5, privilegelevel(message.author), message):
             return
         channel_mod = client.get_channel(catbotdata.requireddata['mod-channel-id'])
         for i in modqueue.getunsolved():
@@ -1022,7 +1026,7 @@ async def on_message(message):
             await channel_mod.send(embed=embed)
 
     elif message.content.startswith('!myreports'):
-        if not canSend(4, privilegelevel(message.author), message):
+        if not canSend(5, privilegelevel(message.author), message):
             return
         channel_mod = client.get_channel(catbotdata.requireddata['mod-channel-id'])
         for i in modqueue.getassigned(message.author.mention):  # at this point we know this is a mod
@@ -1038,7 +1042,7 @@ async def on_message(message):
             await channel_mod.send(embed=embed)
 
     elif message.content.startswith('!deletereport') or message.content.startswith('!removereport'):
-        if not canSend(4, privilegelevel(message.author), message):
+        if not canSend(5, privilegelevel(message.author), message):
             return
         channel_mod = client.get_channel(catbotdata.requireddata['mod-channel-id'])
         report = modqueue.deletereportbyid(int(message.content[14:]))
@@ -1057,7 +1061,7 @@ async def on_message(message):
             'Your request with the code ' + str(report[6]) + ' has been solved.')
 
     elif message.content.startswith('!kill'):
-        if not canSend(5, privilegelevel(message.author), message):
+        if not canSend(6, privilegelevel(message.author), message):
             return
         await message.channel.send('Dead.')
         exit(0)
@@ -1065,7 +1069,7 @@ async def on_message(message):
 
 def privilegelevel(member):
     level = 1  # by default a user is unworthy
-    if member.id in catbotdata.requireddata['tier-5-users']:
+    if member.id in catbotdata.requireddata['tier-6-users']:
         return 5
     member = serveruser(member)
     if member is False:  # user not in server
@@ -1077,8 +1081,10 @@ def privilegelevel(member):
             return 1  # muted
         if i.id in catbotdata.requireddata['tier-3-roles']:  # purple/vip/worthy helper/boosters
             level = max(level, 3)
-        if i.id in catbotdata.requireddata['tier-4-roles']:  # mods
+        if i.id in catbotdata.requireddata['tier-4-roles']:  # power_users
             level = max(level, 4)
+        if i.id in catbotdata.requireddata['tier-5-roles']:  # mods
+            level = max(level, 5)
     return level
 
 
