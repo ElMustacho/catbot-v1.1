@@ -261,7 +261,7 @@ class Enemyunits:
             pickle.dump(self._customnames, f, pickle.DEFAULT_PROTOCOL)
 
     def getnames(self, enemy, enemycode):
-        name = enemy[86]
+        name = enemy[88]
         allnames = 'The custom names of ' + name + ' are: '
         for key, value in self._customnames.items():
             if value == enemycode:
