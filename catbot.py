@@ -54,7 +54,7 @@ async def on_message(message):
     if message.author == client.user:  # bot doesn't want to answer itself
         return
 
-    elif message.content.startswith('!sayhi'):
+    elif message.content == '!sayhi':
         level = privilegelevel(message.author)
         if not canSend(1, level, message):
             return
@@ -1070,7 +1070,7 @@ async def on_message(message):
 def privilegelevel(member):
     level = 1  # by default a user is unworthy
     if member.id in catbotdata.requireddata['tier-6-users']:
-        return 5
+        return 6
     member = serveruser(member)
     if member is False:  # user not in server
         return 0

@@ -46,7 +46,7 @@ class Stagedata:
             query = '''select stages.stage, stages.level, stages.category, stages.stageid from stages;'''
             stage = cursor.execute(query).fetchall()
             stagenames_nodiff = [x[0].lower() for x in stage]
-            stagenames_nodiff = [x[:x.find('(')-1] for x in stagenames_nodiff]
+            stagenames_nodiff = [x[:x.find('(') if x.find('(')>0 else len(x)] for x in stagenames_nodiff]
             dss = list(map(lambda x: nl.edit_distance(x, stagename), stagenames_nodiff))
             if min(dss) > errors:
                 stagenames = [x[0].lower() for x in stage]
