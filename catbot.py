@@ -148,8 +148,9 @@ async def on_message(message):
         if isADM(message):
             return
         reactions = ['▶', '◀️', '⏩', '⏪', '\U00002705', '\U0001F5D1']
+        reactions_made = []
         for reaction in reactions:
-            asyncio.create_task(sent_message.add_reaction(reaction))
+            reactions_made.append(asyncio.create_task(sent_message.add_reaction(reaction)))
 
         def check(reaction_received, user_that_sent):
             return user_that_sent == message.author and str(reaction_received.emoji) in ['▶', '◀️', '⏩', '⏪',
@@ -185,6 +186,8 @@ async def on_message(message):
                                                    newcode))
             except TypeError:
                 await sent_message.edit(content="That form doesn't exists.")
+        for reaction in reactions_made:
+            await reaction
         await sent_message.clear_reactions()
         return
 
