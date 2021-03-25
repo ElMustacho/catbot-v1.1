@@ -147,12 +147,9 @@ async def on_message(message):
         sent_message = await message.channel.send(embed=embedsend)
         if isADM(message):
             return
-        await sent_message.add_reaction('▶')
-        await sent_message.add_reaction('◀️')
-        await sent_message.add_reaction('⏩')
-        await sent_message.add_reaction('⏪')
-        await sent_message.add_reaction('\U00002705')
-        await sent_message.add_reaction('\U0001F5D1')
+        reactions = ['▶', '◀️', '⏩', '⏪', '\U00002705', '\U0001F5D1']
+        for reaction in reactions:
+            asyncio.create_task(sent_message.add_reaction(reaction))
 
         def check(reaction_received, user_that_sent):
             return user_that_sent == message.author and str(reaction_received.emoji) in ['▶', '◀️', '⏩', '⏪',
