@@ -102,7 +102,7 @@ class Catunits:
         catEmbed.add_field(name='Speed - Attack Frequency', value=str(round(int(cat[2]), 0)) + ' - ' + str(tba) + 's',
                            inline=isinline)
         catEmbed.add_field(name='Cost - Respawn', value=str(round(int(cat[6] * 1.5), 0)) + ' - ' + str(
-            round(max(((cat[7] * 2 - 254) / 30), 2), 2)) + 's', inline=isinline)
+            round(max(((cat[7] * 2 - 264) / 30), 2), 2)) + 's', inline=isinline)
         rangestr = ''
         if ',' in damagekind:  # it's long range or omni
             leftrange = str(max(round(int(cat[44]), 0), round(int(cat[44] + cat[45]))))
