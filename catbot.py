@@ -1089,8 +1089,7 @@ def privilegelevel(member):
 
 
 def canAnswer(message):
-    if not isADM(
-            message) and catbotdata.timelastmessage > datetime.now():  # second condition is asking if silence is active
+    if not isADM(message) and catbotdata.timelastmessage > datetime.now():  # is silence is active
         if privilegelevel(serveruser(message.author)) < 3:  # if you are important you can skip the silence
             return False
     return True

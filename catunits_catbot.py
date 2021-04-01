@@ -546,12 +546,12 @@ class Catunits:
         elif talent_to_apply == 70:  # weaken relic
             unit[37] += first_param
             unit[38] += second_param
-            unit[39] += second_param
+            unit[39] += third_param
             unit[78] |= 1
         elif talent_to_apply == 71:  # weaken alien
             unit[37] += first_param
             unit[38] += second_param
-            unit[39] += second_param
+            unit[39] += third_param
             unit[21] |= 1
         elif talent_to_apply == 72:  # slow metal
             unit[27] += first_param
