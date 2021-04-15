@@ -794,7 +794,7 @@ async def on_message(message):
         if unit_talents[-2:] == 's.':  # no talents for unit
             await message.channel.send(unit_talents)
             return
-        ep = [0, 0, 0, 0, 0, 0, 0, 0]
+        ep = [0, 0, 0, 0, 0, 0, 0, 0, 0]
         unit_talents = [list(ele) for ele in unit_talents]
         talents_expl = [list(ele) for ele in talents_expl]
         for line, lv in zip(unit_talents, attempt):
@@ -814,7 +814,7 @@ async def on_message(message):
         emb = catculator.getstatsEmbed(cat_unit, level, int(cat[0]), ep)
         str_expl = ''
         for talent_ex, lv, talent in zip(talents_expl, attempt, unit_talents):
-            level_applied = lv
+            level_applied = max(lv, 0)
             if lv > talent[3]:
                 level_applied = talent[3]
                 if level_applied == 0:
@@ -1064,6 +1064,7 @@ async def on_message(message):
         if not canSend(6, privilegelevel(message.author), message):
             return
         await message.channel.send('Dead.')
+        await client.close()
         exit(0)
 
 

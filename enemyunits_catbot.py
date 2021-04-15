@@ -191,6 +191,9 @@ class Enemyunits:
             offensive += 'Warp ' + warp1 + '% (' + warp2 + ' / ' + warp3 + ' range, ' + warp4 + 's), '
         if enemy[73] > 0:  # curses
             offensive += 'Curses ' + str(round(int(enemy[73]))) + '% (' + str(round(int(enemy[74]) / 30, 2)) + 's), '
+        if enemy[75] > 0:  # savage blows
+            offensive += 'Savage Blow ' + str(round(int(enemy[75]))) + '% (' + str(round(int(enemy[76]))) + \
+                         '% extra power), '
         if enemy[79] > 0:  # poison
             offensive += 'Poisons ' + str(round(int(enemy[79]))) + '% (' + str(int(enemy[80])) + '% hp), '
         if enemy[81] > 0:  # surge attack

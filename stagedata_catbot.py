@@ -223,22 +223,22 @@ SELECT DISTINCT stages.stage, stages.category, stages.level from units join stag
                 if name3 != '':
                     tuple = (str(enemycode[0][0]), str(enemycode1[0][0]), str(enemycode2[0][0]))
                     results = cursor.execute(
-                        '''SELECT DISTINCT stages.stage, stages.category, stages.level, stages.energy from units join stages on units.stageid = stages.stageid where level not like '%Zombie%' and enemycode=? and category in ('SoL', 'CH') 
+                        '''SELECT DISTINCT stages.stage, stages.category, stages.level, stages.energy from units join stages on units.stageid = stages.stageid where level not like '%Zombie%' and enemycode=? and category in ('SoL', 'Story Mode') 
 INTERSECT
-SELECT DISTINCT stages.stage, stages.category, stages.level, stages.energy from units join stages on units.stageid = stages.stageid where level not like '%Zombie%' and enemycode=? and category in ('SoL', 'CH') 
+SELECT DISTINCT stages.stage, stages.category, stages.level, stages.energy from units join stages on units.stageid = stages.stageid where level not like '%Zombie%' and enemycode=? and category in ('SoL', 'Story Mode') 
 INTERSECT
-SELECT DISTINCT stages.stage, stages.category, stages.level, stages.energy from units join stages on units.stageid = stages.stageid where level not like '%Zombie%' and enemycode=? and category in ('SoL', 'CH') order by stages.energy''',
+SELECT DISTINCT stages.stage, stages.category, stages.level, stages.energy from units join stages on units.stageid = stages.stageid where level not like '%Zombie%' and enemycode=? and category in ('SoL', 'Story Mode') order by stages.energy''',
                         tuple).fetchall()
                 else:
                     tuple = (str(enemycode[0][0]), str(enemycode1[0][0]))
                     results = cursor.execute(
-                        '''SELECT DISTINCT stages.stage, stages.category, stages.level, stages.energy from units join stages on units.stageid = stages.stageid where level not like '%Zombie%' and enemycode=? and category in ('SoL', 'CH') 
+                        '''SELECT DISTINCT stages.stage, stages.category, stages.level, stages.energy from units join stages on units.stageid = stages.stageid where level not like '%Zombie%' and enemycode=? and category in ('SoL', 'Story Mode') 
 INTERSECT
-SELECT DISTINCT stages.stage, stages.category, stages.level, stages.energy from units join stages on units.stageid = stages.stageid where level not like '%Zombie%' and enemycode=? and category in ('SoL', 'CH') order by stages.energy''',
+SELECT DISTINCT stages.stage, stages.category, stages.level, stages.energy from units join stages on units.stageid = stages.stageid where level not like '%Zombie%' and enemycode=? and category in ('SoL', 'Story Mode') order by stages.energy''',
                         tuple).fetchall()
             else:
                 results = cursor.execute(
-                    '''SELECT DISTINCT stages.stage, stages.category, stages.level, stages.energy from units join stages on units.stageid = stages.stageid where level not like '%Zombie%' and enemycode=? and category in ('SoL', 'CH') order by stages.energy''',
+                    '''SELECT DISTINCT stages.stage, stages.category, stages.level, stages.energy from units join stages on units.stageid = stages.stageid where level not like '%Zombie%' and enemycode=? and category in ('SoL', 'Story Mode') order by stages.energy''',
                     [str(enemycode[0][0])]).fetchall()
 
             if len(results) == 0:

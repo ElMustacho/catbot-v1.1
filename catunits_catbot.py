@@ -10,7 +10,7 @@ from collections import defaultdict
 
 class Catunits:
     def __init__(self):
-        self._cats = pd.read_csv('unitdata10.1.tsv', sep='\t')
+        self._cats = pd.read_csv('auto_units.tsv', sep='\t')
         self._customnames = None
         try:
             self._customnames = pickle.load(open('catCustomUnits.pkl', 'rb'))  # this is a dictionary
@@ -78,15 +78,23 @@ class Catunits:
             rarity = 'Legend Rare'
         catEmbed.add_field(name='Level - Rarity', value=str(level) + ' - ' + rarity, inline=isinline)
         lvmult = float(self.levelMultiplier(cat[97], unitcode, level))
-        hpv = str(math.ceil(int(cat[0]) * lvmult)) + ' HP - ' + str(round(int(cat[1]), 0)) + ' KB'
+        lives_once = ''
+        if cat[58] > 0:
+            lives_once = ' (hits once before dying)'
+        hpv = str(math.ceil(int(cat[0]) * lvmult)) + ' HP' + lives_once + ' - ' + str(round(int(cat[1]), 0)) + ' KB'
         catEmbed.add_field(name='HP - Knockbacks', value=hpv, inline=isinline)
-        dmg = str(math.ceil(int(cat[3]) * lvmult))
+        if len(extraparam) > 0:
+            talent_atk = extraparam[8]
+        else:
+            talent_atk = 1
+        dmg = str(round(math.floor(math.floor(cat[3] * lvmult) * max(1, talent_atk))))
         tba = round(int(cat[100]) / 30, 2)
         if int(cat[59]) > 0:
-            dmg += '/' + str(math.ceil(int(cat[59]) * lvmult))
+            dmg += '/' + str(round(math.floor(math.floor(cat[59] * lvmult) * max(1, talent_atk))))
         if int(cat[60]) > 0:
-            dmg += '/' + str(math.ceil(int(cat[60]) * lvmult))
-        dps = ' Damage - ' + str(round((cat[3] + cat[59] + cat[60])*lvmult/tba)) + ' DPS'
+            dmg += '/' + str(round(math.floor(math.floor(cat[60] * lvmult) * max(1, talent_atk))))
+        dps = ' Damage - ' + str(round(math.floor(math.floor((cat[3]+cat[59]+cat[60]) * lvmult) *
+                                                  max(1, talent_atk))/tba)) + ' DPS'
         damagekind = ''
         if cat[12] == 1:
             damagekind += 'area'
@@ -393,7 +401,7 @@ class Catunits:
         if talent_to_apply == 1:  # weaken
             unit[37] += first_param
             unit[38] += second_param
-            unit[39] += third_param
+            unit[39] += 100 - third_param
         elif talent_to_apply == 2:  # freeze
             unit[25] += first_param
             unit[26] += second_param
@@ -451,9 +459,7 @@ class Catunits:
         elif talent_to_apply == 27:  # hp up
             unit[0] *= (1+first_param/100)
         elif talent_to_apply == 28:  # atk up
-            unit[3] *= (1 + first_param / 100)
-            unit[59] *= (1 + first_param / 100)
-            unit[60] *= (1 + first_param / 100)
+            extra_param[8] = (1 + first_param / 100)
         elif talent_to_apply == 29:  # speed up
             unit[2] += first_param
         elif talent_to_apply == 30:  # knockback chance up (unused)
@@ -546,12 +552,12 @@ class Catunits:
         elif talent_to_apply == 70:  # weaken relic
             unit[37] += first_param
             unit[38] += second_param
-            unit[39] += third_param
+            unit[39] += 100 - third_param
             unit[78] |= 1
         elif talent_to_apply == 71:  # weaken alien
             unit[37] += first_param
             unit[38] += second_param
-            unit[39] += third_param
+            unit[39] += 100 - third_param
             unit[21] |= 1
         elif talent_to_apply == 72:  # slow metal
             unit[27] += first_param
