@@ -66,19 +66,19 @@ async def on_message(message):
             await message.channel.send(random.choice(lv6answers))
         elif level == 5:
             lv5answers = ["Hi moderator, how you doin'?", "Pay attention everyone, cops are here!",
-                          "You gotta pay respect to mods!", "Mods are moderating in 2021 too!"]
+                          "You gotta pay respect to mods!", "Mods are moderating in 2021 too!", "Please don't ban me!"]
             await message.channel.send(random.choice(lv5answers))
         elif level == 4:
             lv4answers = ["It's a power user, it's overwhelming!", "Almost a mod for all I care.",
-                          "I'm gonna listen to names changed from this user.", "My friend :)."]
+                          "I'm gonna listen to names changed from this user.", "My friend :).", "The power of friendship is strong!"]
             await message.channel.send(random.choice(lv4answers))
         elif level == 3:
             lv3answers = ["Wow, you are important, that's cool!", "OMG! Senpai noticed me!",
-                          "I'm happy that you are here!", "It's epic to have an user so cool as you in 2021!"]
+                          "I'm happy that you are here!", "It's epic to have an user so cool as you in 2021!", "I wish everyone was as cool as you."]
             await message.channel.send(random.choice(lv3answers))
         elif level == 2:
             lv2answers = ['Well, at least you are here.', 'You are a cat. How about that.',
-                          'Look, an user said hi to me!', "A battle catter in 2021, hi to you."]
+                          'Look, an user said hi to me!', "A battle catter in 2021, hi to you.", "You don't have anything better to do, is that so?"]
             await message.channel.send(random.choice(lv2answers))
         else:
             await message.channel.send('You can do better than this.')
