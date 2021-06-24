@@ -475,10 +475,10 @@ async def on_message(message):
         limit = message.content.find(';')
         if limit == -1:
             limit = len(message.content)
-        unit1 = message.content[message.content.find(' ') + 1:limit]
+        unit1 = message.content[message.content.find(' '):limit].strip()
         unit2 = message.content[
-                message.content.find(';') + 1:message.content.find(';', message.content.find(';') + 1)]
-        unit3 = message.content[message.content.rfind(';') + 2:]
+                message.content.find(';') + 1:message.content.find(';', message.content.find(';') + 1)].strip()
+        unit3 = message.content[message.content.rfind(';') + 1:].strip()
         if message.content.count(';') < 2:
             unit2 = ''
         if message.content.count(';') < 1:
