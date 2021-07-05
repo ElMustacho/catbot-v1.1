@@ -487,7 +487,7 @@ class Catunits:
         elif talent_to_apply == 41:  # target traitless
             unit[19] |= 1
         elif talent_to_apply == 42:  # weaken duration up
-            unit[38] += first_param
+            unit[38] += second_param
         elif talent_to_apply == 43:  # freeze duration up
             unit[26] += second_param
         elif talent_to_apply == 44:  # slow duration up

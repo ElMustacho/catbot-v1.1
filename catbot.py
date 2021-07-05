@@ -278,11 +278,23 @@ async def on_message(message):
         if catcode == "name not unique":  # name wasn't unique
             await message.channel.send('Couldn\'t discriminate.')
             return
-        response = catculator.givenewname(catcode[0], message.content[limit + 2:])
-        if response:
-            await message.channel.send('The name ' + message.content[limit + 2:] + ' is now assigned.')
+        sent_message = await message.channel.send('The name `' + message.content[limit + 2:] + '` is going to be assigned, is that okay?')
+        await sent_message.add_reaction('✅')
+        def check(reaction_received, user_that_sent):
+            return user_that_sent == message.author and str(reaction_received.emoji) == '✅' and reaction_received.message.id == sent_message.id
+
+        try:
+            reaction, user = await client.wait_for('reaction_add', timeout=15.0, check=check)
+        except asyncio.TimeoutError:
+            pass
         else:
-            await message.channel.send('Name was already used.')
+            response = catculator.givenewname(catcode[0], message.content[limit + 2:])
+            if response:
+                await message.channel.send('The name ' + message.content[limit + 2:] + ' is now assigned.')
+            else:
+                await message.channel.send('Name was already used.')
+        await sent_message.clear_reactions()
+        return
 
     elif message.content.startswith('!renameenemy'):
         if not canSend(4, privilegelevel(message.author), message):
@@ -303,11 +315,23 @@ async def on_message(message):
         if enemycode[0][0] is None:
             await message.channel.send('Invalid code for cat unit.')
             return
-        response = enemyculator.givenewname(enemycode[0][0], message.content[limit + 2:])
-        if response:
-            await message.channel.send('The name ' + message.content[limit + 2:] + ' is now assigned.')
+        sent_message = await message.channel.send('The name `' + message.content[limit + 2:] + '` is going to be assigned, is that okay?')
+        await sent_message.add_reaction('✅')
+        def check(reaction_received, user_that_sent):
+            return user_that_sent == message.author and str(reaction_received.emoji) == '✅' and reaction_received.message.id == sent_message.id
+
+        try:
+            reaction, user = await client.wait_for('reaction_add', timeout=15.0, check=check)
+        except asyncio.TimeoutError:
+            pass
         else:
-            await message.channel.send('Name was already used.')
+            response = enemyculator.givenewname(enemycode[0][0], message.content[limit + 2:])
+            if response:
+                await message.channel.send('The name ' + message.content[limit + 2:] + ' is now assigned.')
+            else:
+                await message.channel.send('Name was already used.')
+        await sent_message.clear_reactions()
+        return
 
     elif message.content.startswith('!silence'):
         if not canSend(5, privilegelevel(message.author), message):
@@ -867,7 +891,7 @@ async def on_message(message):
         return
 
     elif message.channel.id == catbotdata.requireddata['welcome-channel']:
-        if message.content == '$password super galaxy cosmo':
+        if message.content == '$password sacred blade sakura':
             member = serveruser(message.author)
             await member.add_roles(discord.utils.get(client.get_guild(catbotdata.requireddata['server-id']).roles,
                                                      id=catbotdata.requireddata['tier-2-roles'][0]),
