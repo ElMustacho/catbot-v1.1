@@ -122,6 +122,8 @@ class Enemyunits:
             magstring = magstring + ' HP, ' + str(int(round(mag2*100,0))) + '% Damage'
         enemyEmbed.add_field(name='Magnification', value=magstring, inline=True)
         hpv = str(math.ceil(int(enemy[0]) * magnification)) + ' HP - ' + str(round(int(enemy[1]), 0)) + ' KB'
+        if enemy[52]==2:
+            hpv+=' (suicides on hit)'
         enemyEmbed.add_field(name='HP - Knockbacks', value=hpv, inline=True)
         dmg = str(math.ceil(int(enemy[3]) * mag2))
         if int(enemy[55]) > 0:
