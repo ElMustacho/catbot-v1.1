@@ -16,7 +16,7 @@ class Enemyunits:
 
     def namefromcode(self, enemycode):
         returnthis = self._enemies.iloc[enemycode]
-        returnthis = returnthis.iat[88]
+        returnthis = returnthis.iat[95]
         return returnthis
 
     def getrow(self, row):
@@ -113,7 +113,7 @@ class Enemyunits:
         return locator
 
     def getstatsembed(self, enemy, magnification, mag2=None):
-        backswing = enemy[94]-max(enemy[12],enemy[57],enemy[58])
+        backswing = int(enemy[94])-max(enemy[12],enemy[57],enemy[58])
         real_tba = max(enemy[12], enemy[57], enemy[58]) + max(backswing, enemy[4]*2-1)
         if mag2 is None:
             mag2 = magnification

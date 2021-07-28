@@ -30,7 +30,7 @@ class Catunits:
     def getnamebycode(self, id):
         returned = None
         try:
-            returned = self._cats.iloc[id][98]
+            returned = self._cats.iloc[id][100]
         except IndexError:
             pass
         return returned
@@ -171,8 +171,8 @@ class Catunits:
                 round(int(cat[89]))) + '), '
         if cat[92] > 0:  # curse attack
             offensivestr += 'Curses ' + str(round(int(cat[92]))) + '% for ' + str(round(cat[93] / 30, 2)) + 's, '
-        if cat[97] > 0:  # shield breaks
-            offensivestr += 'Breaks shields '+str(cat[97])+'%, '
+        if cat[95] > 0:  # shield breaks
+            offensivestr += 'Breaks shields '+str(cat[95])+'%, '
         offensivestr = offensivestr[:-2]
         if len(offensivestr) > 3:
             catEmbed.add_field(name='Offensive abilities', value=offensivestr, inline=isinline)
