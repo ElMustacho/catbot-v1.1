@@ -22,7 +22,6 @@ class Enemyunits:
     def getrow(self, row):
         if row < 0:
             return None
-        returned = None
         try:
             returned = self._enemies.iloc[row]
         except IndexError:
@@ -95,11 +94,15 @@ class Enemyunits:
             fstr += '1'
         else:
             fstr += '0'
+        if enemy[93] != 0:  # devil
+            fstr += '1'
+        else:
+            fstr += '0'
         if enemy[48] > 0:  # witch trait
             fstr = "witchtrait"
         if enemy[71] > 0:  # is eva
             fstr = "evatrait"
-        return 'https://raw.githubusercontent.com/ElMustacho/catbot-v1.1/master/traitpics/' + fstr + '.png'
+        return 'https://raw.githubusercontent.com/ElMustacho/catbot-v1.1/master/new_pics/' + fstr + '.png'
 
     def getUnitCode(self, identifier, errors):
         locator = None
@@ -110,11 +113,11 @@ class Enemyunits:
         return locator
 
     def getstatsembed(self, enemy, magnification, mag2=None):
-        backswing = enemy[87]-max(enemy[12],enemy[57],enemy[58])
+        backswing = enemy[94]-max(enemy[12],enemy[57],enemy[58])
         real_tba = max(enemy[12], enemy[57], enemy[58]) + max(backswing, enemy[4]*2-1)
         if mag2 is None:
             mag2 = magnification
-        title = 'Stats of ' + str(enemy[88])
+        title = 'Stats of ' + str(enemy[95])
         enemyEmbed = emb(description=title, color=0x00ff00)
         enemyEmbed.set_author(name='Cat Bot')
         magstring = str(int(magnification*100)) + '%'
@@ -199,7 +202,13 @@ class Enemyunits:
         if enemy[79] > 0:  # poison
             offensive += 'Poisons ' + str(round(int(enemy[79]))) + '% (' + str(int(enemy[80])) + '% hp), '
         if enemy[81] > 0:  # surge attack
-            offensive += 'Surge Attack ' + str(round(int(enemy[81]))) + '% (' + str(round(int(enemy[82]/4))) + '-' + str(round(int(enemy[82]/4)+int(enemy[83]/4))) + ', level ' + str(round(int(enemy[84]))) + '), '
+            offensive += 'Surge Attack ' + str(round(int(enemy[81]))) + '% (' + str(
+                round(int(enemy[82] / 4))) + '-' + str(
+                round(int(enemy[82] / 4) + int(enemy[83] / 4))) + ', level ' + str(round(int(enemy[84]))) + '), '
+        if enemy[89] > 0:  # surge death attack
+            offensive += 'Surge Death Attack ' + str(round(int(enemy[89]))) + '% (' + str(
+                round(int(enemy[90] / 4))) + '-' + str(
+                round(int(enemy[90] / 4) + int(enemy[91] / 4))) + ', level ' + str(round(int(enemy[92]))) + '), '
         offensive = offensive[:-2]
         if len(offensive) > 3:
             enemyEmbed.add_field(name='Offensive abilities', value=offensive, inline=True)
@@ -232,6 +241,8 @@ class Enemyunits:
             defensive += 'Immune to warp, '
         if enemy[77] > 0:  # dodge
             defensive += 'Dodge ' + str(round(int(enemy[77]))) + '% (' + str(round(int(enemy[78]) / 30, 2)) + 's), '
+        if enemy[87] > 0:  # shield
+            defensive += 'Shield ' + str(round(int(enemy[87]))) + ', resets at '+str(enemy[88])+'%, '
         defensive = defensive[:-2]
         if len(defensive) > 3:
             enemyEmbed.add_field(name='Defensive abilities', value=defensive, inline=True)
