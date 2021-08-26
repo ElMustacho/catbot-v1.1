@@ -242,7 +242,7 @@ class Enemyunits:
         if enemy[77] > 0:  # dodge
             defensive += 'Dodge ' + str(round(int(enemy[77]))) + '% (' + str(round(int(enemy[78]) / 30, 2)) + 's), '
         if int(enemy[87]) > 0:  # shield
-            defensive += 'Shield ' + str(round(int(enemy[87]))) + ', resets at '+str(enemy[88])+'%, '
+            defensive += 'Shield ' + str(round(int(enemy[87]))*magnification) + ', resets at '+str(enemy[88])+'%, '
         defensive = defensive[:-2]
         if len(defensive) > 3:
             enemyEmbed.add_field(name='Defensive abilities', value=defensive, inline=True)

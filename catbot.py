@@ -304,7 +304,7 @@ async def on_message(message):
 			await message.channel.send('Incorrect format, check command format.')
 			return
 		realnameunit = message.content[13: limit]
-		enemycode = enemyculator.getUnitCode(realnameunit.lower(), 0)
+		enemycode = enemyculator.getUnitCode(realnameunit.lower(), 1)
 		if enemycode is None:  # too many errors
 			await message.channel.send('That was gibberish.')
 			return
