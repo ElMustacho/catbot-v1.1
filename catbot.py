@@ -792,9 +792,14 @@ async def on_message(message):
 			return
 		if cat == "name not unique":  # name wasn't unique
 			await message.channel.send('Couldn\'t discriminate.')
+		catrow = catculator.getrow(cat[0])
+		if catrow[97] != 4:
+			await message.channel.send('Please enter an Uber Rare unit.')
 			return
-		code_unit=str(int(cat[0]/3))
-		await message.channel.send('''https://thanksfeanor.pythonanywhere.com/UDP/'''+code_unit.zfill(3))
+
+		code_unit = str(int(cat[0] / 3))
+		await message.channel.send("**UDP Entry of " + catrow.tolist()[
+			98] + '''**\n https://thanksfeanor.pythonanywhere.com/UDP/''' + code_unit.zfill(3))
 		return
 	
 	elif message.content.startswith('!cst '):  # todo needs stats multiplication reordering

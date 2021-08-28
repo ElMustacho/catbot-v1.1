@@ -172,7 +172,7 @@ class Catunits:
         if cat[92] > 0:  # curse attack
             offensivestr += 'Curses ' + str(round(int(cat[92]))) + '% for ' + str(round(cat[93] / 30, 2)) + 's, '
         if cat[95] > 0:  # shield breaks
-            offensivestr += 'Breaks shields '+str(cat[95])+'%, '
+            offensivestr += 'Shield Piercing '+str(cat[95])+'%, '
         offensivestr = offensivestr[:-2]
         if len(offensivestr) > 3:
             catEmbed.add_field(name='Offensive abilities', value=offensivestr, inline=isinline)
