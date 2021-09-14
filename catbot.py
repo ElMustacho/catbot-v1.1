@@ -45,8 +45,6 @@ async def on_member_update(before, after):
 
 @client.event
 async def on_message(message):
-	if len(str(message.content)) > 300:  # don't bother with stuff too long
-		return
 
 	if '\t' in message.content:  # catbot doesn't like tab
 		return
@@ -188,7 +186,10 @@ async def on_message(message):
 				await sent_message.edit(content="That form doesn't exists.")
 		for reaction in reactions_made:
 			await reaction
-		await sent_message.clear_reactions()
+		try:
+			await sent_message.clear_reactions()
+		except:
+			pass
 		return
 
 	elif message.content.startswith('!enemystats') or message.content.startswith('!es'):
@@ -779,7 +780,7 @@ async def on_message(message):
 		await message.channel.send(str(answer))
 		return
 		
-	elif message.content.startswith('!udp '):
+	elif message.content.startswith('!udp ') or message.content.startswith('!UDP '):
 		if not canSend(2, privilegelevel(message.author), message):
 			return
 		if privilegelevel(message.author) < 3 and message.channel.id not in catbotdata.requireddata['freeforall-channels']:
@@ -793,13 +794,12 @@ async def on_message(message):
 		if cat == "name not unique":  # name wasn't unique
 			await message.channel.send('Couldn\'t discriminate.')
 		catrow = catculator.getrow(cat[0])
-		if catrow[97] != 4:
+		if catrow[99] < 4:
 			await message.channel.send('Please enter an Uber Rare unit.')
 			return
-
-		code_unit = str(int(cat[0] / 3))
-		await message.channel.send("**UDP Entry of " + catrow.tolist()[
-			98] + '''**\n https://thanksfeanor.pythonanywhere.com/UDP/''' + code_unit.zfill(3))
+		else:
+			code_unit = str(int(cat[0] / 3))
+			await message.channel.send("**UDP Entry of " + catrow.tolist()[100] + '''**\nhttps://thanksfeanor.pythonanywhere.com/UDP/''' + code_unit.zfill(3))
 		return
 	
 	elif message.content.startswith('!cst '):  # todo needs stats multiplication reordering
@@ -914,7 +914,7 @@ async def on_message(message):
 		return
 
 	elif message.channel.id == catbotdata.requireddata['welcome-channel']:
-		if message.content == '$password sacred blade sakura':
+		if message.content == '$password elder mask doron':
 			member = serveruser(message.author)
 			await member.add_roles(discord.utils.get(client.get_guild(catbotdata.requireddata['server-id']).roles,
 													 id=catbotdata.requireddata['tier-2-roles'][0]),
