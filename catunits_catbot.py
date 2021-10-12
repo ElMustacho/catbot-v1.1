@@ -172,7 +172,7 @@ class Catunits:
         if cat[92] > 0:  # curse attack
             offensivestr += 'Curses ' + str(round(int(cat[92]))) + '% for ' + str(round(cat[93] / 30, 2)) + 's, '
         if cat[95] > 0:  # shield breaks
-            offensivestr += 'Shield Piercing '+str(cat[95])+'%, '
+            offensivestr += 'Shield Piercing '+str(int(cat[95]))+'%, '
         offensivestr = offensivestr[:-2]
         if len(offensivestr) > 3:
             catEmbed.add_field(name='Offensive abilities', value=offensivestr, inline=isinline)
@@ -581,6 +581,10 @@ class Catunits:
             unit[25] += first_param
             unit[26] += second_param
             unit[18] |= 1
+        elif talent_to_apply == 77:
+            unit[96] |= 1
+        elif talent_to_apply == 78:
+            unit[95] += first_param
         return [unit, extra_param]
 
     def get_talents_by_id(self, unit_id):

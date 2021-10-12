@@ -500,7 +500,10 @@ async def on_message(message):
             sending = "Other enemies / " + str(embedtosend.footer.text)
             embedtosend.set_footer(text=sending)
             await sent_message.edit(embed=embedtosend)
-        await sent_message.clear_reactions()
+        try:
+            await sent_message.clear_reactions()
+        except:
+            pass
         return
 
     elif message.content.startswith('!whereis '):
