@@ -5,6 +5,7 @@ import sqlite3
 import nltk as nl
 
 
+
 class Stagedata:
     def __init__(self, enemydata):
         self._stagedata = ''
@@ -58,7 +59,11 @@ class Stagedata:
             if len(nearestmatch) > 1:
                 if stagelevel == '':
                     results = -2
-                    raise Exception('Could not discriminate.')
+                    closest = []
+                    for near in nearestmatch:
+                        closest.append(stage[near])
+                    return closest
+                    # raise Exception('Could not discriminate.')
                 else:
                     stagelevels = [x[1].lower() for x in stage]
                     leveldss = list(map(lambda x: nl.edit_distance(x, stagelevel), stagelevels))
@@ -100,7 +105,7 @@ class Stagedata:
             conn.close()
         return results
 
-    def makeembed(self, stageinfo, stageenemies, stagetimed, stagereward, stagerestrictions):
+    def makeembed(self, stageinfo, stageenemies, stagetimed, stagereward, stagerestrictions, stageid):
         decsstring='Base hp = ' + str(stageinfo[0][4]) +', stage length = ' + str(stageinfo[0][7]) + ', max enemies = ' + str(stageinfo[0][8]) +'\n'
         for reward in stagereward:
             decsstring += str(reward[0])+'% of getting ' + str(reward[1]) + ' ' + reward[2] + ', '
@@ -111,7 +116,7 @@ class Stagedata:
         if len(stagetimed) > 0:
             decsstring = decsstring[:-2] + '\n'
         decsstring += 'Difficulties ' + stageinfo[0][14]
-        stageEmbed = emb(title=stageinfo[0][3] + ', ' + stageinfo[0][2] + ', ' + stageinfo[0][1], description=decsstring,
+        stageEmbed = emb(title=stageinfo[0][3] + ', ' + stageinfo[0][2] + ', ' + stageinfo[0][1] + ', '+str(stageid), description=decsstring,
                          color=0x009B77)
         stageEmbed.set_author(name='Cat Bot')
         enemystring = ''

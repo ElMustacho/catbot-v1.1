@@ -434,7 +434,7 @@ async def on_message(message):
         else:
             await message.channel.send('No such name to delete.')
 
-    elif message.content.startswith('!stagebeta') or message.content.startswith('!sb'):
+    elif message.content.startswith('!stagebeta ') or message.content.startswith('!sb '):
         if not canSend(1, privilegelevel(message.author), message):
             return
         if privilegelevel(message.author) < 3 and message.channel.id not in catbotdata.requireddata[
@@ -470,12 +470,21 @@ async def on_message(message):
         elif stageid is None:
             await message.channel.send("Catbot is confused and doesn't know what happened.")
             return
+        try:  # enter here if stage not found AND there were multiple close enoughs that are equally likely
+            if len(stageid) > 1:
+                str_to_send = "I couldn't find the stage. Here is some close enough."
+                for line in stageid:
+                    str_to_send += '\n'+line[0]+', '+line[1]+', '+line[2]+', '+str(line[3])
+                await message.channel.send(str_to_send)
+                return
+        except Exception as E:
+            pass
         stageinfo = stagedata.idtostage(stageid)
         stageenemies = stagedata.idtoenemies(stageid)
         stagetimed = stagedata.idtotimed(stageid)
         stagereward = stagedata.idtoreward(stageid)
         stagerestrictions = stagedata.idtorestrictions(stageid)
-        embedtosend = stagedata.makeembed(stageinfo, stageenemies, stagetimed, stagereward, stagerestrictions)
+        embedtosend = stagedata.makeembed(stageinfo, stageenemies, stagetimed, stagereward, stagerestrictions, stageid)
         if len(stageenemies) > 25:  # embed won't show everything
             sending = "First 25 enemies / " + str(embedtosend.footer.text)
             embedtosend.set_footer(text=sending)
@@ -496,7 +505,7 @@ async def on_message(message):
         except asyncio.TimeoutError:
             pass
         else:
-            embedtosend = stagedata.makeembed(stageinfo, stageenemies[25:], stagetimed, stagereward, stagerestrictions)
+            embedtosend = stagedata.makeembed(stageinfo, stageenemies[25:], stagetimed, stagereward, stagerestrictions, stageid)
             sending = "Other enemies / " + str(embedtosend.footer.text)
             embedtosend.set_footer(text=sending)
             await sent_message.edit(embed=embedtosend)
@@ -644,7 +653,60 @@ async def on_message(message):
                 nameunit3 = enemyculator.namefromcode(enemystats3[0][0])
         await message.channel.send(
             stagedata.whereisthenemymonthly(enemystats1, nameunit1, nameunit2, nameunit3, enemystats2, enemystats3))
+        return
 
+    elif message.content.startswith('!sbid '):
+        if not canSend(1, privilegelevel(message.author), message):
+            return
+        if privilegelevel(message.author) < 3 and message.channel.id not in catbotdata.requireddata[
+            'freeforall-channels']:
+            if not isokayifnotclog(message, isADM(message)):
+                return
+        stage_id = message.content[message.content.find(' ') + 1:]
+        try:
+            stage_id = int(stage_id)
+        except Exception as TypeError:
+            await message.channel.send('Wrong value, I need an integer value that points to a specific stage.')
+            return
+        stageinfo = stagedata.idtostage(stage_id)
+        if len(stageinfo)<1:
+            await message.channel.send("The stage code wasn't valid.")
+            return
+        stageenemies = stagedata.idtoenemies(stage_id)
+        stagetimed = stagedata.idtotimed(stage_id)
+        stagereward = stagedata.idtoreward(stage_id)
+        stagerestrictions = stagedata.idtorestrictions(stage_id)
+        embedtosend = stagedata.makeembed(stageinfo, stageenemies, stagetimed, stagereward, stagerestrictions, stage_id)
+        if len(stageenemies) > 25:  # embed won't show everything
+            sending = "First 25 enemies / " + str(embedtosend.footer.text)
+            embedtosend.set_footer(text=sending)
+        else:
+            sending = "All enemies / " + str(embedtosend.footer.text)
+            embedtosend.set_footer(text=sending)
+        sent_message = await message.channel.send(embed=embedtosend)
+        if len(stageenemies) < 26 or isADM(message):  # no point in showing more enemies, can't react in dms
+            return
+        await sent_message.add_reaction('▶')
+
+        def check(reaction_received, user_that_sent):
+            return user_that_sent == message.author and str(
+                reaction_received.emoji) == '▶' and reaction_received.message.id == sent_message.id
+
+        try:
+            reaction, user = await client.wait_for('reaction_add', timeout=15.0, check=check)
+        except asyncio.TimeoutError:
+            pass
+        else:
+            embedtosend = stagedata.makeembed(stageinfo, stageenemies[25:], stagetimed, stagereward, stagerestrictions,
+                                              stage_id)
+            sending = "Other enemies / " + str(embedtosend.footer.text)
+            embedtosend.set_footer(text=sending)
+            await sent_message.edit(embed=embedtosend)
+        try:
+            await sent_message.clear_reactions()
+        except:
+            pass
+        return
 
     elif message.content.startswith('!whereisb '):
         if not canSend(3, privilegelevel(message.author), message):
@@ -933,7 +995,7 @@ async def on_message(message):
         return
 
     elif message.channel.id == catbotdata.requireddata['welcome-channel']:
-        if message.content == '$password elder mask doron':
+        if message.content == '$password sir metal seal':
             member = serveruser(message.author)
             await member.add_roles(discord.utils.get(client.get_guild(catbotdata.requireddata['server-id']).roles,
                                                      id=catbotdata.requireddata['tier-2-roles'][0]),
@@ -1053,7 +1115,7 @@ async def on_message(message):
         untrusted = untrusting.get_data()
         old_level = 0
         for line in untrusted:
-            if line[0] == str(user_id):
+            if line[0] == str(user_id.id):
                 old_level = int(line[4])
         time_of_untrust = untrusting.level_to_time(level + old_level)
         untrusting.add_entry(user_id.id, message.author.id, reason, datetime.now(), level + old_level)
@@ -1062,7 +1124,7 @@ async def on_message(message):
                               id=catbotdata.requireddata['untrust-role']))
         await user_id.send(
             'You have been untrusted for ' + reason + ", you'll receive a message when this action is reversed.")
-        sent_message = await message.channel.send('Told the user about it. React with given button to end now.')
+        sent_message = await message.channel.send("Told the user about it. React with given button to end now. It's level "+str(level+old_level)+".")
 
         await sent_message.add_reaction('❌')
 

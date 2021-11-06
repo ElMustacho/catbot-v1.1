@@ -145,7 +145,7 @@ class Catunits:
             else:  # regular
                 offensivestr += "Wave"
             offensivestr += ' attack ' + str(round(int(cat[35]))) + '% (' + str(
-                333 + round(int(cat[36]) - 1) * 200) + ' range), '
+                333 + round(int(cat[36]) - 1) * 200) + ' range, level '+str(cat[36])+'), '
         if cat[37] > 0:  # weaken
             offensivestr += 'Weaken ' + str(round(int(cat[37]))) + '% (' + str(round(int(cat[39]))) + '% power, ' + str(
                 round(int(cat[38]) / 30, 2)) + 's), '
