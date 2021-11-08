@@ -10,9 +10,6 @@ class untrust:
         return self.data
 
     def add_entry(self, user, mod, reason, date, level):
-        for line in self.data:
-            if line[0] == user:
-                return("not again")
         new_entry = [user, mod, reason, date, level]
         with open('untrust.csv', 'w', newline='') as file:
             writer = csv.writer(file)

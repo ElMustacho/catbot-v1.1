@@ -249,14 +249,14 @@ class Catunits:
         names = self._cats.loc[:, 'enname'].to_list()
         names = [str(x).lower() for x in names]
         # edit distance of everything in the tsv
-        dss = list(map(lambda x: nl.edit_distance(x, strToCmp), names))
+        dss = list(map(lambda x: edit_distance_fast(x, strToCmp, errors), names))
 
         closest = [i for i, x in enumerate(dss) if x == min(dss)]
 
         # from dictionary
         distancedict = defaultdict(list)
         for i in self._customnames:
-            distancedict[nl.edit_distance(strToCmp, i.lower())].append(self._customnames[i])
+            distancedict[edit_distance_fast(strToCmp, i.lower(),errors)].append(self._customnames[i])
         customnames = []
         try:
             customnames = min(distancedict.items())
@@ -610,3 +610,33 @@ class Catunits:
             return str(self.getnamebycode(unit_id)) + " doesn't have talents."
             
         return results
+
+def edit_distance_fast(s1, s2, errors):
+    '''
+    Returns the edit distance between s1 and s2,
+    unless distance > errors, in which case it will
+    return some number greater than errors. Uses
+    Ukkonen's improvement on the Wagner-Fisher algorithm.
+
+    Credits to clam
+    '''
+    # ensure that len(s1) <= len(s2)
+    len1, len2 = len(s1), len(s2)
+    if len(s1) > len(s2):
+        s1, s2 = s2, s1
+        len1, len2 = len2, len1
+    # distance is at least len2 - len1
+    if len2 - len1 > errors:
+        return errors + 1
+    prev_row = [*range(len2 + 1)]
+    for i, c1 in enumerate(s1):
+        cur_row = [i + 1, *([errors + 1] * len2)]
+        # only need to check the interval [i-errors,i+errors]
+        for j in range(max(0, i - errors), min(len2, i + errors + 1)):
+            cur_row[j + 1] = min(
+                prev_row[j + 1] + 1,  # skip char in s1
+                cur_row[j] + 1,  # skip char in s2
+                prev_row[j] + (c1 != s2[j])  # substitution
+            )
+        prev_row = cur_row
+    return cur_row[len2]

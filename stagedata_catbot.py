@@ -48,10 +48,10 @@ class Stagedata:
             stage = cursor.execute(query).fetchall()
             stagenames_nodiff = [x[0].lower() for x in stage]
             stagenames_nodiff = [x[:x.find('(') if x.find('(')>0 else len(x)] for x in stagenames_nodiff]
-            dss = list(map(lambda x: nl.edit_distance(x, stagename), stagenames_nodiff))
+            dss = list(map(lambda x: edit_distance_fast(x, stagename, errors), stagenames_nodiff))
             if min(dss) > errors:
                 stagenames = [x[0].lower() for x in stage]
-                dss = list(map(lambda x: nl.edit_distance(x, stagename), stagenames))
+                dss = list(map(lambda x: edit_distance_fast(x, stagename, errors), stagenames))
                 if min(dss) > errors:  # if we ignore the difficulty, can we find the stage?
                     results = -1
                     raise Exception('String could not match anything.')  # didn't find stage anyway
@@ -66,7 +66,7 @@ class Stagedata:
                     # raise Exception('Could not discriminate.')
                 else:
                     stagelevels = [x[1].lower() for x in stage]
-                    leveldss = list(map(lambda x: nl.edit_distance(x, stagelevel), stagelevels))
+                    leveldss = list(map(lambda x: edit_distance_fast(x, stagelevel, errors), stagelevels))
                     if min(leveldss) > errors:
                         results = -1
                         raise Exception('Level could not match anything.')
@@ -81,7 +81,7 @@ class Stagedata:
                             raise Exception('Could not discriminate.')
                         else:
                             stagecategories = [x[2].lower() for x in stage]
-                            categorydss = list(map(lambda x: nl.edit_distance(x, stagecategory), stagecategories))
+                            categorydss = list(map(lambda x: edit_distance_fast(x, stagecategory, errors), stagecategories))
                             if min(categorydss) > errors:
                                 results = -1
                                 raise Exception('Category could not match anything.')
@@ -157,7 +157,7 @@ class Stagedata:
             query = '''select * from searchunitstages'''  # TODO this is going to change later
             stagenames = cursor.execute(query).fetchall()
             stagenames = [x[0].lower() for x in stagenames]
-            dss = list(map(lambda x: nl.edit_distance(x, stringtosearch), stagenames))
+            dss = list(map(lambda x: edit_distance_fast(x, stringtosearch, errors), stagenames))
             if min(dss) > errors:
                 results = -1
                 raise Exception('String could not match anything.')
@@ -370,3 +370,32 @@ SELECT DISTINCT stages.stage, stages.category, stages.level from units join stag
 
 # select timed.* from timed JOIN stages on timed.stage_id=stages.stageid where stages.stage = "Mallow March";
 
+def edit_distance_fast(s1, s2, errors):
+    '''
+    Returns the edit distance between s1 and s2,
+    unless distance > errors, in which case it will
+    return some number greater than errors. Uses
+    Ukkonen's improvement on the Wagner-Fisher algorithm.
+
+    Credits to clam
+    '''
+    # ensure that len(s1) <= len(s2)
+    len1, len2 = len(s1), len(s2)
+    if len(s1) > len(s2):
+        s1, s2 = s2, s1
+        len1, len2 = len2, len1
+    # distance is at least len2 - len1
+    if len2 - len1 > errors:
+        return errors + 1
+    prev_row = [*range(len2 + 1)]
+    for i, c1 in enumerate(s1):
+        cur_row = [i + 1, *([errors + 1] * len2)]
+        # only need to check the interval [i-errors,i+errors]
+        for j in range(max(0, i - errors), min(len2, i + errors + 1)):
+            cur_row[j + 1] = min(
+                prev_row[j + 1] + 1,  # skip char in s1
+                cur_row[j] + 1,  # skip char in s2
+                prev_row[j] + (c1 != s2[j])  # substitution
+            )
+        prev_row = cur_row
+    return cur_row[len2]
