@@ -35,16 +35,15 @@ class Catunits:
             pass
         return returned
 
-
     def getUnitCode(self, identifier, errors):
         try:  # was this a string or a int?
             locator = [int(identifier), 0]
         except (ValueError, TypeError):
             locator = self.closeEnough(identifier, errors)
-            if locator == None:
+            if locator is None:
                 return "no result"
             if len(locator[0]) > 1:
-                return "name not unique"
+                return ["name not unique", locator[0]]
             locator[0] = locator[0][0]
         return locator
 
@@ -265,7 +264,9 @@ class Catunits:
         if min(dss) > errors and customnames[0] > errors:  # both were too bad
             return None
         if min(dss) < customnames[0]:  # normal names were better
-            return [closest, min(dss), 'original']  # all of the closest and the distance of the closests
+            return [closest, min(dss), 'original']  # all of the closest and the distance of the closest
+        elif min(dss) == customnames[0]:  # equally good names
+            return [list(set(closest+customnames[1])), min(dss), 'mixed']
         else:  # custom names were better
             return [customnames[1], customnames[0], 'custom']  # the best matches of all custom names
 

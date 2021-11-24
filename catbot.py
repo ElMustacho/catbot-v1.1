@@ -109,7 +109,7 @@ async def on_message(message):
             await message.channel.send('You need to input a cat unit name or code.')
             return
         catstats = catculator.getUnitCode(cat, 6)  # second parameter is number of errors allowed
-        if catstats == "no result":  # too many errors, maybe they meant an enemy?
+        if catstats[0] == "no result":  # too many errors, maybe they meant an enemy?
             enemystats = enemyculator.getUnitCode(message.content[message.content.find(' ') + 1:limit].lower(), 3)
             if enemystats is None:  # too many errors for an enemy
                 await message.channel.send(
@@ -131,8 +131,11 @@ async def on_message(message):
             embedsend = enemyculator.getstatsembed(enemy, 1)
             await message.channel.send("Did you mean to search an enemy?", embed=embedsend)
             return
-        if catstats == "name not unique":  # name wasn't unique
-            await message.channel.send('Couldn\'t discriminate.')
+        if catstats[0] == "name not unique":  # name wasn't unique
+            message_to_send = "I couldn't find an unit given that name. Perhaps you meant any of these?\n"
+            for element in catstats[1]:
+                message_to_send += catculator.getnamebycode(element)+', '
+            await message.channel.send(message_to_send[:-2])
             return
         cat = catculator.getrow(catstats[0])
         if cat is None:
@@ -224,7 +227,7 @@ async def on_message(message):
                 await message.channel.send('You need to input an enemy name.')
             if catstats == "no result":
                 await message.channel.send(enemy + '; wasn\'t recognized.')
-            if catstats == "name not unique":  # name wasn't unique
+            if catstats[0] == "name not unique":  # name wasn't unique
                 await message.channel.send(
                     message.content[message.content.find(' ') + 1:limit] + '; wasn\'t recognized.')
                 return
@@ -283,7 +286,7 @@ async def on_message(message):
         if catcode == "no result":  # too many errors
             await message.channel.send('That was gibberish.')
             return
-        if catcode == "name not unique":  # name wasn't unique
+        if catcode[0] == "name not unique":  # name wasn't unique
             await message.channel.send('Couldn\'t discriminate.')
             return
         sent_message = await message.channel.send(
@@ -368,7 +371,7 @@ async def on_message(message):
         if catstats == "no result":  # too many errors
             await message.channel.send(message.content[12:] + '; wasn\'t recognized.')
             return
-        if catstats == "name not unique":  # name wasn't unique
+        if catstats[0] == "name not unique":  # name wasn't unique
             await message.channel.send('Couldn\'t discriminate.')
             return
         cat = catculator.getrow(catstats[0])
@@ -401,7 +404,7 @@ async def on_message(message):
         if catcode == "no result":  # too many errors
             await message.channel.send('That was gibberish.')
             return
-        if catcode == "name not unique":  # name wasn't unique
+        if catcode[0] == "name not unique":  # name wasn't unique
             await message.channel.send('Couldn\'t discriminate.')
             return
         operationsuccess = catculator.removename(catcode[0], message.content[limit + 2:])
@@ -852,7 +855,7 @@ async def on_message(message):
         if cat == "no result":
             await message.channel.send("Gibberish.")
             return
-        if cat == "name not unique":  # name wasn't unique
+        if cat[0] == "name not unique":  # name wasn't unique
             await message.channel.send('Couldn\'t discriminate.')
             return
         answer = catculator.get_talents_by_id(cat[0] - 2)  # offset by 2 to fix unitcodes
@@ -871,7 +874,7 @@ async def on_message(message):
         if cat == "no result":
             await message.channel.send("Gibberish.")
             return
-        if cat == "name not unique":  # name wasn't unique
+        if cat[0] == "name not unique":  # name wasn't unique
             await message.channel.send('Couldn\'t discriminate.')
         catrow = catculator.getrow(cat[0])
         if catrow[99] < 4:
@@ -906,7 +909,7 @@ async def on_message(message):
         if cat == "no result":
             await message.channel.send("Gibberish.")
             return
-        if cat == "name not unique":  # name wasn't unique
+        if cat[0] == "name not unique":  # name wasn't unique
             await message.channel.send('Couldn\'t discriminate.')
             return
         unit_talents = catculator.get_talents_by_id(cat[0] - 2)  # offset by 2 required

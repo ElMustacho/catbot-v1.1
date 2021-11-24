@@ -3,8 +3,14 @@ import csv
 class untrust:
 
     def __init__(self):
-        with open('untrust.csv', 'r', newline='') as file:
-            self.data = list(csv.reader(file))
+        try:
+            with open('untrust.csv', 'r', newline='') as file:
+                self.data = list(csv.reader(file))
+        except OSError:  # file doesn't exist
+            open('untrust.csv', 'a').close()
+            with open('untrust.csv', 'w', newline='') as file:
+                self.data = list(csv.reader(file))
+            print('Made a new file for untrusting.')
 
     def get_data(self):
         return self.data
