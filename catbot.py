@@ -495,7 +495,7 @@ async def on_message(message):
             sending = "All enemies / " + str(embedtosend.footer.text)
             embedtosend.set_footer(text=sending)
         sent_message = await message.channel.send(embed=embedtosend)
-        if len(stageenemies) < 26 or isADM(message):  # no point in showing more enemies, can't react in dms
+        if len(stageenemies) < 26:  # no point in showing more enemies
             return
         await sent_message.add_reaction('▶')
 
@@ -687,7 +687,7 @@ async def on_message(message):
             sending = "All enemies / " + str(embedtosend.footer.text)
             embedtosend.set_footer(text=sending)
         sent_message = await message.channel.send(embed=embedtosend)
-        if len(stageenemies) < 26 or isADM(message):  # no point in showing more enemies, can't react in dms
+        if len(stageenemies) < 26:  # no point in showing more enemies, can't react in dms
             return
         await sent_message.add_reaction('▶')
 

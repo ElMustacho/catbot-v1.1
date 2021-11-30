@@ -41,7 +41,7 @@ class Catunits:
         except (ValueError, TypeError):
             locator = self.closeEnough(identifier, errors)
             if locator is None:
-                return "no result"
+                return ["no result"]
             if len(locator[0]) > 1:
                 return ["name not unique", locator[0]]
             locator[0] = locator[0][0]
