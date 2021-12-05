@@ -839,7 +839,7 @@ async def on_message(message):
         return
 
     elif message.content.startswith('!say'):
-        if not canSend(6, privilegelevel(message.author), message):
+        if not canSend(5, privilegelevel(message.author), message):
             return
         looking = message.content[message.content.find(' ') + 1: find_nth(message.content, ' ', 2)]
         channel_to_send = client.get_channel(int(looking))
