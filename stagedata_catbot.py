@@ -116,7 +116,7 @@ class Stagedata:
         if len(stagetimed) > 0:
             decsstring = decsstring[:-2] + '\n'
         decsstring += 'Difficulties ' + stageinfo[0][14]
-        stageEmbed = emb(title=stageinfo[0][3] + ', ' + stageinfo[0][2] + ', ' + stageinfo[0][1] + ', '+str(stageid), description=decsstring,
+        stageEmbed = emb(title=stageinfo[0][3] + '; ' + stageinfo[0][2] + '; ' + stageinfo[0][1] + '; '+str(stageid), description=decsstring,
                          color=0x009B77)
         stageEmbed.set_author(name='Cat Bot')
         enemystring = ''

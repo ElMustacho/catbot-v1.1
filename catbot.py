@@ -477,7 +477,7 @@ async def on_message(message):
             if len(stageid) > 1:
                 str_to_send = "I couldn't find the stage. Here is some close enough."
                 for line in stageid:
-                    str_to_send += '\n'+line[0]+', '+line[1]+', '+line[2]+', '+str(line[3])
+                    str_to_send += '\n'+line[0]+'; '+line[1]+'; '+line[2]+'; '+str(line[3])
                 await message.channel.send(str_to_send)
                 return
         except Exception as E:
@@ -998,7 +998,7 @@ async def on_message(message):
         return
 
     elif message.channel.id == catbotdata.requireddata['welcome-channel']:
-        if message.content == '$password sir metal seal':
+        if message.content == '$password mad doktor klay':
             member = serveruser(message.author)
             await member.add_roles(discord.utils.get(client.get_guild(catbotdata.requireddata['server-id']).roles,
                                                      id=catbotdata.requireddata['tier-2-roles'][0]),
