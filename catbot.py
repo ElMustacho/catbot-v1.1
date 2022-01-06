@@ -958,7 +958,7 @@ async def on_message(message):
             attempt = attempt[:5]
         while len(attempt) < 5:
             attempt.append(10)
-        if cat == "no result":
+        if cat[0] == "no result":
             await message.channel.send("Gibberish.")
             return
         if cat[0] == "name not unique":  # name wasn't unique
