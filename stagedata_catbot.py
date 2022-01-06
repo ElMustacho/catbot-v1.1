@@ -40,7 +40,7 @@ class Stagedata:
     def getstageid(self, stagename, errors, stagelevel = '', stagecategory = ''):
         results = None
         try:
-            conn = sqlite3.connect('stages10.2.db')
+            conn = sqlite3.connect('stages.db')
             cursor = conn.cursor()
             query = '''select stages.stage, stages.level, stages.category, stages.stageid from stages;'''
             stage = cursor.execute(query).fetchall()
@@ -195,7 +195,7 @@ class Stagedata:
             return results
 
     def whereistheenemy(self, enemycode, name, name2="", name3="", enemycode1="", enemycode2=""): # todo refactor to ignore name
-        with sqlite3.connect('stages10.2.db') as conn:
+        with sqlite3.connect('stages.db') as conn:
             cursor = conn.cursor()
             results = None
             if name2 != '':
@@ -239,7 +239,7 @@ SELECT DISTINCT stages.stage, stages.category, stages.level from units join stag
             return answer
 
     def whereisthenemymonthly(self, enemycode, name, name2="", name3="", enemycode1="", enemycode2=""): # todo refactor to ignore name
-        with sqlite3.connect('stages10.2.db') as conn:
+        with sqlite3.connect('stages.db') as conn:
             cursor = conn.cursor()
             results = None
             if name2 != '':
@@ -283,7 +283,7 @@ SELECT DISTINCT stages.stage, stages.category, stages.level, stages.energy from 
             return answer
 
     def listofstagesfromenemies(self, enemycode, name2="", name3="", enemycode1="", enemycode2=""):
-        with sqlite3.connect('stages10.2.db') as conn:
+        with sqlite3.connect('stages.db') as conn:
             cursor = conn.cursor()
             results = None
             if name2 != '':
@@ -339,26 +339,26 @@ SELECT DISTINCT stages.stage, stages.category, stages.level from units join stag
             return answer
 
     def does_name_exist(self, name):
-        with sqlite3.connect('stages10.2.db') as conn:
+        with sqlite3.connect('stages.db') as conn:
             cursor = conn.cursor()
             results = cursor.execute('select count(*) from stages where name = ?', (name,)).fetchone()
             return results
 
     def idtoenemies(self, id_f):
-        with sqlite3.connect('stages10.2.db') as conn:
+        with sqlite3.connect('stages.db') as conn:
             cursor = conn.cursor()
             results = cursor.execute('select units.* from units JOIN stages on units.stageid=stages.stageid where '
                                      'units.stageid = ?', [id_f]).fetchall()
             return results
 
     def idtostage(self, id_f):
-        with sqlite3.connect('stages10.2.db') as conn:
+        with sqlite3.connect('stages.db') as conn:
             cursor = conn.cursor()
             results = cursor.execute('select * from stages where stageid = ?', [id_f]).fetchall()
             return results
 
     def idtotimed(self, id_f):
-        with sqlite3.connect('stages10.2.db') as conn:
+        with sqlite3.connect('stages.db') as conn:
             cursor = conn.cursor()
             results = cursor.execute(
                 "select time, 'reward-translation'.item, amount from timed JOIN stages on "
@@ -368,7 +368,7 @@ SELECT DISTINCT stages.stage, stages.category, stages.level from units join stag
             return results
 
     def idtoreward(self, id_f):
-        with sqlite3.connect('stages10.2.db') as conn:
+        with sqlite3.connect('stages.db') as conn:
             cursor = conn.cursor()
             results = cursor.execute(
                 "SELECT chance, amount, 'reward-translation'.item from rewards join 'reward-translation' where code = rewards.item and stage_id=?;",
@@ -376,7 +376,7 @@ SELECT DISTINCT stages.stage, stages.category, stages.level from units join stag
             return results
 
     def idtorestrictions(self, id_f):
-        with sqlite3.connect('stages10.2.db') as conn:
+        with sqlite3.connect('stages.db') as conn:
             cursor = conn.cursor()
             results = cursor.execute(
                 'select "restrict".* from "restrict" JOIN stages on "restrict".stageid=stages.stageid where stages.stageid = ?',
