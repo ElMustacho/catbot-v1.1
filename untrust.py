@@ -23,7 +23,8 @@ class untrust:
             writer.writerows(self.data)
         return("added")
 
-    def level_to_time(self, level):
+    @staticmethod
+    def level_to_time(level):
         if level == 1:
             return 3600
         elif level == 2:

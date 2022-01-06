@@ -19,8 +19,10 @@ import catunits_catbot
 import enemyunits_catbot
 import stagedata_catbot
 import catcombos
+import custom_stages
 import random
 import math
+import re
 
 intents = discord.Intents.all()
 
@@ -66,7 +68,7 @@ async def on_message(message):
             await message.channel.send(random.choice(lv6answers))
         elif level == 5:
             lv5answers = ["Hi moderator, how you doin'?", "Pay attention everyone, cops are here!",
-                          "You gotta pay respect to mods!", "Mods are moderating in 2021 too!", "Please don't ban me!",
+                          "You gotta pay respect to mods!", "Mods are moderating in 2022 too!", "Please don't ban me!",
                           "Now that blu left I'm sobbing and crying!"]
             await message.channel.send(random.choice(lv5answers))
         elif level == 4:
@@ -76,13 +78,13 @@ async def on_message(message):
             await message.channel.send(random.choice(lv4answers))
         elif level == 3:
             lv3answers = ["Wow, you are important, that's cool!", "OMG! Senpai noticed me!",
-                          "I'm happy that you are here!", "It's epic to have an user so cool as you in 2021!",
-                          "I wish everyone was as cool as you.", "I hope you get a exclusive uber next time you roll!"]
+                          "I'm happy that you are here!", "It's epic to have an user so cool as you in 2022!",
+                          "I wish everyone was as cool as you.", "I hope you get a exclusive uber next time you roll!", "Cash = respect."]
             await message.channel.send(random.choice(lv3answers))
         elif level == 2:
             lv2answers = ['Well, at least you are here.', 'You are a cat. How about that.',
-                          'Look, an user said hi to me!', "A battle catter in 2021, hi to you.",
-                          "You don't have anything better to do, is that so?",
+                          'Look, an user said hi to me!', "A battle catter in 2022, hi to you.",
+                          "You don't have anything better to do, is that so?","By boosting r/bc, you drastically reduce the chances of being dissed!",
                           "Please speak to me only in bot commands."]
             await message.channel.send(random.choice(lv2answers))
         else:
@@ -279,7 +281,7 @@ async def on_message(message):
 
         limit = message.content.find(';')
         if limit < 0:
-            await message.channel.send('Incorrect format, check command format.')
+            await message.channel.send('Incorrect format, check command usage.')
             return
         realnameunit = message.content[11: limit]
         catcode = catculator.getUnitCode(realnameunit.lower(), 0)
@@ -315,7 +317,7 @@ async def on_message(message):
             return
         limit = message.content.find(';')
         if limit < 0:
-            await message.channel.send('Incorrect format, check command format.')
+            await message.channel.send('Incorrect format, check command usage.')
             return
         realnameunit = message.content[13: limit]
         enemycode = enemyculator.getUnitCode(realnameunit.lower(), 1)
@@ -397,7 +399,7 @@ async def on_message(message):
             return
         limit = message.content.find(';')
         if limit < 0:
-            await message.channel.send('Incorrect format, check command format.')
+            await message.channel.send('Incorrect format, check command usage.')
             return
         realnameunit = message.content[15: limit]
         catcode = catculator.getUnitCode(realnameunit.lower(), 0)
@@ -418,7 +420,7 @@ async def on_message(message):
             return
         limit = message.content.find(';')
         if limit < 0:
-            await message.channel.send('Incorrect format, check command format.')
+            await message.channel.send('Incorrect format, check command usage.')
             return
         realnameunit = message.content[17: limit]
         enemycode = enemyculator.getUnitCode(realnameunit.lower(), 0)
@@ -476,8 +478,14 @@ async def on_message(message):
         try:  # enter here if stage not found AND there were multiple close enoughs that are equally likely
             if len(stageid) > 1:
                 str_to_send = "I couldn't find the stage. Here is some close enough."
-                for line in stageid:
-                    str_to_send += '\n'+line[0]+'; '+line[1]+'; '+line[2]+'; '+str(line[3])
+                if len(stageid[0]) > 0:
+                    str_to_send += "\n**Actual names:**"
+                    for line in stageid[0]:
+                        str_to_send += '\n'+line[0]+'; '+line[1]+'; '+line[2]+'; '+str(line[3])
+                if len(stageid[1]) > 0:
+                    str_to_send += '\n**Custom names only:**'
+                    for line in stageid[1]:
+                        str_to_send += '\n'+line[0]
                 await message.channel.send(str_to_send)
                 return
         except Exception as E:
@@ -517,6 +525,50 @@ async def on_message(message):
         except:
             pass
         return
+
+    elif message.content.startswith('!renamestage '):
+        if not canSend(4, privilegelevel(message.author), message):
+            return
+        limit = message.content.find(';')
+        if limit < 0:
+            await message.channel.send('Incorrect format, check command usage.')
+            return
+        realstageid = message.content[13: limit]
+        try:
+            stage_id = int(realstageid)
+        except Exception as not_an_int:
+            await message.channel.send('Wrong value, I need an integer value that points to a specific stage.')
+            return
+        stageinfo = stagedata.idtostage(stage_id)
+        if len(stageinfo)<1:
+            await message.channel.send("The stage code wasn't valid.")
+            return
+        new_custom_stage = message.content[limit+2:]
+        if custom_stages.Custom_stages.does_name_exist(new_custom_stage) or stagedata.does_name_exist(new_custom_stage)>0:
+            await message.channel.send("The name was already used once.")
+            return
+        if not re.match('[a-zA-Z 0-9]+$', new_custom_stage):
+            await message.channel.send("The name must be composed of letters, numbers and spaces only.")
+            return
+        stageinfo_data = str(stageinfo[0][3]) +'; '+stageinfo[0][2] +'; '+stageinfo[0][1] +'; '+stageinfo[0][0]
+        sent_message = await message.channel.send(
+            'The name `' + new_custom_stage + '` is going to be assigned for the stage `'+stageinfo_data+'`, is that okay?')
+        await sent_message.add_reaction('✅')
+
+        def check(reaction_received, user_that_sent):
+            return user_that_sent == message.author and str(
+                reaction_received.emoji) == '✅' and reaction_received.message.id == sent_message.id
+
+        try:
+            reaction, user = await client.wait_for('reaction_add', timeout=15.0, check=check)
+        except asyncio.TimeoutError:
+            pass
+        else:
+            response = custom_stages.Custom_stages.add_name(stage_id,new_custom_stage,str(message.author),datetime.now())
+            await message.channel.send(str(response))
+        await sent_message.clear_reactions()
+        return
+
 
     elif message.content.startswith('!whereis '):
         if not canSend(1, privilegelevel(message.author), message):
@@ -1031,12 +1083,29 @@ async def on_message(message):
         if len(user_id) < 10:
             await message.channel.send("User ID isn't correct.")
             return
-        answer = icing.add_entry(user_id, message.author.id, reason, str(datetime.now()))
-        if answer != 'not again':
-            await message.channel.send("Added to thin ice.")
+        #answer = icing.add_entry(user_id, message.author.id, reason, str(datetime.now()))
+        checkthin = icing.is_on_thin_ice(user_id)
+        if checkthin is None:
+            sent_message = await message.channel.send('`'+str(user_id)+'` is going to be put on thin ice because of: **'+str(reason)+'**, is that okay?')
+            await sent_message.add_reaction('✅')
+
+            def check(reaction_received, user_that_sent):
+                return user_that_sent == message.author and str(
+                    reaction_received.emoji) == '✅' and reaction_received.message.id == sent_message.id
+
+            try:
+                reaction, user = await client.wait_for('reaction_add', timeout=15.0, check=check)
+            except asyncio.TimeoutError:
+                pass
+            else:
+                icing.add_entry(user_id, message.author.id, reason, str(datetime.now()))
+                await message.channel.send("Action confirmed, don't forget to inform the user.")
+            await sent_message.clear_reactions()
+            return
         else:
             await message.channel.send("User was already on thin ice!")
-        return
+            return
+
 
     elif message.content.startswith('!remove_thin_ice '):
         if not canSend(5, privilegelevel(message.author), message):

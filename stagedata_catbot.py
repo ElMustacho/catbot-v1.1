@@ -1,15 +1,13 @@
 import math
-
+import custom_stages
 from discord import Embed as emb
 import sqlite3
-import nltk as nl
-
 
 
 class Stagedata:
     def __init__(self, enemydata):
-        self._stagedata = ''
         self._enemydata = enemydata
+        custom_stages.Custom_stages.setup_table()  # sets up table, does nothing if already done once in the past
 
     def dataToEmbed(self, enemylines, stagedata, magnification):  # TODO refine the enemylines
         stageEmbed = emb(description='Amount | First Spawn Frame *(Respawn F)* | Base Health',
@@ -46,24 +44,41 @@ class Stagedata:
             cursor = conn.cursor()
             query = '''select stages.stage, stages.level, stages.category, stages.stageid from stages;'''
             stage = cursor.execute(query).fetchall()
+            custom_stages_for_reference = custom_stages.Custom_stages.get_all_names()
             stagenames_nodiff = [x[0].lower() for x in stage]
             stagenames_nodiff = [x[:x.find('(') if x.find('(')>0 else len(x)] for x in stagenames_nodiff]
             dss = list(map(lambda x: edit_distance_fast(x, stagename, errors), stagenames_nodiff))
-            if min(dss) > errors:
+            custom_stagenames_nodiff = [x[0].lower() for x in custom_stages.Custom_stages.get_all_names()]
+            dss_custom = list(map(lambda x: edit_distance_fast(x, stagename, errors), custom_stagenames_nodiff))
+            # 1) an actual name is the best one
+            # 2) a custom name is the best one
+            # 3) both names sucks, in which case we check if
+            # 3b) there's a good match as an actual name without the difficulty spelled in
+            # 4) more than 2 any names could fit equally good, in which case
+            # 4b) there's a good match if we also take in account the map for actual names
+            # 4c) there's a good match if we also take in account the map and the category for actual names
+            # actual names are given priority
+
+            if min(dss) > errors and min(dss_custom) > errors:  # case 3
                 stagenames = [x[0].lower() for x in stage]
                 dss = list(map(lambda x: edit_distance_fast(x, stagename, errors), stagenames))
-                if min(dss) > errors:  # if we ignore the difficulty, can we find the stage?
+                if min(dss) > errors:  # case 3b
                     results = -1
                     raise Exception('String could not match anything.')  # didn't find stage anyway
-            nearestmatch = [i for i, x in enumerate(dss) if x == min(dss)]
-            if len(nearestmatch) > 1:
+            #FIXME throws exception if empty
+            best_minimum = min(min(dss),min(dss_custom))
+            nearestmatch = [i for i, x in enumerate(dss) if x == best_minimum]
+            nearestmatch_custom = [i for i, x in enumerate(dss_custom) if x == best_minimum]
+            all_best_matches = nearestmatch + nearestmatch_custom
+            if len(all_best_matches) > 1:  # this means we have more than 2 best shots
                 if stagelevel == '':
-                    results = -2
                     closest = []
+                    closest_custom = []
                     for near in nearestmatch:
                         closest.append(stage[near])
-                    return closest
-                    # raise Exception('Could not discriminate.')
+                    for near in nearestmatch_custom:
+                        closest_custom.append(custom_stages_for_reference[near])
+                    return [closest, closest_custom]
                 else:
                     stagelevels = [x[1].lower() for x in stage]
                     leveldss = list(map(lambda x: edit_distance_fast(x, stagelevel, errors), stagelevels))
@@ -97,8 +112,11 @@ class Stagedata:
                                 results = stage[intersection2[0]][3]
                     else:
                         results = stage[intersection1[0]][3]
-            else:
-                results = stage[nearestmatch[0]][3]
+            else:  # we have exactly 1 best match
+                if len(nearestmatch_custom) > 0:  # case 2
+                    results = custom_stages.Custom_stages.custom_name_to_id(custom_stagenames_nodiff[nearestmatch_custom[0]])[0]
+                else:  # case 1
+                    results = stage[nearestmatch[0]][3]
         except Exception as e:
             print(e)
         finally:
@@ -319,6 +337,12 @@ SELECT DISTINCT stages.stage, stages.category, stages.level from units join stag
             if len(answer) > 2000:
                 return 'too long'  # todo make this work for any length
             return answer
+
+    def does_name_exist(self, name):
+        with sqlite3.connect('stages10.2.db') as conn:
+            cursor = conn.cursor()
+            results = cursor.execute('select count(*) from stages where name = ?', (name,)).fetchone()
+            return results
 
     def idtoenemies(self, id_f):
         with sqlite3.connect('stages10.2.db') as conn:
