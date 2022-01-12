@@ -202,27 +202,29 @@ class Stagedata:
                 if name3 != '':
                     tuple = (str(enemycode[0][0]), str(enemycode1[0][0]), str(enemycode2[0][0]))
                     results = cursor.execute(
-                        '''SELECT DISTINCT stages.stage, stages.category, stages.level from units join stages on units.stageid = stages.stageid where enemycode=? 
+                        '''SELECT DISTINCT stages.stage, stages.category, stages.level, stages.stageid from units join stages on units.stageid = stages.stageid where enemycode=? 
 INTERSECT
-SELECT DISTINCT stages.stage, stages.category, stages.level from units join stages on units.stageid = stages.stageid where enemycode=? 
+SELECT DISTINCT stages.stage, stages.category, stages.level, stages.stageid from units join stages on units.stageid = stages.stageid where enemycode=? 
 INTERSECT
-SELECT DISTINCT stages.stage, stages.category, stages.level from units join stages on units.stageid = stages.stageid where enemycode=? order by stages.category''',
+SELECT DISTINCT stages.stage, stages.category, stages.level, stages.stageid from units join stages on units.stageid = stages.stageid where enemycode=? order by stages.category''',
                         tuple).fetchall()
                 else:
                     tuple=(str(enemycode[0][0]), str(enemycode1[0][0]))
                     results = cursor.execute(
-                        '''SELECT DISTINCT stages.stage, stages.category, stages.level from units join stages on units.stageid = stages.stageid where enemycode=? 
+                        '''SELECT DISTINCT stages.stage, stages.category, stages.level, stages.stageid from units join stages on units.stageid = stages.stageid where enemycode=? 
 INTERSECT
-SELECT DISTINCT stages.stage, stages.category, stages.level from units join stages on units.stageid = stages.stageid where enemycode=? order by stages.category''',
+SELECT DISTINCT stages.stage, stages.category, stages.level, stages.stageid from units join stages on units.stageid = stages.stageid where enemycode=? order by stages.category''',
                         tuple).fetchall()
             else:
                 results = cursor.execute(
-                    'SELECT DISTINCT stages.stage, stages.category from units join stages on units.stageid = stages.stageid where enemycode=? order by stages.category',
+                    'SELECT DISTINCT stages.stage, stages.category, stages.level, stages.stageid from units join stages on units.stageid = stages.stageid where enemycode=? order by stages.category',
                     [str(enemycode[0][0])]).fetchall()
 
             if len(results) == 0:
                 return "No stages found."
-            answer = "Stages found: "  #todo make this nicer, text wise, in respect with the number of units
+            elif len(results) == 1:  # teleport to best result by using sbid function
+                return results[0]
+            answer = "Stages found: "  #todo make this nicer, text wise, in respect to the number of units
             category = ''
             for stage in results:
                 if stage[1] != category:

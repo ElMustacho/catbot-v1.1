@@ -1,13 +1,9 @@
 # todo list
 # give out the previous two nicely
 # write/declare/init stuff only once
-# don't upload to git unwanted files
-# get fixed values from a file, like the token
-# make embed function, for each kind of embed
-# tell the user what happens when a report belonging to him is solved or initiated
+# review all code and check if you can code stuff appearing multiple times only once
 import asyncio
 import sqlite3
-import time
 
 import discord
 from datetime import datetime, timedelta
@@ -170,7 +166,10 @@ async def on_message(message):
         try:
             reaction, user = await client.wait_for('reaction_add', timeout=15.0, check=check)
         except asyncio.TimeoutError:
-            pass
+            try:
+                await sent_message.clear_reactions()
+            except Exception:  # we can't remove reactions, not a big deal
+                pass
         else:
             offset = 0
             txtreaction = str(reaction)
@@ -302,7 +301,10 @@ async def on_message(message):
         try:
             reaction, user = await client.wait_for('reaction_add', timeout=15.0, check=check)
         except asyncio.TimeoutError:
-            pass
+            try:
+                await sent_message.clear_reactions()
+            except Exception:  # we can't remove reactions, not a big deal
+                pass
         else:
             response = catculator.givenewname(catcode[0], message.content[limit + 2:])
             if response:
@@ -342,7 +344,10 @@ async def on_message(message):
         try:
             reaction, user = await client.wait_for('reaction_add', timeout=15.0, check=check)
         except asyncio.TimeoutError:
-            pass
+            try:
+                await sent_message.clear_reactions()
+            except Exception:  # we can't remove reactions, not a big deal
+                pass
         else:
             response = enemyculator.givenewname(enemycode[0][0], message.content[limit + 2:])
             if response:
@@ -514,7 +519,10 @@ async def on_message(message):
         try:
             reaction, user = await client.wait_for('reaction_add', timeout=15.0, check=check)
         except asyncio.TimeoutError:
-            pass
+            try:
+                await sent_message.clear_reactions()
+            except Exception:  # we can't remove reactions, not a big deal
+                pass
         else:
             embedtosend = stagedata.makeembed(stageinfo, stageenemies[25:], stagetimed, stagereward, stagerestrictions, stageid)
             sending = "Other enemies / " + str(embedtosend.footer.text)
@@ -562,7 +570,10 @@ async def on_message(message):
         try:
             reaction, user = await client.wait_for('reaction_add', timeout=15.0, check=check)
         except asyncio.TimeoutError:
-            pass
+            try:
+                await sent_message.clear_reactions()
+            except Exception:  # we can't remove reactions, not a big deal
+                pass
         else:
             response = custom_stages.Custom_stages.add_name(stage_id,new_custom_stage,str(message.author),datetime.now())
             await message.channel.send(str(response))
@@ -636,8 +647,55 @@ async def on_message(message):
                     await message.channel.send('I need a name, not a number.')
                     return
                 nameunit3 = enemyculator.namefromcode(enemystats3[0][0])
-        await message.channel.send(
-            stagedata.whereistheenemy(enemystats1, nameunit1, nameunit2, nameunit3, enemystats2, enemystats3))
+        list_of_stages=stagedata.whereistheenemy(enemystats1, nameunit1, nameunit2, nameunit3, enemystats2, enemystats3)
+        if isinstance(list_of_stages, tuple):  #teleport to best result
+            stage_id=list_of_stages[3]
+            stageinfo = stagedata.idtostage(stage_id)
+            if len(stageinfo) < 1:
+                await message.channel.send("The stage code wasn't valid.")
+                return
+            stageenemies = stagedata.idtoenemies(stage_id)
+            stagetimed = stagedata.idtotimed(stage_id)
+            stagereward = stagedata.idtoreward(stage_id)
+            stagerestrictions = stagedata.idtorestrictions(stage_id)
+            embedtosend = stagedata.makeembed(stageinfo, stageenemies, stagetimed, stagereward, stagerestrictions,
+                                              stage_id)
+            if len(stageenemies) > 25:  # embed won't show everything
+                sending = "First 25 enemies / " + str(embedtosend.footer.text)
+                embedtosend.set_footer(text=sending)
+            else:
+                sending = "All enemies / " + str(embedtosend.footer.text)
+                embedtosend.set_footer(text=sending)
+            sent_message = await message.channel.send("Only one stage matches the request, here it is.", embed=embedtosend)
+            if len(stageenemies) < 26:  # no point in showing more enemies, can't react in dms
+                return
+            await sent_message.add_reaction('▶')
+
+            def check(reaction_received, user_that_sent):
+                return user_that_sent == message.author and str(
+                    reaction_received.emoji) == '▶' and reaction_received.message.id == sent_message.id
+
+            try:
+                reaction, user = await client.wait_for('reaction_add', timeout=15.0, check=check)
+            except asyncio.TimeoutError:
+                try:
+                    await sent_message.clear_reactions()
+                except Exception:  # we can't remove reactions, not a big deal
+                    pass
+            else:
+                embedtosend = stagedata.makeembed(stageinfo, stageenemies[25:], stagetimed, stagereward,
+                                                  stagerestrictions,
+                                                  stage_id)
+                sending = "Other enemies / " + str(embedtosend.footer.text)
+                embedtosend.set_footer(text=sending)
+                await sent_message.edit(embed=embedtosend)
+            try:
+                await sent_message.clear_reactions()
+            except:
+                pass
+            return
+        else:
+            await message.channel.send(list_of_stages)
         return
 
     elif message.content.startswith('!whereismonthly '):
@@ -750,7 +808,10 @@ async def on_message(message):
         try:
             reaction, user = await client.wait_for('reaction_add', timeout=15.0, check=check)
         except asyncio.TimeoutError:
-            pass
+            try:
+                await sent_message.clear_reactions()
+            except Exception:  # we can't remove reactions, not a big deal
+                pass
         else:
             embedtosend = stagedata.makeembed(stageinfo, stageenemies[25:], stagetimed, stagereward, stagerestrictions,
                                               stage_id)
@@ -1096,7 +1157,10 @@ async def on_message(message):
             try:
                 reaction, user = await client.wait_for('reaction_add', timeout=15.0, check=check)
             except asyncio.TimeoutError:
-                pass
+                try:
+                    await sent_message.clear_reactions()
+                except Exception:  # we can't remove reactions, not a big deal
+                    pass
             else:
                 icing.add_entry(user_id, message.author.id, reason, str(datetime.now()))
                 await message.channel.send("Action confirmed, don't forget to inform the user.")
