@@ -132,7 +132,9 @@ async def on_message(message):
         if catstats[0] == "name not unique":  # name wasn't unique
             message_to_send = "I couldn't find an unit given that name. Perhaps you meant any of these?\n"
             for element in catstats[1]:
-                message_to_send += catculator.getnamebycode(element)+', '
+                name = catculator.getnamebycode(element)
+                if name[0] != '?' and name[0] != '#':
+                    message_to_send += name+', '
             await message.channel.send(message_to_send[:-2])
             return
         cat = catculator.getrow(catstats[0])
@@ -147,7 +149,7 @@ async def on_message(message):
             level = 30
         try:
             embedsend = catculator.getstatsEmbed(cat, level, catstats[0])
-        except TypeError:
+        except Exception:
             await message.channel.send("That code doesn't provide any result.")
             return
         sent_message = await message.channel.send(embed=embedsend)

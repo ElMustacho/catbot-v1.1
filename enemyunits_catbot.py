@@ -16,7 +16,7 @@ class Enemyunits:
 
     def namefromcode(self, enemycode):
         returnthis = self._enemies.iloc[enemycode]
-        returnthis = returnthis.iat[95]
+        returnthis = returnthis.iat[96]
         return returnthis
 
     def getrow(self, row):
@@ -113,11 +113,11 @@ class Enemyunits:
         return locator
 
     def getstatsembed(self, enemy, magnification, mag2=None):
-        backswing = int(enemy[94])-max(enemy[12],enemy[57],enemy[58])
+        backswing = int(enemy[95])-max(enemy[12],enemy[57],enemy[58])
         real_tba = max(enemy[12], enemy[57], enemy[58]) + max(backswing, enemy[4]*2-1)
         if mag2 is None:
             mag2 = magnification
-        title = 'Stats of ' + str(enemy[95])
+        title = 'Stats of ' + str(enemy[96])
         enemyEmbed = emb(description=title, color=0x00ff00)
         enemyEmbed.set_author(name='Cat Bot')
         magstring = str(int(magnification*100)) + '%'
@@ -262,6 +262,8 @@ class Enemyunits:
                 atkroutine += 'f / ' + str(round(int(enemy[58])))
         atkroutine += 'f / ' + str(backswing) + 'f'
         enemyEmbed.add_field(name='Attack timings', value=atkroutine, inline=True)
+        if int(enemy[95]) > 1:  # is a baron
+            enemyEmbed.add_field(name='Miscellaneous', value="It's a baron unit", inline=True)
         return enemyEmbed
 
     def givenewname(self, enemycode, newname):

@@ -63,8 +63,7 @@ class Stagedata:
                 stagenames = [x[0].lower() for x in stage]
                 dss = list(map(lambda x: edit_distance_fast(x, stagename, errors), stagenames))
                 if min(dss) > errors:  # case 3b
-                    results = -1
-                    raise Exception('String could not match anything.')  # didn't find stage anyway
+                    return -1
             #FIXME throws exception if empty
             best_minimum = min(min(dss),min(dss_custom))
             nearestmatch = [i for i, x in enumerate(dss) if x == best_minimum]

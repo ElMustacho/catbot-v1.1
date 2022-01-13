@@ -30,7 +30,7 @@ class Catunits:
     def getnamebycode(self, id):
         returned = None
         try:
-            returned = self._cats.iloc[id][100]
+            returned = self._cats.iloc[id][101]
         except IndexError:
             pass
         return returned
@@ -47,11 +47,11 @@ class Catunits:
             locator[0] = locator[0][0]
         return locator
 
-    def getstatsEmbed(self, cat, level, unitcode, extraparam = []):
+    def getstatsEmbed(self, cat, level, unitcode, extraparam = []):  #todo made up stats should be accessed from right
         isinline = True
-        title = 'Stats of ' + cat[98]
-        if len(cat[100]) > 1:
-            title = 'Stats of ' + cat[100]
+        title = 'Stats of ' + cat[99]
+        if len(cat[101]) > 1:
+            title = 'Stats of ' + cat[101]
         whichform = unitcode
         if whichform % 3 == 0:
             title += ' - First form'
@@ -63,20 +63,20 @@ class Catunits:
         catEmbed = emb(description=title, color=0xff3300)
         catEmbed.set_author(name='Cat Bot')
         rarity = ''
-        if cat[99] == 0:
+        if cat[100] == 0:
             rarity = 'Normal Rare'
-        elif cat[99] == 1:
+        elif cat[100] == 1:
             rarity = 'Special Rare'
-        elif cat[99] == 2:
+        elif cat[100] == 2:
             rarity = 'Rare'
-        elif cat[99] == 3:
+        elif cat[100] == 3:
             rarity = 'Super Rare'
-        elif cat[99] == 4:
+        elif cat[100] == 4:
             rarity = 'Uber Super Rare'
-        elif cat[99] == 5:
+        elif cat[100] == 5:
             rarity = 'Legend Rare'
         catEmbed.add_field(name='Level - Rarity', value=str(level) + ' - ' + rarity, inline=isinline)
-        lvmult = float(self.levelMultiplier(cat[99], unitcode, level))
+        lvmult = float(self.levelMultiplier(cat[100], unitcode, level))
         lives_once = ''
         if cat[58] > 0:
             lives_once = ' (hits once before dying)'
@@ -87,7 +87,7 @@ class Catunits:
         else:
             talent_atk = 1
         dmg = str(round(math.floor(math.floor(cat[3] * lvmult) * max(1, talent_atk))))
-        tba = round(int(cat[102]) / 30, 2)
+        tba = round(int(cat[103]) / 30, 2)
         if int(cat[59]) > 0:
             dmg += '/' + str(round(math.floor(math.floor(cat[59] * lvmult) * max(1, talent_atk))))
         if int(cat[60]) > 0:
@@ -172,6 +172,8 @@ class Catunits:
             offensivestr += 'Curses ' + str(round(int(cat[92]))) + '% for ' + str(round(cat[93] / 30, 2)) + 's, '
         if cat[95] > 0:  # shield breaks
             offensivestr += 'Shield Piercing '+str(int(cat[95]))+'%, '
+        if cat[97] > 0:  # strong versus barons
+            offensivestr += 'Strong versus barons, '
         offensivestr = offensivestr[:-2]
         if len(offensivestr) > 3:
             catEmbed.add_field(name='Offensive abilities', value=offensivestr, inline=isinline)
@@ -239,7 +241,7 @@ class Catunits:
                 atkroutine += 'f / __**' + str(round(int(cat[62]))) + '**__'
             else:
                 atkroutine += 'f / ' + str(round(int(cat[62])))
-        atkroutine += 'f / ' + str(round(int(cat[101]))) + 'f'  # backswing
+        atkroutine += 'f / ' + str(round(int(cat[102]))) + 'f'  # backswing
         catEmbed.add_field(name='Attack timings', value=atkroutine, inline=isinline)
         return catEmbed
 
