@@ -85,12 +85,16 @@ async def on_message(message):
             await message.channel.send(random.choice(lv2answers))
         else:
             await message.channel.send('You can do better than this.')
+        log_event(message.content, message.author.id, datetime.now(), 1)
+        return
 
     elif message.content.startswith('!mytier'):
         if not canSend(1, privilegelevel(message.author), message):
             if not isokayifnotclog(message, isADM(message)):
                 return
         await message.channel.send('Your tier is: ' + str(privilegelevel(message.author)))
+        log_event(message.content, message.author.id, datetime.now(), 1)
+        return
 
     elif message.content.startswith('!catstats ') or message.content.startswith('!cs '):
         if not canSend(1, privilegelevel(message.author), message):
@@ -105,6 +109,7 @@ async def on_message(message):
         cat = message.content[message.content.find(' ') + 1:limit].lower()
         if cat == '!cs':
             await message.channel.send('You need to input a cat unit name or code.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         catstats = catculator.getUnitCode(cat, 6)  # second parameter is number of errors allowed
         if catstats[0] == "no result":  # too many errors, maybe they meant an enemy?
@@ -112,14 +117,16 @@ async def on_message(message):
             if enemystats is None:  # too many errors for an enemy
                 await message.channel.send(
                     message.content[message.content.find(' ') + 1:limit] + '; wasn\'t recognized.')
+                log_event(message.content, message.author.id, datetime.now(), -1)
                 return
-            try:
+            try:  #TODO try to use isinstance
                 lenght = len(enemystats[0])
             except TypeError:
                 enemystats[0] = [enemystats[0]]
             if len(enemystats[0]) > 1:  # name wasn't unique
                 await message.channel.send(
                     message.content[message.content.find(' ') + 1:limit] + '; wasn\'t recognized.')
+                log_event(message.content, message.author.id, datetime.now(), -1)
                 return
             enemy = enemyculator.getrow(enemystats[0][0])
             if enemy is None:
@@ -128,6 +135,7 @@ async def on_message(message):
                 return
             embedsend = enemyculator.getstatsembed(enemy, 1)
             await message.channel.send("Did you mean to search an enemy?", embed=embedsend)
+            log_event(message.content, message.author.id, datetime.now(), 0)
             return
         if catstats[0] == "name not unique":  # name wasn't unique
             message_to_send = "I couldn't find an unit given that name. Perhaps you meant any of these?\n"
@@ -136,10 +144,12 @@ async def on_message(message):
                 if name[0] != '?' and name[0] != '#':
                     message_to_send += name+', '
             await message.channel.send(message_to_send[:-2])
+            log_event(message.content, message.author.id, datetime.now(), 0)
             return
         cat = catculator.getrow(catstats[0])
         if cat is None:
             await message.channel.send('Invalid code for cat unit.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         try:
             level = int(message.content[message.content.find(';') + 1:])
@@ -151,10 +161,9 @@ async def on_message(message):
             embedsend = catculator.getstatsEmbed(cat, level, catstats[0])
         except Exception:
             await message.channel.send("That code doesn't provide any result.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         sent_message = await message.channel.send(embed=embedsend)
-        if isADM(message):
-            return
         reactions = ['▶', '◀️', '⏩', '⏪', '\U00002705', '\U0001F5D1']
         reactions_made = []
         for reaction in reactions:
@@ -186,23 +195,32 @@ async def on_message(message):
             elif txtreaction == '\U0001F5D1':
                 await message.delete()
                 await sent_message.delete()
+                log_event(message.content, message.author.id, datetime.now(), -1)
                 return
             else:
-                await sent_message.clear_reactions()
+                try:
+                    await sent_message.clear_reactions()
+                except Exception as E:  #TODO catch something better
+                    pass  # we have no perms, no big deal
+                log_event(message.content, message.author.id, datetime.now(), 2)
                 return
             try:
                 newcode = catstats[0] + offset
                 await sent_message.edit(
                     embed=catculator.getstatsEmbed(catculator.getrow(newcode), level,
                                                    newcode))
+                log_event(message.content, message.author.id, datetime.now(), 2)
             except TypeError:
                 await sent_message.edit(content="That form doesn't exists.")
+                log_event(message.content, message.author.id, datetime.now(), -1)
+                return
         for reaction in reactions_made:
             await reaction
         try:
             await sent_message.clear_reactions()
-        except:
+        except Exception as E:  #TODO catch something better
             pass
+        log_event(message.content, message.author.id, datetime.now(), 1)
         return
 
     elif message.content.startswith('!enemystats') or message.content.startswith('!es'):
@@ -218,6 +236,7 @@ async def on_message(message):
         enemy = message.content[message.content.find(' ') + 1:limit].lower()
         if enemy == '!es':
             await message.channel.send('You need to provide an enemy unit name.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         enemystats = enemyculator.getUnitCode(enemy, 6)  # second parameter is number of errors allowed
         if enemystats is None:  # too many errors, maybe they meant a cat
@@ -228,19 +247,26 @@ async def on_message(message):
             enemy = message.content[message.content.find(' ') + 1:limit]
             if enemy == '':
                 await message.channel.send('You need to input an enemy name.')
+                log_event(message.content, message.author.id, datetime.now(), -1)
+                return
             if catstats == "no result":
                 await message.channel.send(enemy + '; wasn\'t recognized.')
+                log_event(message.content, message.author.id, datetime.now(), -1)
+                return
             if catstats[0] == "name not unique":  # name wasn't unique
                 await message.channel.send(
                     message.content[message.content.find(' ') + 1:limit] + '; wasn\'t recognized.')
+                log_event(message.content, message.author.id, datetime.now(), -1)
                 return
             cat = catculator.getrow(catstats[0])
             if cat is None:
                 await message.channel.send(
                     message.content[message.content.find(' ') + 1:limit] + '; wasn\'t recognized.')
+                log_event(message.content, message.author.id, datetime.now(), -1)
                 return
             embedsend = catculator.getstatsEmbed(cat, 30, catstats[0])
             await message.channel.send("Did you mean to search a cat?", embed=embedsend)
+            log_event(message.content, message.author.id, datetime.now(), 0)
             return
         try:
             lenght = len(enemystats[0])
@@ -248,10 +274,12 @@ async def on_message(message):
             enemystats[0] = [enemystats[0]]
         if len(enemystats[0]) > 1:  # name wasn't unique
             await message.channel.send('Couldn\'t discriminate.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         enemy = enemyculator.getrow(enemystats[0][0])
         if enemy is None:
             await message.channel.send('Invalid code for enemy unit.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         try:
             border = message.content.find('%')
@@ -265,6 +293,7 @@ async def on_message(message):
                 mag2 = float(int(message.content[find_nth(str(message.content), ';', 2) + 1:]) / 100)
             elif message.content.count(';') > 2:
                 await message.channel.send("Wrong syntax, you passed too many arguments.")
+                log_event(message.content, message.author.id, datetime.now(), -1)
                 return
         except:
             magnification = 1
@@ -275,6 +304,8 @@ async def on_message(message):
             mag2 = 1
         embedsend = enemyculator.getstatsembed(enemy, magnification, mag2)
         await message.channel.send(embed=embedsend)
+        log_event(message.content, message.author.id, datetime.now(), 1)
+        return
 
     elif message.content.startswith('!renamecat'):
         if not canSend(4, privilegelevel(message.author), message):
@@ -283,14 +314,17 @@ async def on_message(message):
         limit = message.content.find(';')
         if limit < 0:
             await message.channel.send('Incorrect format, check command usage.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         realnameunit = message.content[11: limit]
         catcode = catculator.getUnitCode(realnameunit.lower(), 0)
         if catcode == "no result":  # too many errors
             await message.channel.send('That was gibberish.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         if catcode[0] == "name not unique":  # name wasn't unique
             await message.channel.send('Couldn\'t discriminate.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         sent_message = await message.channel.send(
             'The name `' + message.content[limit + 2:] + '` is going to be assigned, is that okay?')
@@ -311,9 +345,17 @@ async def on_message(message):
             response = catculator.givenewname(catcode[0], message.content[limit + 2:])
             if response:
                 await message.channel.send('The name ' + message.content[limit + 2:] + ' is now assigned.')
+                log_event(message.content, message.author.id, datetime.now(), 1)
             else:
                 await message.channel.send('Name was already used.')
-        await sent_message.clear_reactions()
+                log_event(message.content, message.author.id, datetime.now(), -1)
+                return
+        try:
+            await sent_message.clear_reactions()
+        except Exception as E:
+            pass
+        # if we are here, it means the name was not okay
+        log_event(message.content, message.author.id, datetime.now(), -1)
         return
 
     elif message.content.startswith('!renameenemy'):
@@ -322,18 +364,21 @@ async def on_message(message):
         limit = message.content.find(';')
         if limit < 0:
             await message.channel.send('Incorrect format, check command usage.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         realnameunit = message.content[13: limit]
         enemycode = enemyculator.getUnitCode(realnameunit.lower(), 1)
         if enemycode is None:  # too many errors
             await message.channel.send('That was gibberish.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         if len(enemycode[0]) > 1:  # name wasn't unique
             await message.channel.send('Couldn\'t discriminate.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
-
         if enemycode[0][0] is None:
             await message.channel.send('Invalid code for cat unit.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         sent_message = await message.channel.send(
             'The name `' + message.content[limit + 2:] + '` is going to be assigned, is that okay?')
@@ -354,9 +399,18 @@ async def on_message(message):
             response = enemyculator.givenewname(enemycode[0][0], message.content[limit + 2:])
             if response:
                 await message.channel.send('The name ' + message.content[limit + 2:] + ' is now assigned.')
+                log_event(message.content, message.author.id, datetime.now(), 1)
+                return
             else:
                 await message.channel.send('Name was already used.')
-        await sent_message.clear_reactions()
+                log_event(message.content, message.author.id, datetime.now(), -1)
+                return
+        try:
+            await sent_message.clear_reactions()
+        except Exception as E:
+            pass
+        # if we are here the name wasn't fine
+        log_event(message.content, message.author.id, datetime.now(), -1)
         return
 
     elif message.content.startswith('!silence'):
@@ -379,12 +433,16 @@ async def on_message(message):
         catstats = catculator.getUnitCode(message.content[12:].lower(), 6)
         if catstats == "no result":  # too many errors
             await message.channel.send(message.content[12:] + '; wasn\'t recognized.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         if catstats[0] == "name not unique":  # name wasn't unique
             await message.channel.send('Couldn\'t discriminate.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         cat = catculator.getrow(catstats[0])
         await message.channel.send(catculator.getnames(cat, catstats[0]))
+        log_event(message.content, message.author.id, datetime.now(), 1)
+        return
 
     elif message.content.startswith('!enemynamesof'):
         if not canSend(2, privilegelevel(message.author), message):
@@ -394,12 +452,16 @@ async def on_message(message):
                                               6)  # second parameter is number of errors allowed
         if enemystats[0] is None:  # too many errors
             await message.channel.send(message.content[15:] + '; wasn\'t recognized.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         if len(enemystats[0]) > 1:  # name wasn't unique
             await message.channel.send('Couldn\'t discriminate.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         enemy = enemyculator.getrow(enemystats[0][0])
         await message.channel.send(enemyculator.getnames(enemy, enemystats[0][0]))
+        log_event(message.content, message.author.id, datetime.now(), 1)
+        return
 
     elif message.content.startswith('!deletecatname') or message.content.startswith('!removecatname'):
         if not canSend(4, privilegelevel(message.author), message):
@@ -407,20 +469,27 @@ async def on_message(message):
         limit = message.content.find(';')
         if limit < 0:
             await message.channel.send('Incorrect format, check command usage.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         realnameunit = message.content[15: limit]
         catcode = catculator.getUnitCode(realnameunit.lower(), 0)
         if catcode == "no result":  # too many errors
             await message.channel.send('That was gibberish.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         if catcode[0] == "name not unique":  # name wasn't unique
             await message.channel.send('Couldn\'t discriminate.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         operationsuccess = catculator.removename(catcode[0], message.content[limit + 2:])
         if operationsuccess:
             await message.channel.send('Name was deleted successfully.')
+            log_event(message.content, message.author.id, datetime.now(), 1)
+            return
         else:
             await message.channel.send('No such name to delete.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
+            return
 
     elif message.content.startswith('!deleteenemyname'):
         if not canSend(4, privilegelevel(message.author), message):
@@ -428,23 +497,31 @@ async def on_message(message):
         limit = message.content.find(';')
         if limit < 0:
             await message.channel.send('Incorrect format, check command usage.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         realnameunit = message.content[17: limit]
         enemycode = enemyculator.getUnitCode(realnameunit.lower(), 0)
         if enemycode is None:  # too many errors
             await message.channel.send('That was gibberish.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         if len(enemycode[0]) > 1:  # name wasn't unique
             await message.channel.send('Couldn\'t discriminate.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         if enemycode[0][0] is None:
             await message.channel.send('Invalid code for cat unit.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         operationsuccess = enemyculator.removename(enemycode[0][0], message.content[limit + 2:])
         if operationsuccess:
             await message.channel.send('Name was deleted successfully.')
+            log_event(message.content, message.author.id, datetime.now(), 1)
+            return
         else:
             await message.channel.send('No such name to delete.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
+            return
 
     elif message.content.startswith('!stagebeta ') or message.content.startswith('!sb '):
         if not canSend(1, privilegelevel(message.author), message):
@@ -468,19 +545,24 @@ async def on_message(message):
             stagelevel = ''
         if s_string.count(';') > 3:
             await message.channel.send("Wrong syntax, check again command usage guide.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         stageid = stagedata.getstageid(stagestring.lower(), 5, stagelevel.lower(), categorystring.lower())
         if stageid == -1:  # too many errors
             await message.channel.send("That stage doesn't exist.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         elif stageid == -2:  # could not tell between more than 1 stage
             await message.channel.send("You need to be more specific.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         elif stageid == -3:  # empty intersection
             await message.channel.send("The combination of the stage, map and category produces no result.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         elif stageid is None:
             await message.channel.send("Catbot is confused and doesn't know what happened.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         try:  # enter here if stage not found AND there were multiple close enoughs that are equally likely
             if len(stageid) > 1:
@@ -494,6 +576,7 @@ async def on_message(message):
                     for line in stageid[1]:
                         str_to_send += '\n'+line[0]
                 await message.channel.send(str_to_send)
+                log_event(message.content, message.author.id, datetime.now(), 0)
                 return
         except Exception as E:
             pass
@@ -534,6 +617,7 @@ async def on_message(message):
             await sent_message.clear_reactions()
         except:
             pass
+        log_event(message.content, message.author.id, datetime.now(), 1)
         return
 
     elif message.content.startswith('!renamestage '):
@@ -542,12 +626,14 @@ async def on_message(message):
         limit = message.content.find(';')
         if limit < 0:
             await message.channel.send('Incorrect format, check command usage.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         realstageid = message.content[13: limit]
         try:
             stage_id = int(realstageid)
         except Exception as not_an_int:
             await message.channel.send('Wrong value, I need an integer value that points to a specific stage.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         stageinfo = stagedata.idtostage(stage_id)
         if len(stageinfo)<1:
@@ -556,9 +642,11 @@ async def on_message(message):
         new_custom_stage = message.content[limit+2:]
         if custom_stages.Custom_stages.does_name_exist(new_custom_stage) or stagedata.does_name_exist(new_custom_stage)>0:
             await message.channel.send("The name was already used once.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         if not re.match('[a-zA-Z 0-9]+$', new_custom_stage):
             await message.channel.send("The name must be composed of letters, numbers and spaces only.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         stageinfo_data = str(stageinfo[0][3]) +'; '+stageinfo[0][2] +'; '+stageinfo[0][1] +'; '+stageinfo[0][0]
         sent_message = await message.channel.send(
@@ -579,7 +667,14 @@ async def on_message(message):
         else:
             response = custom_stages.Custom_stages.add_name(stage_id,new_custom_stage,str(message.author),datetime.now())
             await message.channel.send(str(response))
-        await sent_message.clear_reactions()
+            if response == 'The name was successfully added.':
+                log_event(message.content, message.author.id, datetime.now(), 1)
+            else:
+                log_event(message.content, message.author.id, datetime.now(), -1)
+        try:
+            await sent_message.clear_reactions()
+        except Exception as E:
+            pass
         return
 
 
@@ -603,6 +698,7 @@ async def on_message(message):
             unit3 = ''
         if message.content.count(';') > 2:
             await message.channel.send("Wrong syntax, check again command usage guide.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         if unit2 == "" and unit3 != "":
             unit2 = unit3
@@ -612,13 +708,16 @@ async def on_message(message):
         enemystats3 = None
         if enemystats1 is None:  # too many errors
             await message.channel.send("The first unit does not exist.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         try:  # was this a string or a int?
             if len(enemystats1[0]) > 1:  # name wasn't unique
                 await message.channel.send('Couldn\'t discriminate.')
+                log_event(message.content, message.author.id, datetime.now(), -1)
                 return
         except TypeError:
             await message.channel.send('I need a name, not a number.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         nameunit1 = enemyculator.namefromcode(enemystats1[0][0])
         nameunit2 = ''
@@ -627,10 +726,12 @@ async def on_message(message):
             enemystats2 = enemyculator.getUnitCode(unit2.lower(), 4)
             if enemystats2 is None:  # too many errors
                 await message.channel.send("The second unit does not exist.")
+                log_event(message.content, message.author.id, datetime.now(), -1)
                 return
             try:  # was this a string or a int?
                 if len(enemystats2[0]) > 1:  # name wasn't unique
                     await message.channel.send('Couldn\'t discriminate.')
+                    log_event(message.content, message.author.id, datetime.now(), -1)
                     return
             except TypeError:
                 await message.channel.send('I need a name, not a number.')
@@ -640,13 +741,16 @@ async def on_message(message):
                 enemystats3 = enemyculator.getUnitCode(unit3.lower(), 4)
                 if enemystats3 is None:  # too many errors
                     await message.channel.send("The third unit does not exist.")
+                    log_event(message.content, message.author.id, datetime.now(), -1)
                     return
                 try:  # was this a string or a int?
                     if len(enemystats3[0]) > 1:  # name wasn't unique
                         await message.channel.send('Couldn\'t discriminate.')
+                        log_event(message.content, message.author.id, datetime.now(), -1)
                         return
                 except TypeError:
                     await message.channel.send('I need a name, not a number.')
+                    log_event(message.content, message.author.id, datetime.now(), -1)
                     return
                 nameunit3 = enemyculator.namefromcode(enemystats3[0][0])
         list_of_stages=stagedata.whereistheenemy(enemystats1, nameunit1, nameunit2, nameunit3, enemystats2, enemystats3)
@@ -655,6 +759,7 @@ async def on_message(message):
             stageinfo = stagedata.idtostage(stage_id)
             if len(stageinfo) < 1:
                 await message.channel.send("The stage code wasn't valid.")
+                log_event(message.content, message.author.id, datetime.now(), -1)
                 return
             stageenemies = stagedata.idtoenemies(stage_id)
             stagetimed = stagedata.idtotimed(stage_id)
@@ -698,6 +803,7 @@ async def on_message(message):
             return
         else:
             await message.channel.send(list_of_stages)
+        log_event(message.content, message.author.id, datetime.now(), 1)
         return
 
     elif message.content.startswith('!whereismonthly '):
@@ -720,6 +826,7 @@ async def on_message(message):
             unit3 = ''
         if message.content.count(';') > 2:
             await message.channel.send("Wrong syntax, check again command usage guide.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         if unit2 == "" and unit3 != "":
             unit2 = unit3
@@ -729,13 +836,16 @@ async def on_message(message):
         enemystats3 = None
         if enemystats1 is None:  # too many errors
             await message.channel.send("The first unit does not exist.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         try:  # was this a string or a int?
             if len(enemystats1[0]) > 1:  # name wasn't unique
                 await message.channel.send('Couldn\'t discriminate.')
+                log_event(message.content, message.author.id, datetime.now(), -1)
                 return
         except TypeError:
             await message.channel.send('I need a name, not a number.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         nameunit1 = enemyculator.namefromcode(enemystats1[0][0])
         nameunit2 = ''
@@ -744,30 +854,37 @@ async def on_message(message):
             enemystats2 = enemyculator.getUnitCode(unit2.lower(), 4)
             if enemystats2 is None:  # too many errors
                 await message.channel.send("The second unit does not exist.")
+                log_event(message.content, message.author.id, datetime.now(), -1)
                 return
             try:  # was this a string or a int?
                 if len(enemystats2[0]) > 1:  # name wasn't unique
                     await message.channel.send('Couldn\'t discriminate.')
+                    log_event(message.content, message.author.id, datetime.now(), -1)
                     return
             except TypeError:
                 await message.channel.send('I need a name, not a number.')
+                log_event(message.content, message.author.id, datetime.now(), -1)
                 return
             nameunit2 = enemyculator.namefromcode(enemystats2[0][0])
             if unit3 != '':
                 enemystats3 = enemyculator.getUnitCode(unit3.lower(), 4)
                 if enemystats3 is None:  # too many errors
                     await message.channel.send("The third unit does not exist.")
+                    log_event(message.content, message.author.id, datetime.now(), -1)
                     return
                 try:  # was this a string or a int?
                     if len(enemystats3[0]) > 1:  # name wasn't unique
                         await message.channel.send('Couldn\'t discriminate.')
+                        log_event(message.content, message.author.id, datetime.now(), -1)
                         return
                 except TypeError:
                     await message.channel.send('I need a name, not a number.')
+                    log_event(message.content, message.author.id, datetime.now(), -1)
                     return
                 nameunit3 = enemyculator.namefromcode(enemystats3[0][0])
         await message.channel.send(
             stagedata.whereisthenemymonthly(enemystats1, nameunit1, nameunit2, nameunit3, enemystats2, enemystats3))
+        log_event(message.content, message.author.id, datetime.now(), 1)
         return
 
     elif message.content.startswith('!sbid '):
@@ -782,10 +899,12 @@ async def on_message(message):
             stage_id = int(stage_id)
         except Exception as TypeError:
             await message.channel.send('Wrong value, I need an integer value that points to a specific stage.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         stageinfo = stagedata.idtostage(stage_id)
         if len(stageinfo)<1:
             await message.channel.send("The stage code wasn't valid.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         stageenemies = stagedata.idtoenemies(stage_id)
         stagetimed = stagedata.idtotimed(stage_id)
@@ -824,6 +943,7 @@ async def on_message(message):
             await sent_message.clear_reactions()
         except:
             pass
+        log_event(message.content, message.author.id, datetime.now(), 1)
         return
 
     elif message.content.startswith('!whereisb '):
@@ -845,6 +965,7 @@ async def on_message(message):
             unit3 = ''
         if message.content.count(';') > 2:
             await message.channel.send("Wrong syntax, check again command usage guide.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         if unit2 == "" and unit3 != "":
             unit2 = unit3
@@ -854,6 +975,7 @@ async def on_message(message):
         enemystats3 = None
         if enemystats1 is None:  # too many errors
             await message.channel.send("The first unit does not exist.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         try:  # was this a string or a int?
             if len(enemystats1[0]) > 1:  # name wasn't unique
@@ -861,6 +983,7 @@ async def on_message(message):
                 return
         except TypeError:
             await message.channel.send('I need a name, not a number.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         nameunit_2 = ''
         nameunit_3 = ''
@@ -868,10 +991,12 @@ async def on_message(message):
             enemystats2 = enemyculator.getUnitCode(unit2.lower(), 4)
             if enemystats2 is None:  # too many errors
                 await message.channel.send("The second unit does not exist.")
+                log_event(message.content, message.author.id, datetime.now(), -1)
                 return
             try:  # was this a string or a int?
                 if len(enemystats2[0]) > 1:  # name wasn't unique
                     await message.channel.send('Couldn\'t discriminate.')
+                    log_event(message.content, message.author.id, datetime.now(), -1)
                     return
             except TypeError:
                 await message.channel.send('I need a name, not a number.')
@@ -881,18 +1006,23 @@ async def on_message(message):
                 enemystats3 = enemyculator.getUnitCode(unit3.lower(), 4)
                 if enemystats3 is None:  # too many errors
                     await message.channel.send("The third unit does not exist.")
+                    log_event(message.content, message.author.id, datetime.now(), -1)
                     return
                 try:  # was this a string or a int?
                     if len(enemystats3[0]) > 1:  # name wasn't unique
                         await message.channel.send('Couldn\'t discriminate.')
+                        log_event(message.content, message.author.id, datetime.now(), -1)
                         return
                 except TypeError:
                     await message.channel.send('I need a name, not a number.')
+                    log_event(message.content, message.author.id, datetime.now(), -1)
                     return
                 nameunit_3 = enemyculator.namefromcode(enemystats3[0][0])
         stages = stagedata.listofstagesfromenemies(enemystats1, nameunit_2, nameunit_3, enemystats2, enemystats3)
         if stages == "No stages found.":
             await message.channel.send("No stages found.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
+            return
         embed_to_send = stagedata.showstagesinembed(stages)
         sent_message = await message.channel.send(embed=embed_to_send)
         if len(stages) < 26:
@@ -927,7 +1057,11 @@ async def on_message(message):
                 await sent_message.clear_reactions()
                 await sent_message.add_reaction('▶')
                 await sent_message.add_reaction('◀')
-        await sent_message.clear_reactions()
+        try:
+            await sent_message.clear_reactions()
+        except Exception as E:
+            pass
+        log_event(message.content, message.author.id, datetime.now(), 1)
         return
 
 
@@ -938,8 +1072,12 @@ async def on_message(message):
             'freeforall-channels']:
             if not isokayifnotclog(message, isADM(message)):
                 return
-        await message.channel.send(
-            catcombos.combos.name_to_combo(message.content[message.content.find(' ') + 1:], catculator))
+        comboes = catcombos.combos.name_to_combo(message.content[message.content.find(' ') + 1:], catculator)
+        await message.channel.send(comboes)
+        if comboes[2] == 'e':  #go here if something is found
+            log_event(message.content, message.author.id, datetime.now(), 1)
+        else:
+            log_event(message.content, message.author.id, datetime.now(), -1)
         return
 
     elif message.content.startswith('!combowith'):
@@ -949,8 +1087,13 @@ async def on_message(message):
             'freeforall-channels']:
             if not isokayifnotclog(message, isADM(message)):
                 return
-        await message.channel.send(
-            catcombos.combos.search_by_unit(message.content[message.content.find(' ') + 1:], catculator))
+        comboes = catcombos.combos.search_by_unit(message.content[message.content.find(' ') + 1:], catculator)
+        await message.channel.send(comboes)
+        # TODO figure out how to tell if unit found or not
+        #if comboes[3] == 'b':  #go here if something is found
+        #    log_event(message.content, message.author.id, datetime.now(), -1)
+        #else:
+        #    log_event(message.content, message.author.id, datetime.now(), 1)
         return
 
     elif message.content.startswith('!say'):
@@ -960,6 +1103,7 @@ async def on_message(message):
         channel_to_send = client.get_channel(int(looking))
         message_to_send = message.content[find_nth(message.content, ' ', 2):]
         await channel_to_send.send(message_to_send)
+        log_event(message.content, message.author.id, datetime.now(), 1)
         return
 
     elif message.content.startswith('!rawtalents'):
@@ -969,12 +1113,15 @@ async def on_message(message):
 
         if cat == "no result":
             await message.channel.send("Gibberish.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         if cat[0] == "name not unique":  # name wasn't unique
             await message.channel.send('Couldn\'t discriminate.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         answer = catculator.get_talents_by_id(cat[0] - 2)  # offset by 2 to fix unitcodes
         await message.channel.send(str(answer))
+        log_event(message.content, message.author.id, datetime.now(), 1)
         return
 
     elif message.content.startswith('!udp ') or message.content.startswith('!UDP '):
@@ -988,17 +1135,22 @@ async def on_message(message):
         cat = catculator.getUnitCode(message.content[message.content.find(' ') + 1:].lower(), 6)
         if cat == "no result":
             await message.channel.send("Gibberish.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         if cat[0] == "name not unique":  # name wasn't unique
             await message.channel.send('Couldn\'t discriminate.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
+            return
         catrow = catculator.getrow(cat[0])
         if catrow[100] < 4:
             await message.channel.send('Please enter an Uber Rare unit.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         else:
             code_unit = str(int(cat[0] / 3))
             await message.channel.send("**UDP Entry of " + catrow.tolist()[
                 101] + '''**\nhttps://thanksfeanor.pythonanywhere.com/UDP/''' + code_unit.zfill(3))
+        log_event(message.content, message.author.id, datetime.now(), 1)
         return
 
     elif message.content.startswith('!cst '):  # todo needs stats multiplication reordering
@@ -1023,22 +1175,27 @@ async def on_message(message):
             attempt.append(10)
         if cat[0] == "no result":
             await message.channel.send("Gibberish.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         if cat[0] == "name not unique":  # name wasn't unique
             await message.channel.send('Couldn\'t discriminate.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         unit_talents = catculator.get_talents_by_id(cat[0] - 2)  # offset by 2 required
         talents_expl = catculator.get_talent_explanation(cat[0] - 2)  # offset by 2 required
         cat_row = catculator.getrow(cat[0])
         if cat_row is None or unit_talents[:3] == 'nan':
             await message.channel.send("Invalid unitcode.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         cat_unit = cat_row.tolist()
         if unit_talents[-2:] == 'd.':  # no db found
             await message.channel.send(unit_talents)
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         if unit_talents[-2:] == 's.':  # no talents for unit
             await message.channel.send(unit_talents)
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
         ep = [0, 0, 0, 0, 0, 0, 0, 0, 0]
         unit_talents = [list(ele) for ele in unit_talents]
@@ -1067,6 +1224,7 @@ async def on_message(message):
                     level_applied = 1
             str_expl += talent_ex[0] + ' (' + str(level_applied) + '), '
         emb.add_field(name="Talents applied", value=str(str_expl[:-2]), inline=True)
+        log_event(message.content, message.author.id, datetime.now(), 1)
         await message.channel.send(embed=emb)
         return
 
@@ -1082,9 +1240,12 @@ async def on_message(message):
                 pass
             else:
                 await message.channel.send(results[0])
+                log_event(message.content, message.author.id, datetime.now(), 1)
                 await message.delete()
+                return
         except sqlite3.OperationalError:  # database not found
             print("Database for custom commands not found.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
             return
 
     if not catbotdata.requireddata['moderation']:
@@ -1288,9 +1449,6 @@ async def on_message(message):
         return
 
 
-
-
-
     elif message.content.startswith('!solve'):
         if not canSend(5, privilegelevel(message.author), message):
             return
@@ -1472,6 +1630,26 @@ def catch(func, handle=lambda e: e, *args, **kwargs):
         return func(*args, **kwargs)
     except Exception as e:
         return handle(e)
+
+
+def log_event(message, user, date, result):
+    if not catbotdata.requireddata['logging']:
+        return
+    try:
+        command, parameters = message[:message.find(' ')], message[message.find(' ')+1:]
+    except Exception as E:
+        command = message
+        parameters = None
+    try:
+        conn = sqlite3.connect('logging.db')
+        cursor = conn.cursor()
+        cursor.execute('''insert into events (command, parameters, user, time, success) values (?,?,?,?,?);''', (command, parameters, int(user), str(date), result))
+        conn.commit()
+    except Exception as E:
+        print(E)
+    finally:
+        print('logged '+str((command, parameters, user, date, result)))
+        return
 
 
 icing = thin_ice()

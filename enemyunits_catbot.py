@@ -260,9 +260,9 @@ class Enemyunits:
                 atkroutine += 'f / __**' + str(round(int(enemy[58]))) + '**__'
             else:
                 atkroutine += 'f / ' + str(round(int(enemy[58])))
-        atkroutine += 'f / ' + str(backswing) + 'f'
+        atkroutine += 'f / ' + str(int(backswing)) + 'f'
         enemyEmbed.add_field(name='Attack timings', value=atkroutine, inline=True)
-        if int(enemy[95]) > 1:  # is a baron
+        if int(enemy[94]) > 1:  # is a baron
             enemyEmbed.add_field(name='Miscellaneous', value="It's a baron unit", inline=True)
         return enemyEmbed
 
