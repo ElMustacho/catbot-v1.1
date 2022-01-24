@@ -1,5 +1,5 @@
 # CatBot Commands
-If you see innaccuracies here, feel free to point them out.
+If you see any inaccuracies here, feel free to point them out.
 
 
 
