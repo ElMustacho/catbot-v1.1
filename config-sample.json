@@ -6,6 +6,7 @@
   "log-channel-id": 396154070890577922,
   "mod-channel-id": 652569911113023498,
   "moderation": true,
+  "logging": false,
   "server-id": 355179033018892289,
   "tier-1-roles": [
     602057565378969601
