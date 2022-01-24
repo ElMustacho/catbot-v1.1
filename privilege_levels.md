@@ -1,4 +1,6 @@
 # Privilege Levels
+A user with privilege level `n` can use all commands with a privilege level <= `n`.
+
 
 ![#000000](https://via.placeholder.com/15/000000/000000?text=+) **0** - CatBot Banned - people who are banned from CatBot, or not a part of the server. CatBot will not respond to any messages or DMs from these users.
 
