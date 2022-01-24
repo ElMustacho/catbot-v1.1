@@ -171,4 +171,4 @@ Send a message in a specified channel.
 
 
 ## ![#FF00FF](https://via.placeholder.com/15/FF00FF/000000?text=+) Custom commands
-(WIP)
+See [the documentation on custom commands](custom_commands.md).
