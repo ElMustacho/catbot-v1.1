@@ -62,9 +62,14 @@ __Example:__ `!rawtalents can can cat`
 
 Returns the schematics of the specified stage.
 
+Note that beta is a legacy nomenclature; the command is fully functional and holds the name for the sake of not using a 
+new command.
+
 The second and third parameters are optional, though they may be necessary to use if multiple stages have similar names,
 which is the case for certain enigma stages. You can skip the difficulty of the stage in its title, as seen in the last
 example.
+
+In case of multiple matches, catbot will try to give all the relevant stages.
 
 __Examples:__
 - `!sb No Plan A (Deadly)`
@@ -76,6 +81,8 @@ __Examples:__
 `!sbid stage_ID`
 
 Returns the schematics of the stage with the given ID.
+
+The ID does not appear in the game, and it exists for indexing only.
 
 Stage IDs appear when you use !sb. This is mostly meant for debugging purposes, but feel free to use it if you wish to.
 
@@ -161,7 +168,8 @@ __Example:__ `!deletecatname Manic Macho Legs; MML`
 #### ![#E69138](https://via.placeholder.com/15/E69138/000000?text=+) !renameenemy enemy_unit; new_alias,![#000000](https://via.placeholder.com/15/000000/000000?text=+) !enemynamesof enemy_unit, ![#E69138](https://via.placeholder.com/15/E69138/000000?text=+) !deleteenemyname actual_name; custom_name 
 See the three previous commands: they work the same.
 
-
+#### ![#E69138](https://via.placeholder.com/15/E69138/000000?text=+) !renamestage stage_id; new_alias
+Adds a custom name for stages
 
 ## Miscellaneous
 
