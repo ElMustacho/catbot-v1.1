@@ -12,7 +12,7 @@ Colour coding of commands will be done as per [privilege levels](privilege_level
 
 ## Unit stats & info
 
-### catstats / cs
+### ![#000000](https://via.placeholder.com/15/000000/000000?text=+) catstats / cs
 `!cs cat_unit; [level] = 30`
 
 Returns the specified unit’s stats.
@@ -22,7 +22,7 @@ All EoC treasures are assumed complete.
 __Example:__ `!cs surfer cat; 25`
 
 
-### cst
+### ![#000000](https://via.placeholder.com/15/000000/000000?text=+) cst
 `!cst cat_unit; [level] = 30; [talent_1] = max; [talent_2] = max; [talent_3] = max; [talent_4] = max; [talent_5] = max`
 
 Returns the specified unit’s stats, with support for talents. All EoC treasures are assumed complete.
@@ -34,7 +34,7 @@ Entering a non-integer level makes it default to the highest level. Entering a n
 __Example:__ `!cst can can cat; 37; 1;0;10;10;10`
 
 
-### enemystats / es
+### ![#000000](https://via.placeholder.com/15/000000/000000?text=+) enemystats / es
 `!es enemy_unit; [magnification] = 100; [atk_magnification] = [magnification]`
 
 Returns the specified enemy’s stats.
@@ -44,7 +44,7 @@ The third parameter allows you to specify magnifications for attack and health s
 __Example:__ `!es Nimoy Bore; 750`
 
 
-### rawtalents
+### ![#E69138](https://via.placeholder.com/15/E69138/000000?text=+) rawtalents
 `!rawtalents cat_unit`
 
 Returns raw talents data of the specified unit.
@@ -55,7 +55,7 @@ __Example:__ `!rawtalents can can cat`
 
 ## Stages
 
-### stagebeta / sb
+### ![#000000](https://via.placeholder.com/15/000000/000000?text=+) stagebeta / sb
 `!sb stage_name; [map_name]; [category]`
 
 Returns the schematics of the specified stage.
@@ -68,7 +68,7 @@ __Examples:__
 - `!sb Cradle Shrine; Necro Cradle; Enigma`
 
 
-### sbid
+### ![#000000](https://via.placeholder.com/15/000000/000000?text=+) sbid
 `!sbid stage_ID`
 
 Returns the schematics of the stage with the given ID.
@@ -78,7 +78,7 @@ Stage IDs appear when you use !sb. This is mostly meant for debugging purposes, 
 __Example:__ `!sbid 1007`
 
 
-### whereis
+### ![#000000](https://via.placeholder.com/15/000000/000000?text=+) whereis
 `!whereis enemy; [enemy_2]; [enemy_3]`
 
 Returns all stages where the specified enemy appears. Specify multiple enemies to return every stage where __all__ of them appear.
@@ -86,7 +86,7 @@ Returns all stages where the specified enemy appears. Specify multiple enemies t
 __Example:__ `!whereis JK Bun Bun; Capy; Those Guys`
 
 
-### whereisb
+### ![#000000](https://via.placeholder.com/15/000000/000000?text=+) whereisb
 `!whereisb enemy; [enemy_2]; [enemy_3]`
 
 Returns all stages where the specified enemy appears, but as an embed. Specify multiple enemies to return every stage where __all__ of them appear.
@@ -94,7 +94,7 @@ Returns all stages where the specified enemy appears, but as an embed. Specify m
 __Example:__ `!whereis JK Bun Bun; Capy; Those Guys`
 
 
-### whereismonthly
+### ![#000000](https://via.placeholder.com/15/000000/000000?text=+) whereismonthly
 `!whereismonthly enemy; [enemy_2]; [enemy_3]`
 
 Returns all stages where the specified enemy appears (sorted in ascending order of energy cost). Specify multiple enemies to return every stage where __all__ of them appear.
@@ -105,7 +105,7 @@ __Example:__ `!whereismonthly JK Bun Bun; Capy`
 
 ## Combos
 
-### comboname
+### ![#000000](https://via.placeholder.com/15/000000/000000?text=+) comboname
 `!comboname name_of_combo`
 
 Returns the specified CatCombo’s full name, the units needed to activate it, and its effect.
@@ -113,7 +113,7 @@ Returns the specified CatCombo’s full name, the units needed to activate it, a
 __Example:__ `!comboname Part-Time Coworkers`
 
 
-### combowith
+### ![#000000](https://via.placeholder.com/15/000000/000000?text=+) combowith
 `!combowith cat_unit`
 
 Returns all combos the specified unit is a part of.
@@ -126,7 +126,7 @@ __Example:__ `!combowith Riceball Cat`
 
 ## Aliases
 
-### renamecat
+### ![#E69138](https://via.placeholder.com/15/E69138/000000?text=+) renamecat
 `!renamecat existing_name; new_alias`
 
 Creates an alias (custom name) to use instead of the real name when using a command for a unit.
@@ -134,7 +134,7 @@ Creates an alias (custom name) to use instead of the real name when using a comm
 __Example:__ `!renamecat Manic Macho Legs; MML`
 
 
-### catnamesof
+### ![#000000](https://via.placeholder.com/15/000000/000000?text=+) catnamesof
 `!catnamesof cat_unit`
 
 Returns all custom names for the specified cat unit.
@@ -142,7 +142,7 @@ Returns all custom names for the specified cat unit.
 __Example:__ `!catnamesof Diabolic Gao`
 
 
-### deletecatname
+### ![#E69138](https://via.placeholder.com/15/E69138/000000?text=+) deletecatname
 `!deletecatname actual_name; custom_name`
 
 Deletes the specified custom name.
@@ -150,25 +150,25 @@ Deletes the specified custom name.
 __Example:__ `!deletecatname Manic Macho Legs; MML`
 
 
-#### !renameenemy enemy_unit; new_alias | !enemynamesof enemy_unit | !deleteenemyname actual_name; custom_name 
+#### ![#E69138](https://via.placeholder.com/15/E69138/000000?text=+) !renameenemy enemy_unit; new_alias, ![#000000](https://via.placeholder.com/15/000000/000000?text=+) !enemynamesof enemy_unit, ![#E69138](https://via.placeholder.com/15/E69138/000000?text=+) !deleteenemyname actual_name; custom_name 
 See the three previous commands: they work the same.
 
 
 
 ## Miscellaneous
 
-### sayhi
+### ![#000000](https://via.placeholder.com/15/000000/000000?text=+) sayhi
 `!sayhi`
 
 Responds to you based on your privilege level.
 
 
-### say
+### ![#0000FF](https://via.placeholder.com/15/0000FF/000000?text=+) say
 `!say channel_id message_content`
 
 Send a message in a specified channel.
 
 
 
-## Custom commands
+## ![#FF00FF](https://via.placeholder.com/15/FF00FF/000000?text=+) Custom commands
 (WIP)
