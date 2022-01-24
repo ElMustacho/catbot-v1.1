@@ -3,7 +3,8 @@
 
 If you see any inaccuracies here, feel free to point them out.
 
-This only lists the commands themselves: if you need their output, refer to [this](https://docs.google.com/spreadsheets/d/1I38Wppqq-HR_dhcBGL9DhYwTkXMZQwQ0_-ga6L5UmUs).
+This only lists the commands themselves: if you need their output, refer to
+[this](https://docs.google.com/spreadsheets/d/1I38Wppqq-HR_dhcBGL9DhYwTkXMZQwQ0_-ga6L5UmUs).
 
 ## Game mechanics
 - `!mechanics attackanimations`

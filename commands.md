@@ -39,7 +39,9 @@ __Example:__ `!cst can can cat; 37; 1;0;10;10;10`
 
 Returns the specified enemy’s stats.
 
-The third parameter allows you to specify magnifications for attack and health separately (the first parameter being used for health), though split magnifications are only used for baron (gauntlet) bosses in-game. If the third parameter is left blank, the second parameter will be used for both attack and health.
+The third parameter allows you to specify magnifications for attack and health separately (the first parameter being
+used for health), though split magnifications are only used for baron (gauntlet) bosses in-game. If the third parameter
+is left blank, the second parameter will be used for both attack and health.
 
 __Example:__ `!es Nimoy Bore; 750`
 
@@ -60,7 +62,9 @@ __Example:__ `!rawtalents can can cat`
 
 Returns the schematics of the specified stage.
 
-The second and third parameters are optional, though they may be necessary to use if multiple stages have similar names, which is the case for certain enigma stages. You can skip the difficulty of the stage in its title, as seen in the last example.
+The second and third parameters are optional, though they may be necessary to use if multiple stages have similar names,
+which is the case for certain enigma stages. You can skip the difficulty of the stage in its title, as seen in the last
+example.
 
 __Examples:__
 - `!sb No Plan A (Deadly)`
@@ -81,7 +85,8 @@ __Example:__ `!sbid 1007`
 ### ![#000000](https://via.placeholder.com/15/000000/000000?text=+) whereis
 `!whereis enemy; [enemy_2]; [enemy_3]`
 
-Returns all stages where the specified enemy appears. Specify multiple enemies to return every stage where __all__ of them appear.
+Returns all stages where the specified enemy appears.
+Specify multiple enemies to return every stage where __all__ of them appear.
 
 __Example:__ `!whereis JK Bun Bun; Capy; Those Guys`
 
@@ -89,7 +94,8 @@ __Example:__ `!whereis JK Bun Bun; Capy; Those Guys`
 ### ![#000000](https://via.placeholder.com/15/000000/000000?text=+) whereisb
 `!whereisb enemy; [enemy_2]; [enemy_3]`
 
-Returns all stages where the specified enemy appears, but as an embed. Specify multiple enemies to return every stage where __all__ of them appear.
+Returns all stages where the specified enemy appears, but as an embed.
+Specify multiple enemies to return every stage where __all__ of them appear.
 
 __Example:__ `!whereis JK Bun Bun; Capy; Those Guys`
 
@@ -97,7 +103,8 @@ __Example:__ `!whereis JK Bun Bun; Capy; Those Guys`
 ### ![#000000](https://via.placeholder.com/15/000000/000000?text=+) whereismonthly
 `!whereismonthly enemy; [enemy_2]; [enemy_3]`
 
-Returns all stages where the specified enemy appears (sorted in ascending order of energy cost). Specify multiple enemies to return every stage where __all__ of them appear.
+Returns all stages where the specified enemy appears (sorted in ascending order of energy cost).
+Specify multiple enemies to return every stage where __all__ of them appear.
 
 __Example:__ `!whereismonthly JK Bun Bun; Capy`
 
@@ -118,7 +125,8 @@ __Example:__ `!comboname Part-Time Coworkers`
 
 Returns all combos the specified unit is a part of.
 
-This command is form-sensitive, meaning that if you specify a unit’s first form, combos that require its 2nd or 3rd form will not be shown.
+This command is form-sensitive, meaning that if you specify a unit’s first form, combos that require its 2nd or 3rd form
+will not be shown.
 
 __Example:__ `!combowith Riceball Cat`
 
@@ -150,7 +158,7 @@ Deletes the specified custom name.
 __Example:__ `!deletecatname Manic Macho Legs; MML`
 
 
-#### ![#E69138](https://via.placeholder.com/15/E69138/000000?text=+) !renameenemy enemy_unit; new_alias, ![#000000](https://via.placeholder.com/15/000000/000000?text=+) !enemynamesof enemy_unit, ![#E69138](https://via.placeholder.com/15/E69138/000000?text=+) !deleteenemyname actual_name; custom_name 
+#### ![#E69138](https://via.placeholder.com/15/E69138/000000?text=+) !renameenemy enemy_unit; new_alias,![#000000](https://via.placeholder.com/15/000000/000000?text=+) !enemynamesof enemy_unit, ![#E69138](https://via.placeholder.com/15/E69138/000000?text=+) !deleteenemyname actual_name; custom_name 
 See the three previous commands: they work the same.
 
 
