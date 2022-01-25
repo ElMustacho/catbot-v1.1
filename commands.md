@@ -54,6 +54,14 @@ Returns raw talents data of the specified unit.
 __Example:__ `!rawtalents can can cat`
 
 
+### ![#000000](https://via.placeholder.com/15/000000/000000?text=+) udp / UDP
+`!udp cat_unit`
+
+Returns a link to the UDP entry of the specified unit.
+
+__Example:__ `!udp Mystica`
+
+
 
 ## Stages
 
@@ -98,7 +106,7 @@ Specify multiple enemies to return every stage where __all__ of them appear.
 __Example:__ `!whereis JK Bun Bun; Capy; Those Guys`
 
 
-### ![#000000](https://via.placeholder.com/15/000000/000000?text=+) whereisb
+### ![#FF00FF](https://via.placeholder.com/15/FF00FF/000000?text=+) whereisb
 `!whereisb enemy; [enemy_2]; [enemy_3]`
 
 Returns all stages where the specified enemy appears, but as an embed.
@@ -157,19 +165,19 @@ Returns all custom names for the specified cat unit.
 __Example:__ `!catnamesof Diabolic Gao`
 
 
-### ![#E69138](https://via.placeholder.com/15/E69138/000000?text=+) deletecatname
+### ![#E69138](https://via.placeholder.com/15/E69138/000000?text=+) deletecatname / removecatname
 `!deletecatname actual_name; custom_name`
 
 Deletes the specified custom name.
 
-__Example:__ `!deletecatname Manic Macho Legs; MML`
+__Example:__ `!removecatname Manic Macho Legs; MML`
 
 
 #### ![#E69138](https://via.placeholder.com/15/E69138/000000?text=+) !renameenemy enemy_unit; new_alias,![#000000](https://via.placeholder.com/15/000000/000000?text=+) !enemynamesof enemy_unit, ![#E69138](https://via.placeholder.com/15/E69138/000000?text=+) !deleteenemyname actual_name; custom_name 
 See the three previous commands: they work the same.
 
 #### ![#E69138](https://via.placeholder.com/15/E69138/000000?text=+) !renamestage stage_id; new_alias
-Adds a custom name for stages
+Adds a custom name for stages.
 
 ## Miscellaneous
 
@@ -179,7 +187,13 @@ Adds a custom name for stages
 Responds to you based on your privilege level.
 
 
-### ![#0000FF](https://via.placeholder.com/15/0000FF/000000?text=+) say
+### ![#000000](https://via.placeholder.com/15/000000/000000?text=+) mytier
+`!mytier`
+
+Responds to you with your privilege level.
+
+
+### ![#FF0000](https://via.placeholder.com/15/FF0000/000000?text=+) say
 `!say channel_id message_content`
 
 Send a message in a specified channel.
