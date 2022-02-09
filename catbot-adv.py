@@ -155,8 +155,8 @@ async def on_message(message):
             level = int(message.content[message.content.find(';') + 1:])
         except:
             level = 30
-        if level < 0 or level > 130:
-            level = 30
+        if level < 0 or level > int(cat[-1]):  # since 11.2 update, we store he maximum level of a unit here
+            level = min(30, int(cat[-1]))  # the maximum level might be lower than 30; this is the case for superfeline
         try:
             embedsend = catculator.getstatsEmbed(cat, level, catstats[0])
         except Exception:

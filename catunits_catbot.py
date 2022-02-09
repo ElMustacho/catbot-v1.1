@@ -228,6 +228,14 @@ class Catunits:
         defensivestr = defensivestr[:-2]
         if len(defensivestr) > 3:
             catEmbed.add_field(name='Defensive abilities', value=defensivestr, inline=isinline)
+        misc_abilities = ''
+        if cat[97] > 0:  # colossus killer
+            misc_abilities += 'Strong versus colossal enemies, '
+        if cat[77] > 0:  # eva killer
+            misc_abilities += 'Eva killer, '
+        if cat[54] > 0:  # witch killer
+            misc_abilities += 'Witch killer, '
+        misc_abilities = misc_abilities[:-2]
         atkroutine = str(round(int(cat[13])))
         if cat[63] > 0:  # first attack applies effects
             atkroutine = '__**' + atkroutine + '**__'
@@ -243,6 +251,8 @@ class Catunits:
                 atkroutine += 'f / ' + str(round(int(cat[62])))
         atkroutine += 'f / ' + str(round(int(cat[102]))) + 'f'  # backswing
         catEmbed.add_field(name='Attack timings', value=atkroutine, inline=isinline)
+        if len(misc_abilities) > 3:
+            catEmbed.add_field(name='Miscellaneous abilities', value=misc_abilities, inline=isinline)
         return catEmbed
 
     def closeEnough(self, strToCmp, errors):
