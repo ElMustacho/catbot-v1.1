@@ -172,8 +172,6 @@ class Catunits:
             offensivestr += 'Curses ' + str(round(int(cat[92]))) + '% for ' + str(round(cat[93] / 30, 2)) + 's, '
         if cat[95] > 0:  # shield breaks
             offensivestr += 'Shield Piercing '+str(int(cat[95]))+'%, '
-        if cat[97] > 0:  # strong versus barons
-            offensivestr += 'Strong versus barons, '
         offensivestr = offensivestr[:-2]
         if len(offensivestr) > 3:
             catEmbed.add_field(name='Offensive abilities', value=offensivestr, inline=isinline)
@@ -230,11 +228,11 @@ class Catunits:
             catEmbed.add_field(name='Defensive abilities', value=defensivestr, inline=isinline)
         misc_abilities = ''
         if cat[97] > 0:  # colossus killer
-            misc_abilities += 'Strong versus colossal enemies, '
+            misc_abilities += 'Colossus Killer, '
         if cat[77] > 0:  # eva killer
-            misc_abilities += 'Eva killer, '
+            misc_abilities += 'Eva Killer, '
         if cat[54] > 0:  # witch killer
-            misc_abilities += 'Witch killer, '
+            misc_abilities += 'Witch Killer, '
         misc_abilities = misc_abilities[:-2]
         atkroutine = str(round(int(cat[13])))
         if cat[63] > 0:  # first attack applies effects

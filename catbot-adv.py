@@ -753,7 +753,7 @@ async def on_message(message):
                     log_event(message.content, message.author.id, datetime.now(), -1)
                     return
                 nameunit3 = enemyculator.namefromcode(enemystats3[0][0])
-        list_of_stages=stagedata.whereistheenemy(enemystats1, nameunit1, nameunit2, nameunit3, enemystats2, enemystats3)
+        list_of_stages=stagedata.whereistheenemy(enemystats1, enemystats2, enemystats3)
         if isinstance(list_of_stages, tuple):  #teleport to best result
             stage_id=list_of_stages[3]
             stageinfo = stagedata.idtostage(stage_id)
