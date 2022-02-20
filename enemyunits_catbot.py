@@ -16,7 +16,7 @@ class Enemyunits:
 
     def namefromcode(self, enemycode):
         returnthis = self._enemies.iloc[enemycode]
-        returnthis = returnthis.iat[96]
+        returnthis = returnthis.iat[-2]
         return returnthis
 
     def getrow(self, row):
@@ -113,11 +113,11 @@ class Enemyunits:
         return locator
 
     def getstatsembed(self, enemy, magnification, mag2=None):
-        backswing = int(enemy[95])-max(enemy[12],enemy[57],enemy[58])
+        backswing = int(enemy[-3])-max(enemy[12],enemy[57],enemy[58])
         real_tba = max(enemy[12], enemy[57], enemy[58]) + max(backswing, enemy[4]*2-1)
         if mag2 is None:
             mag2 = magnification
-        title = 'Stats of ' + str(enemy[96])
+        title = 'Stats of ' + str(enemy[-2])
         enemyEmbed = emb(description=title, color=0x00ff00)
         enemyEmbed.set_author(name='Cat Bot')
         magstring = str(int(magnification*100)) + '%'
@@ -144,6 +144,8 @@ class Enemyunits:
                 damagekind += ', long range'
             elif enemy[36] < 0:
                 damagekind += ', omnistrike'
+        if enemy[95] > 0 or enemy[98] > 0:  # multiarea attack
+            damagekind += ', multiarea'
         damagetype = 'Damage (' + damagekind + ') - DPS'
         enemyEmbed.add_field(name=damagetype, value=dmg + dps, inline=True)
         tba = str(round(int(real_tba) / 30, 2))
@@ -151,10 +153,30 @@ class Enemyunits:
                            inline=True)
         enemyEmbed.add_field(name='Cash Awarded', value=str(round(int(enemy[6]*3.95), 0)), inline=True)
         rangestr = ''
-        if ',' in damagekind:  # it's long range or omni
-            leftrange = str(max(round(int(enemy[35]), 0), round(int(enemy[35] + enemy[36]))))
-            rightrange = str(min(round(int(enemy[35]), 0), round(int(enemy[35] + enemy[36]))))
-            rangestr += leftrange + ' to ' + rightrange + '; stands at ' + str(round(int(enemy[5])))
+        if ',' in damagekind:  # it's long range or omni or multi
+            if enemy[95] > 0 and enemy[98] == 0:  # multiarea 1, gods this stuff is a mess
+                second_range_begin = str(int(enemy[96]))
+                second_range_end = str(int(enemy[96] + enemy[97]))
+
+                leftrange = str(max(round(int(enemy[35]), 0), round(int(enemy[35] + enemy[36]))))
+                rightrange = str(min(round(int(enemy[35]), 0), round(int(enemy[35] + enemy[36]))))
+                rangestr += leftrange + ' to ' + rightrange + ' | ' + second_range_begin + ' to ' + second_range_end + '; stands at ' + str(round(int(enemy[5])))
+
+            elif enemy[95] > 0 and enemy[98] > 0:  # multiarea 2
+                second_range_begin = str(int(enemy[96]))
+                second_range_end = str(int(enemy[96] + enemy[97]))
+
+                third_range_begin = str(int(enemy[99]))
+                third_range_end = str(int(enemy[99] + enemy[100]))
+
+                leftrange = str(max(round(int(enemy[35]), 0), round(int(enemy[35] + enemy[36]))))
+                rightrange = str(min(round(int(enemy[35]), 0), round(int(enemy[35] + enemy[36]))))
+                rangestr += leftrange + ' to ' + rightrange + ' | ' + second_range_begin + ' to ' + second_range_end + ' | ' + third_range_begin + ' to ' + third_range_end + '; stands at ' + str(round(int(enemy[5])))
+
+            else:
+                leftrange = str(max(round(int(enemy[35]), 0), round(int(enemy[35] + enemy[36]))))
+                rightrange = str(min(round(int(enemy[35]), 0), round(int(enemy[35] + enemy[36]))))
+                rangestr += leftrange + ' to ' + rightrange + '; stands at ' + str(round(int(enemy[5])))
         else:  # otherwise only range is needed
             rangestr += str(round(int(enemy[5])))
         enemyEmbed.add_field(name='Range', value=rangestr, inline=True)

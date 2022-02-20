@@ -237,9 +237,10 @@ SELECT DISTINCT stages.stage, stages.category, stages.level, stages.stageid from
                         else:
                             first_good_stage = stage
                     else:  # we shouldn't compress anymore
-                        first_good_stage = -1
-                        post_processed_stages[-1][0] += ' __and the next '+str(consecutive_stages)+' stages__'
-                        consecutive_stages = 0
+                        if consecutive_stages > 0:  # we might end up here in case of consecutive stages that really have nothing to do with the neighboor
+                            first_good_stage = -1
+                            post_processed_stages[-1][0] += ' __and the next '+str(consecutive_stages)+' stages__'
+                            consecutive_stages = 0
                         post_processed_stages.append(list(stage))
                 else:
                     if consecutive_stages > 0:  # stop compressing

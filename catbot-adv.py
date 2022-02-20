@@ -1142,14 +1142,13 @@ async def on_message(message):
             log_event(message.content, message.author.id, datetime.now(), -1)
             return
         catrow = catculator.getrow(cat[0])
-        if catrow[100] < 4:
+        if catrow[-5] < 4:
             await message.channel.send('Please enter an Uber Rare unit.')
             log_event(message.content, message.author.id, datetime.now(), -1)
             return
         else:
             code_unit = str(int(cat[0] / 3))
-            await message.channel.send("**UDP Entry of " + catrow.tolist()[
-                101] + '''**\nhttps://thanksfeanor.pythonanywhere.com/UDP/''' + code_unit.zfill(3))
+            await message.channel.send("**UDP Entry of " + catrow.tolist()[-4] + '''**\nhttps://thanksfeanor.pythonanywhere.com/UDP/''' + code_unit.zfill(3))
         log_event(message.content, message.author.id, datetime.now(), 1)
         return
 
@@ -1171,8 +1170,6 @@ async def on_message(message):
             attempt = [catch(lambda: int(talent_level)) if isinstance(catch(lambda: int(talent_level)), int) else 10 for
                        talent_level in levelparams]
             attempt = attempt[:5]
-        while len(attempt) < 5:
-            attempt.append(10)
         if cat[0] == "no result":
             await message.channel.send("Gibberish.")
             log_event(message.content, message.author.id, datetime.now(), -1)
@@ -1183,6 +1180,8 @@ async def on_message(message):
             return
         unit_talents = catculator.get_talents_by_id(cat[0] - 2)  # offset by 2 required
         talents_expl = catculator.get_talent_explanation(cat[0] - 2)  # offset by 2 required
+        while len(attempt) < len(unit_talents):  # in case there are more than 5 talents
+            attempt.append(10)
         cat_row = catculator.getrow(cat[0])
         if cat_row is None or unit_talents[:3] == 'nan':
             await message.channel.send("Invalid unitcode.")
