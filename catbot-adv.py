@@ -11,6 +11,7 @@ from data_catbot import Data_catbot
 from modtools import Modtools
 from thin_ice import thin_ice
 from untrust import untrust
+import catbot_intelligence
 import catunits_catbot
 import enemyunits_catbot
 import stagedata_catbot
@@ -21,7 +22,6 @@ import math
 import re
 
 intents = discord.Intents.all()
-
 client = discord.Client(intents=intents)
 
 
@@ -46,6 +46,7 @@ async def on_member_update(before, after):
 
 @client.event
 async def on_message(message):
+    brain = False
     if '\t' in message.content:  # catbot doesn't like tab
         return
 
@@ -1178,6 +1179,7 @@ async def on_message(message):
             await message.channel.send('Couldn\'t discriminate.')
             log_event(message.content, message.author.id, datetime.now(), -1)
             return
+        cat[0] = (cat[0] // 3)*3 + 2
         unit_talents = catculator.get_talents_by_id(cat[0] - 2)  # offset by 2 required
         talents_expl = catculator.get_talent_explanation(cat[0] - 2)  # offset by 2 required
         while len(attempt) < len(unit_talents):  # in case there are more than 5 talents
@@ -1246,6 +1248,12 @@ async def on_message(message):
             print("Database for custom commands not found.")
             log_event(message.content, message.author.id, datetime.now(), -1)
             return
+
+
+    unit_if_question = catbot_intelligence.is_unit_question_regex(message.content)
+    if len(unit_if_question) > 0:
+        brainchannel = client.get_channel(946509102434111578)
+        await brainchannel.send('I think that ' + message.author.mention + ' asked a stupid regex(v3) question about `'+unit_if_question+'`.\nOriginal message: `'+message.content+'`')
 
     if not catbotdata.requireddata['moderation']:
         return
