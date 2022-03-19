@@ -368,8 +368,9 @@ SELECT DISTINCT stages.stage, stages.category, stages.level from units join stag
     def does_name_exist(self, name):
         with sqlite3.connect('stages.db') as conn:
             cursor = conn.cursor()
-            results = cursor.execute('select count(*) from stages where name = ?', (name,)).fetchone()
-            return results
+            results = cursor.execute('select count(*) from stages where stage = ?', (name,)).fetchone()
+            if results[0] > 0: return True
+            return False
 
     def idtoenemies(self, id_f):
         with sqlite3.connect('stages.db') as conn:

@@ -11,6 +11,7 @@ from data_catbot import Data_catbot
 from modtools import Modtools
 from thin_ice import thin_ice
 from untrust import untrust
+import catbot_udp
 import catbot_intelligence
 import catunits_catbot
 import enemyunits_catbot
@@ -649,7 +650,7 @@ async def on_message(message):
             await message.channel.send("The name must be composed of letters, numbers and spaces only.")
             log_event(message.content, message.author.id, datetime.now(), -1)
             return
-        stageinfo_data = str(stageinfo[0][3]) +'; '+stageinfo[0][2] +'; '+stageinfo[0][1] +'; '+stageinfo[0][0]
+        stageinfo_data = str(stageinfo[0][3]) +'; '+str(stageinfo[0][2]) +'; '+str(stageinfo[0][1]) +'; '+str(stageinfo[0][0])
         sent_message = await message.channel.send(
             'The name `' + new_custom_stage + '` is going to be assigned for the stage `'+stageinfo_data+'`, is that okay?')
         await sent_message.add_reaction('✅')
@@ -1125,6 +1126,33 @@ async def on_message(message):
         log_event(message.content, message.author.id, datetime.now(), 1)
         return
 
+    elif message.content.startswith('!udpa ') or message.content.startswith('!UDPA '):
+        if not canSend(2, privilegelevel(message.author), message):
+            return
+        if privilegelevel(message.author) < 3 and message.channel.id not in catbotdata.requireddata[
+            'freeforall-channels']:
+            if not isokayifnotclog(message, isADM(message)):
+                return
+
+        cat = catculator.getUnitCode(message.content[message.content.find(' ') + 1:].lower(), 6)
+        if cat == "no result":
+            await message.channel.send("Gibberish.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
+            return
+        if cat[0] == "name not unique":  # name wasn't unique
+            await message.channel.send('Couldn\'t discriminate.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
+            return
+
+        code_unit = str(int(cat[0] / 3))
+        if udp.unitExists(code_unit):
+            await message.channel.send(embed=udp.makeEmbedFromUnit(code_unit))
+            log_event(message.content, message.author.id, datetime.now(), 1)
+        else:
+            await message.channel.send('UDP not found for this unit.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
+        return
+
     elif message.content.startswith('!udp ') or message.content.startswith('!UDP '):
         if not canSend(2, privilegelevel(message.author), message):
             return
@@ -1143,8 +1171,9 @@ async def on_message(message):
             log_event(message.content, message.author.id, datetime.now(), -1)
             return
         catrow = catculator.getrow(cat[0])
-        if catrow[-5] < 4:
-            await message.channel.send('Please enter an Uber Rare unit.')
+        code_unit = str(int(cat[0] / 3))
+        if not udp.unitExists(code_unit):
+            await message.channel.send('UDP not found.')
             log_event(message.content, message.author.id, datetime.now(), -1)
             return
         else:
@@ -1225,8 +1254,8 @@ async def on_message(message):
                     level_applied = 1
             str_expl += talent_ex[0] + ' (' + str(level_applied) + '), '
         emb.add_field(name="Talents applied", value=str(str_expl[:-2]), inline=True)
-        log_event(message.content, message.author.id, datetime.now(), 1)
         await message.channel.send(embed=emb)
+        log_event(message.content, message.author.id, datetime.now(), 1)
         return
 
     elif message.content.startswith('!'):  # custom commands
@@ -1281,7 +1310,7 @@ async def on_message(message):
         return
 
     elif message.channel.id == catbotdata.requireddata['welcome-channel']:
-        if message.content == '$password mad doktor klay':
+        if message.content == '$password storm beast naala':  #TODO get this from the json
             member = serveruser(message.author)
             await member.add_roles(discord.utils.get(client.get_guild(catbotdata.requireddata['server-id']).roles,
                                                      id=catbotdata.requireddata['tier-2-roles'][0]),
@@ -1666,4 +1695,5 @@ modqueue = Modtools('results.tsv', 'archives.tsv')
 catculator = catunits_catbot.Catunits()
 catbotdata = Data_catbot.defFromFile()
 stagedata = stagedata_catbot.Stagedata(enemyculator)
+udp = catbot_udp.Catbot_udp('udp.json')
 client.run(catbotdata.requireddata['auth-token'])

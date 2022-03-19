@@ -33,7 +33,7 @@ class Custom_stages:
         try:
             conn = sqlite3.connect('custom_names_for_stages.db')
             cursor = conn.cursor()
-            if cursor.execute('''select count(custom_name) from custom_names where custom_name = ?''', (stage_exact_name,)).fetchone()[0]:
+            if cursor.execute('''select count(custom_name) from custom_names where custom_name = ?''', (stage_exact_name,)).fetchone()[0] > 0:
                 return True
             else:
                 return False
