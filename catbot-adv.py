@@ -739,12 +739,11 @@ async def on_message(message):
             pass
         stageinfo = stagedata.idtostage(stageid)[0]
         stagedetails = stageinfo[3]+'; '+stageinfo[2]+'; ' + stageinfo[1] + '; ' + str(stageinfo[0])
-        print(stageid)
         guides_found = guides.guides_for_stageid(str(stageid))
         if guides_found[0]:
             guide_list = ''
             for i in range(len(guides_found[1])):
-                guide_list += guides_found[1][i][0]+' `'+str(guides_found[1][i][1])+'`'
+                guide_list += '`'+str(guides_found[1][i][1])+'` '+guides_found[1][i][0]
             await message.channel.send("Guides for `"+stagedetails+"` found.\n"+guide_list)
             log_event(message.content,message.author.id,datetime.now(), 1)
             return
