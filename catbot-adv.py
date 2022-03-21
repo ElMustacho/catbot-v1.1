@@ -21,6 +21,7 @@ import custom_stages
 import random
 import math
 import re
+import guides
 
 intents = discord.Intents.all()
 client = discord.Client(intents=intents)
@@ -679,6 +680,176 @@ async def on_message(message):
             pass
         return
 
+    elif message.content.startswith('!guide '):  #TODO what if too long?
+        if not canSend(1, privilegelevel(message.author), message):
+            return
+        if privilegelevel(message.author) < 3 and message.channel.id not in catbotdata.requireddata[
+            'freeforall-channels']:
+            if not isokayifnotclog(message, isADM(message)):
+                return
+        limit = message.content.find(';')
+        if limit == -1:
+            limit = len(message.content)
+        s_string = str(message.content)
+        if s_string[len(s_string) - 1] != ';':
+            s_string += ';'
+        stagestring = s_string[s_string.find(' ') + 1:limit]
+        stagelevel = s_string[s_string.find(';') + 2:find_nth(s_string, ';', 2)]
+        categorystring = s_string[find_nth(s_string, ';', 2) + 2:-1]
+        if s_string.count(';') < 2:
+            categorystring = ''
+        if s_string.count(';') < 1:
+            stagelevel = ''
+        if s_string.count(';') > 3:
+            await message.channel.send("Wrong syntax, check again command usage guide.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
+            return
+        stageid = stagedata.getstageid(stagestring.lower(), 5, stagelevel.lower(), categorystring.lower())
+        if stageid == -1:  # too many errors
+            await message.channel.send("That stage doesn't exist.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
+            return
+        elif stageid == -2:  # could not tell between more than 1 stage
+            await message.channel.send("You need to be more specific.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
+            return
+        elif stageid == -3:  # empty intersection
+            await message.channel.send("The combination of the stage, map and category produces no result.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
+            return
+        elif stageid is None:
+            await message.channel.send("Catbot is confused and doesn't know what happened.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
+            return
+        try:  # enter here if stage not found AND there were multiple close enoughs that are equally likely
+            if len(stageid) > 1:
+                str_to_send = "I couldn't find the stage. Here is some close enough."
+                if len(stageid[0]) > 0:
+                    str_to_send += "\n**Actual names:**"
+                    for line in stageid[0]:
+                        str_to_send += '\n'+line[0]+'; '+line[1]+'; '+line[2]+'; '+str(line[3])
+                if len(stageid[1]) > 0:
+                    str_to_send += '\n**Custom names only:**'
+                    for line in stageid[1]:
+                        str_to_send += '\n'+line[0]
+                await message.channel.send(str_to_send)
+                log_event(message.content, message.author.id, datetime.now(), 0)
+                return
+        except Exception as E:
+            pass
+        stageinfo = stagedata.idtostage(stageid)[0]
+        stagedetails = stageinfo[3]+'; '+stageinfo[2]+'; ' + stageinfo[1] + '; ' + str(stageinfo[0])
+        print(stageid)
+        guides_found = guides.guides_for_stageid(str(stageid))
+        if guides_found[0]:
+            guide_list = ''
+            for i in range(len(guides_found[1])):
+                guide_list += guides_found[1][i][0]+' `'+str(guides_found[1][i][1])+'`'
+            await message.channel.send("Guides for `"+stagedetails+"` found.\n"+guide_list)
+            log_event(message.content,message.author.id,datetime.now(), 1)
+            return
+        await message.channel.send("Guides for `"+stagedetails+"` not found.\nCatbot wishes to say the following: "+str(guides_found[1]))
+        log_event(message.content, message.author.id, datetime.now(), -1)
+        return
+
+    elif message.content.startswith('!removeguide '):
+        if not canSend(4, privilegelevel(message.author), message):
+            return
+
+        try:
+            guide_id = int(message.content[message.content.find(' '):])
+        except Exception as E:
+            await message.channel.send('Not a valid id.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
+            return
+        maybe_guide = guides.get_guide_from_id(guide_id)
+        if isinstance(maybe_guide, Exception):
+            await message.channel.send('Problems with the database: '+str(maybe_guide))
+            log_event(message.content, message.author.id, datetime.now(), -1)
+            return
+        elif maybe_guide is None:
+            await message.channel.send('No such guide exists.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
+            return
+        stageinfo = stagedata.idtostage(maybe_guide[1])[0]
+        stagedetails = stageinfo[3] + '; ' + stageinfo[2] + '; ' + stageinfo[1] + '; ' + str(stageinfo[0])
+        sent_message = await message.channel.send(
+            'The guide `' + maybe_guide[2] + '` is going to be removed from the stage `' + stagedetails + '`, is that okay?')
+        await sent_message.add_reaction('✅')
+
+        def check(reaction_received, user_that_sent):
+            return user_that_sent == message.author and str(
+                reaction_received.emoji) == '✅' and reaction_received.message.id == sent_message.id
+
+        try:
+            reaction, user = await client.wait_for('reaction_add', timeout=15.0, check=check)
+        except asyncio.TimeoutError:
+            try:
+                await sent_message.clear_reactions()
+            except Exception:  # we can't remove reactions, not a big deal
+                pass
+        else:
+            response = guides.remove_guide(str(maybe_guide[0]))
+            await message.channel.send(str(response))
+            if response == 'Deleted guide.':
+                log_event(message.content, message.author.id, datetime.now(), 1)
+            else:
+                log_event(message.content, message.author.id, datetime.now(), -1)
+        try:
+            await sent_message.clear_reactions()
+        except Exception as E:
+            pass
+        return
+
+    elif message.content.startswith('!addguide '):
+        if not canSend(4, privilegelevel(message.author), message):
+            return
+        stage_id = message.content[message.content.find(' ') + 1:message.content.find(';')]
+        guide = message.content[message.content.find(';')+2:]
+        try:
+            stage_id = int(stage_id)
+        except Exception as TypeError:
+            await message.channel.send('Wrong value, I need an integer value that points to a specific stage.')
+            log_event(message.content, message.author.id, datetime.now(), -1)
+            return
+        stageinfo = stagedata.idtostage(stage_id)
+        if len(stageinfo)<1:
+            await message.channel.send("The stage code wasn't valid.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
+            return
+        if len(guide)<20:
+            await message.channel.send("That guide is too short.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
+            return
+        stageinfo_data = str(stageinfo[0][3]) + '; ' + str(stageinfo[0][2]) + '; ' + str(stageinfo[0][1]) + '; ' + str(
+            stageinfo[0][0])
+        sent_message = await message.channel.send(
+            'The guide `' + guide + '` is going to be assigned for the stage `' + stageinfo_data + '`, is that okay?')
+        await sent_message.add_reaction('✅')
+
+        def check(reaction_received, user_that_sent):
+            return user_that_sent == message.author and str(
+                reaction_received.emoji) == '✅' and reaction_received.message.id == sent_message.id
+
+        try:
+            reaction, user = await client.wait_for('reaction_add', timeout=15.0, check=check)
+        except asyncio.TimeoutError:
+            try:
+                await sent_message.clear_reactions()
+            except Exception:  # we can't remove reactions, not a big deal
+                pass
+        else:
+            response = guides.add_guide(stage_id, guide)
+            await message.channel.send(str(response))
+            if response == 'Added guide.':
+                log_event(message.content, message.author.id, datetime.now(), 1)
+            else:
+                log_event(message.content, message.author.id, datetime.now(), -1)
+        try:
+            await sent_message.clear_reactions()
+        except Exception as E:
+            pass
+        return
 
     elif message.content.startswith('!whereis '):
         if not canSend(1, privilegelevel(message.author), message):
@@ -1368,7 +1539,6 @@ async def on_message(message):
         else:
             await message.channel.send("User was already on thin ice!")
             return
-
 
     elif message.content.startswith('!remove_thin_ice '):
         if not canSend(5, privilegelevel(message.author), message):

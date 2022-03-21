@@ -268,7 +268,6 @@ SELECT DISTINCT stages.stage, stages.category, stages.level, stages.stageid from
     def whereisthenemymonthly(self, enemycode, name, name2="", name3="", enemycode1="", enemycode2=""): # todo refactor to ignore name
         with sqlite3.connect('stages.db') as conn:
             cursor = conn.cursor()
-            results = None
             if name2 != '':
                 if name3 != '':
                     tuple = (str(enemycode[0][0]), str(enemycode1[0][0]), str(enemycode2[0][0]))
