@@ -743,7 +743,7 @@ async def on_message(message):
         if guides_found[0]:
             guide_list = ''
             for i in range(len(guides_found[1])):
-                guide_list += '`'+str(guides_found[1][i][1])+'` '+guides_found[1][i][0]
+                guide_list += '`'+str(guides_found[1][i][1])+'` '+guides_found[1][i][0] + '\n'
             await message.channel.send("Guides for `"+stagedetails+"` found.\n"+guide_list)
             log_event(message.content,message.author.id,datetime.now(), 1)
             return

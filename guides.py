@@ -52,7 +52,7 @@ def remove_guide(guide_id):
         conn = sqlite3.connect('guides.db')
         cursor = conn.cursor()
         if cursor.execute('''select count(guide) from guides where id = ?''', (guide_id,)).fetchone()[0]:
-            cursor.execute('''delete from guides where guide=?;''', (guide_id,))
+            cursor.execute('''delete from guides where id=?;''', (guide_id,))
             conn.commit()
             return "Deleted guide."
         else:
