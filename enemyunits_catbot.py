@@ -236,7 +236,7 @@ class Enemyunits:
             enemyEmbed.add_field(name='Offensive abilities', value=offensive, inline=True)
         defensive = ''
         if enemy[34] > 0:  # survive
-            defensive += 'Survive ' + str(round(int(enemy[34]))) + '%, '
+            defensive += 'Survive ' + str(enemy[34]) + '%, '
         if enemy[37] > 0:  # wave immune
             defensive += 'Wave immune, '
         if enemy[39] > 0:  # knockback immune
@@ -259,6 +259,8 @@ class Enemyunits:
             defensive += "It's a base, "
         if enemy[64] > 0:  # has a barrier
             defensive += 'Has a ' + str(int(enemy[64])) + 'hp barrier, '
+        if enemy[85] > 0:  # surge immunity
+            defensive += "Surge immune, "
         if enemy[70] > 0:  # resists warp (never used)
             defensive += 'Immune to warp, '
         if enemy[77] > 0:  # dodge

@@ -680,7 +680,7 @@ async def on_message(message):
             pass
         return
 
-    elif message.content.startswith('!guide '):  #TODO what if too long?
+    elif message.content.startswith('!sg '):  #TODO what if too long?
         if not canSend(1, privilegelevel(message.author), message):
             return
         if privilegelevel(message.author) < 3 and message.channel.id not in catbotdata.requireddata[
