@@ -260,6 +260,11 @@ class Catunits:
             misc_abilities += 'Eva Killer, '
         if cat[54] > 0:  # witch killer
             misc_abilities += 'Witch Killer, '
+        if cat[105] > 0:  # target wild
+            misc_abilities += 'Wild Killer, '
+        if cat[106] > 0:  # wild dodge
+            misc_abilities += 'Wild dodge ' + str(round(int(cat[106]))) + '% (' + str(round(int(cat[107]) / 30, 2)) + 's), '
+
         misc_abilities = misc_abilities[:-2]
         atkroutine = str(round(int(cat[13])))
         if cat[63] > 0:  # first attack applies effects
