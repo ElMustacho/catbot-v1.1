@@ -118,8 +118,8 @@ class Catunits:
                 second_range_begin = str(int(cat[100]))
                 second_range_end = str(int(cat[100] + cat[101]))
 
-                leftrange = str(max(round(int(cat[44]), 0), round(int(cat[44] + cat[45]))))
-                rightrange = str(min(round(int(cat[44]), 0), round(int(cat[44] + cat[45]))))
+                leftrange = str(min(round(int(cat[44]), 0), round(int(cat[44] + cat[45]))))
+                rightrange = str(max(round(int(cat[44]), 0), round(int(cat[44] + cat[45]))))
                 rangestr += leftrange + ' to ' + rightrange + ' | ' + second_range_begin + ' to ' + second_range_end + '; stands at ' + str(
                     round(int(cat[5])))
 
@@ -130,8 +130,8 @@ class Catunits:
                 third_range_begin = str(int(cat[103]))
                 third_range_end = str(int(cat[103] + cat[104]))
 
-                leftrange = str(max(round(int(cat[44]), 0), round(int(cat[44] + cat[45]))))
-                rightrange = str(min(round(int(cat[44]), 0), round(int(cat[44] + cat[45]))))
+                leftrange = str(min(round(int(cat[44]), 0), round(int(cat[44] + cat[45]))))
+                rightrange =  str(max(round(int(cat[44]), 0), round(int(cat[44] + cat[45]))))
                 rangestr += leftrange + ' to ' + rightrange + ' | ' + second_range_begin + ' to ' + second_range_end + ' | ' + third_range_begin + ' to ' + third_range_end + '; stands at ' + str(
                     round(int(cat[5])))
 
@@ -630,6 +630,9 @@ class Catunits:
             unit[95] += first_param
         elif talent_to_apply == 79:  # maybe soul killer
             unit[98] |= 1
+        elif talent_to_apply == 80:  # curse
+            unit[92] += first_param
+            unit[93] += second_param
         return [unit, extra_param]
 
     def get_talents_by_id(self, unit_id):

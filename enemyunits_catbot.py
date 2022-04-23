@@ -158,8 +158,8 @@ class Enemyunits:
                 second_range_begin = str(int(enemy[96]))
                 second_range_end = str(int(enemy[96] + enemy[97]))
 
-                leftrange = str(max(round(int(enemy[35]), 0), round(int(enemy[35] + enemy[36]))))
-                rightrange = str(min(round(int(enemy[35]), 0), round(int(enemy[35] + enemy[36]))))
+                leftrange = str(min(round(int(enemy[35]), 0), round(int(enemy[35] + enemy[36]))))
+                rightrange = str(max(round(int(enemy[35]), 0), round(int(enemy[35] + enemy[36]))))
                 rangestr += leftrange + ' to ' + rightrange + ' | ' + second_range_begin + ' to ' + second_range_end + '; stands at ' + str(round(int(enemy[5])))
 
             elif enemy[95] > 0 and enemy[98] > 0:  # multiarea 2
@@ -169,8 +169,8 @@ class Enemyunits:
                 third_range_begin = str(int(enemy[99]))
                 third_range_end = str(int(enemy[99] + enemy[100]))
 
-                leftrange = str(max(round(int(enemy[35]), 0), round(int(enemy[35] + enemy[36]))))
-                rightrange = str(min(round(int(enemy[35]), 0), round(int(enemy[35] + enemy[36]))))
+                leftrange = str(min(round(int(enemy[35]), 0), round(int(enemy[35] + enemy[36]))))
+                rightrange = str(max(round(int(enemy[35]), 0), round(int(enemy[35] + enemy[36]))))
                 rangestr += leftrange + ' to ' + rightrange + ' | ' + second_range_begin + ' to ' + second_range_end + ' | ' + third_range_begin + ' to ' + third_range_end + '; stands at ' + str(round(int(enemy[5])))
 
             else:
