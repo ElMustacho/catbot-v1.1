@@ -288,9 +288,9 @@ class Enemyunits:
         enemyEmbed.add_field(name='Attack timings', value=atkroutine, inline=True)
         misc_txt=''
         if int(enemy[94]) > 0:  # is a baron
-            misc_txt += "It's a colossal unit, "
+            misc_txt += "It's a Colossal unit, "
         if int(enemy[101]) > 0:  # is a wild enemy
-            misc_txt += "It's a wild unit, "
+            misc_txt += "It's a Behemoth unit, "
         misc_txt = misc_txt[:-2]
         if len(misc_txt) > 3:  # is a baron
             enemyEmbed.add_field(name='Miscellaneous', value=misc_txt, inline=True)

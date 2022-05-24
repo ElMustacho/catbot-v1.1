@@ -260,10 +260,10 @@ class Catunits:
             misc_abilities += 'Eva Killer, '
         if cat[54] > 0:  # witch killer
             misc_abilities += 'Witch Killer, '
-        if cat[105] > 0:  # target wild
-            misc_abilities += 'Wild Killer, '
-        if cat[106] > 0:  # wild dodge
-            misc_abilities += 'Wild dodge ' + str(round(int(cat[106]))) + '% (' + str(round(int(cat[107]) / 30, 2)) + 's), '
+        if cat[105] > 0:  # target Behemoth
+            misc_abilities += 'Behemoth Slayer, '
+        if cat[106] > 0:  # Behemoth dodge
+            misc_abilities += 'Behemoth dodge ' + str(round(int(cat[106]))) + '% (' + str(round(int(cat[107]) / 30, 2)) + 's), '
 
         misc_abilities = misc_abilities[:-2]
         atkroutine = str(round(int(cat[13])))
@@ -643,7 +643,7 @@ class Catunits:
         except sqlite3.OperationalError:  # database not found
             return "Database for cat comboes not found."
         if len(results) == 0:
-            return str(self.getnamebycode(unit_id+2)) + " doesn't have talents."
+            return "The given unit doesn't have talents."
             
         return results
 

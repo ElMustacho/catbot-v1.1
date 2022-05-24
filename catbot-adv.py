@@ -1369,7 +1369,7 @@ async def on_message(message):
             levelparams = message.content[find_nth(message.content, ';', 2) + 1:].split(';')
             attempt = [catch(lambda: int(talent_level)) if isinstance(catch(lambda: int(talent_level)), int) else 10 for
                        talent_level in levelparams]
-            attempt = attempt[:5]
+            attempt = attempt[:6]
         if cat[0] == "no result":
             await message.channel.send("Gibberish.")
             log_event(message.content, message.author.id, datetime.now(), -1)

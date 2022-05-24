@@ -133,6 +133,7 @@ class Stagedata:
         if len(stagetimed) > 0:
             decsstring = decsstring[:-2] + '\n'
         decsstring += 'Difficulties ' + stageinfo[0][14]
+        decsstring += ', Respawns ' + stageinfo[0][16] + '-' + stageinfo[0][17]
         stageEmbed = emb(title=stageinfo[0][3] + '; ' + stageinfo[0][2] + '; ' + stageinfo[0][1] + '; '+str(stageid), description=decsstring,
                          color=0x009B77)
         stageEmbed.set_author(name='Cat Bot')
@@ -258,11 +259,12 @@ SELECT DISTINCT stages.stage, stages.category, stages.level, stages.stageid from
                     answer += '\n**' + stage[1] + '**; '
                 category = stage[1]
                 answer += stage[0] + ' - '
-                if len(answer) > 1950:
+                if len(answer) > 1900:
                     answer += '*and other stages*   '
                     break
             answer = answer[:-3]
             answer += '.'
+            print(answer, '\n',len(answer))
             return answer
 
     def whereisthenemymonthly(self, enemycode, name, name2="", name3="", enemycode1="", enemycode2=""): # todo refactor to ignore name
