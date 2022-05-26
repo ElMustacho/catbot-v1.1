@@ -133,6 +133,7 @@ class Stagedata:
         if len(stagetimed) > 0:
             decsstring = decsstring[:-2] + '\n'
         decsstring += 'Difficulties ' + stageinfo[0][14]
+        decsstring += ', Respawns ' + str(stageinfo[0][16]) + 'f - ' + str(stageinfo[0][17]) + 'f'
         stageEmbed = emb(title=stageinfo[0][3] + '; ' + stageinfo[0][2] + '; ' + stageinfo[0][1] + '; '+str(stageid), description=decsstring,
                          color=0x009B77)
         stageEmbed.set_author(name='Cat Bot')
@@ -193,12 +194,11 @@ class Stagedata:
             conn.close()
             return results
 
-    def whereistheenemy(self, enemycode, name, name2="", name3="", enemycode1="", enemycode2=""): # todo refactor to ignore name
+    def whereistheenemy(self, enemycode, enemycode1=None, enemycode2=None):
         with sqlite3.connect('stages.db') as conn:
             cursor = conn.cursor()
-            results = None
-            if name2 != '':
-                if name3 != '':
+            if enemycode1 is not None:
+                if enemycode2 is not None:
                     tuple = (str(enemycode[0][0]), str(enemycode1[0][0]), str(enemycode2[0][0]))
                     results = cursor.execute(
                         '''SELECT DISTINCT stages.stage, stages.category, stages.level, stages.stageid from units join stages on units.stageid = stages.stageid where enemycode=? 
@@ -225,24 +225,51 @@ SELECT DISTINCT stages.stage, stages.category, stages.level, stages.stageid from
                 return results[0]
             answer = "Stages found: "  #todo make this nicer, text wise, in respect to the number of units
             category = ''
+            post_processed_stages = []
+            last_stage = [-1,-1,-1,-1]
+            first_good_stage = -1
+            consecutive_stages = 0
+            # collapse barons into less stages
             for stage in results:
+                if last_stage[3] == int(stage[3]) - 1:  # can compress this stage
+                    if stage[3] // 100000==24 or stage[3] // 100000==27:  # barons and collab barons only
+                        if first_good_stage == -1:
+                            consecutive_stages+=1
+                        else:
+                            first_good_stage = stage
+                    else:  # we shouldn't compress anymore
+                        if consecutive_stages > 0:  # we might end up here in case of consecutive stages that really have nothing to do with the neighboor
+                            first_good_stage = -1
+                            post_processed_stages[-1][0] += ' __and the next '+str(consecutive_stages)+' stages__'
+                            consecutive_stages = 0
+                        post_processed_stages.append(list(stage))
+                else:
+                    if consecutive_stages > 0:  # stop compressing
+                        first_good_stage = -1
+                        post_processed_stages[-1][0] += ' __and the next ' + str(consecutive_stages) + ' stages__'
+                        consecutive_stages = 0
+                    post_processed_stages.append(list(stage))
+                last_stage = stage
+            if consecutive_stages > 0:  # stop compressing, might happen if last stage could have been compressed
+                post_processed_stages[-1][0] += ' __and the next ' + str(consecutive_stages) + ' stages__'
+            for stage in post_processed_stages:
                 if stage[1] != category:
                     if answer.endswith(' - '):
                         answer = answer[0:-3]
                     answer += '\n**' + stage[1] + '**; '
                 category = stage[1]
                 answer += stage[0] + ' - '
-                if len(answer) > 1950:
+                if len(answer) > 1900:
                     answer += '*and other stages*   '
                     break
             answer = answer[:-3]
             answer += '.'
+            print(answer, '\n',len(answer))
             return answer
 
     def whereisthenemymonthly(self, enemycode, name, name2="", name3="", enemycode1="", enemycode2=""): # todo refactor to ignore name
         with sqlite3.connect('stages.db') as conn:
             cursor = conn.cursor()
-            results = None
             if name2 != '':
                 if name3 != '':
                     tuple = (str(enemycode[0][0]), str(enemycode1[0][0]), str(enemycode2[0][0]))
@@ -342,8 +369,9 @@ SELECT DISTINCT stages.stage, stages.category, stages.level from units join stag
     def does_name_exist(self, name):
         with sqlite3.connect('stages.db') as conn:
             cursor = conn.cursor()
-            results = cursor.execute('select count(*) from stages where name = ?', (name,)).fetchone()
-            return results
+            results = cursor.execute('select count(*) from stages where stage = ?', (name,)).fetchone()
+            if results[0] > 0: return True
+            return False
 
     def idtoenemies(self, id_f):
         with sqlite3.connect('stages.db') as conn:

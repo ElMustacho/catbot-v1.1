@@ -16,7 +16,7 @@ class Enemyunits:
 
     def namefromcode(self, enemycode):
         returnthis = self._enemies.iloc[enemycode]
-        returnthis = returnthis.iat[96]
+        returnthis = returnthis.iat[-2]
         return returnthis
 
     def getrow(self, row):
@@ -113,11 +113,11 @@ class Enemyunits:
         return locator
 
     def getstatsembed(self, enemy, magnification, mag2=None):
-        backswing = int(enemy[95])-max(enemy[12],enemy[57],enemy[58])
+        backswing = int(enemy[-3])-max(enemy[12],enemy[57],enemy[58])
         real_tba = max(enemy[12], enemy[57], enemy[58]) + max(backswing, enemy[4]*2-1)
         if mag2 is None:
             mag2 = magnification
-        title = 'Stats of ' + str(enemy[96])
+        title = 'Stats of ' + str(enemy[-2])
         enemyEmbed = emb(description=title, color=0x00ff00)
         enemyEmbed.set_author(name='Cat Bot')
         magstring = str(int(magnification*100)) + '%'
@@ -144,6 +144,8 @@ class Enemyunits:
                 damagekind += ', long range'
             elif enemy[36] < 0:
                 damagekind += ', omnistrike'
+        if enemy[95] > 0 or enemy[98] > 0:  # multiarea attack
+            damagekind += ', multiarea'
         damagetype = 'Damage (' + damagekind + ') - DPS'
         enemyEmbed.add_field(name=damagetype, value=dmg + dps, inline=True)
         tba = str(round(int(real_tba) / 30, 2))
@@ -151,10 +153,30 @@ class Enemyunits:
                            inline=True)
         enemyEmbed.add_field(name='Cash Awarded', value=str(round(int(enemy[6]*3.95), 0)), inline=True)
         rangestr = ''
-        if ',' in damagekind:  # it's long range or omni
-            leftrange = str(max(round(int(enemy[35]), 0), round(int(enemy[35] + enemy[36]))))
-            rightrange = str(min(round(int(enemy[35]), 0), round(int(enemy[35] + enemy[36]))))
-            rangestr += leftrange + ' to ' + rightrange + '; stands at ' + str(round(int(enemy[5])))
+        if ',' in damagekind:  # it's long range or omni or multi
+            if enemy[95] > 0 and enemy[98] == 0:  # multiarea 1, gods this stuff is a mess
+                second_range_begin = str(int(enemy[96]))
+                second_range_end = str(int(enemy[96] + enemy[97]))
+
+                leftrange = str(min(round(int(enemy[35]), 0), round(int(enemy[35] + enemy[36]))))
+                rightrange = str(max(round(int(enemy[35]), 0), round(int(enemy[35] + enemy[36]))))
+                rangestr += leftrange + ' to ' + rightrange + ' | ' + second_range_begin + ' to ' + second_range_end + '; stands at ' + str(round(int(enemy[5])))
+
+            elif enemy[95] > 0 and enemy[98] > 0:  # multiarea 2
+                second_range_begin = str(int(enemy[96]))
+                second_range_end = str(int(enemy[96] + enemy[97]))
+
+                third_range_begin = str(int(enemy[99]))
+                third_range_end = str(int(enemy[99] + enemy[100]))
+
+                leftrange = str(min(round(int(enemy[35]), 0), round(int(enemy[35] + enemy[36]))))
+                rightrange = str(max(round(int(enemy[35]), 0), round(int(enemy[35] + enemy[36]))))
+                rangestr += leftrange + ' to ' + rightrange + ' | ' + second_range_begin + ' to ' + second_range_end + ' | ' + third_range_begin + ' to ' + third_range_end + '; stands at ' + str(round(int(enemy[5])))
+
+            else:
+                leftrange = str(max(round(int(enemy[35]), 0), round(int(enemy[35] + enemy[36]))))
+                rightrange = str(min(round(int(enemy[35]), 0), round(int(enemy[35] + enemy[36]))))
+                rangestr += leftrange + ' to ' + rightrange + '; stands at ' + str(round(int(enemy[5])))
         else:  # otherwise only range is needed
             rangestr += str(round(int(enemy[5])))
         enemyEmbed.add_field(name='Range', value=rangestr, inline=True)
@@ -214,7 +236,7 @@ class Enemyunits:
             enemyEmbed.add_field(name='Offensive abilities', value=offensive, inline=True)
         defensive = ''
         if enemy[34] > 0:  # survive
-            defensive += 'Survive ' + str(round(int(enemy[34]))) + '%, '
+            defensive += 'Survive ' + str(enemy[34]) + '%, '
         if enemy[37] > 0:  # wave immune
             defensive += 'Wave immune, '
         if enemy[39] > 0:  # knockback immune
@@ -237,6 +259,8 @@ class Enemyunits:
             defensive += "It's a base, "
         if enemy[64] > 0:  # has a barrier
             defensive += 'Has a ' + str(int(enemy[64])) + 'hp barrier, '
+        if enemy[85] > 0:  # surge immunity
+            defensive += "Surge immune, "
         if enemy[70] > 0:  # resists warp (never used)
             defensive += 'Immune to warp, '
         if enemy[77] > 0:  # dodge
@@ -262,8 +286,14 @@ class Enemyunits:
                 atkroutine += 'f / ' + str(round(int(enemy[58])))
         atkroutine += 'f / ' + str(int(backswing)) + 'f'
         enemyEmbed.add_field(name='Attack timings', value=atkroutine, inline=True)
-        if int(enemy[94]) > 1:  # is a baron
-            enemyEmbed.add_field(name='Miscellaneous', value="It's a baron unit", inline=True)
+        misc_txt=''
+        if int(enemy[94]) > 0:  # is a baron
+            misc_txt += "It's a Colossal unit, "
+        if int(enemy[101]) > 0:  # is a wild enemy
+            misc_txt += "It's a Behemoth unit, "
+        misc_txt = misc_txt[:-2]
+        if len(misc_txt) > 3:  # is a baron
+            enemyEmbed.add_field(name='Miscellaneous', value=misc_txt, inline=True)
         return enemyEmbed
 
     def givenewname(self, enemycode, newname):
@@ -279,7 +309,7 @@ class Enemyunits:
             pickle.dump(self._customnames, f, pickle.DEFAULT_PROTOCOL)
 
     def getnames(self, enemy, enemycode):
-        name = enemy[88]
+        name = enemy[-2]
         allnames = 'The custom names of ' + name + ' are: '
         for key, value in self._customnames.items():
             if value == enemycode:

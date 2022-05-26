@@ -30,7 +30,7 @@ class Catunits:
     def getnamebycode(self, id):
         returned = None
         try:
-            returned = self._cats.iloc[id][101]
+            returned = self._cats.iloc[id][-4]
         except IndexError:
             pass
         return returned
@@ -49,9 +49,9 @@ class Catunits:
 
     def getstatsEmbed(self, cat, level, unitcode, extraparam = []):  #todo made up stats should be accessed from right
         isinline = True
-        title = 'Stats of ' + cat[99]
-        if len(cat[101]) > 1:
-            title = 'Stats of ' + cat[101]
+        title = 'Stats of ' + cat[-6]
+        if len(cat[-6]) > 1:
+            title = 'Stats of ' + cat[-4]
         whichform = unitcode
         if whichform % 3 == 0:
             title += ' - First form'
@@ -63,20 +63,20 @@ class Catunits:
         catEmbed = emb(description=title, color=0xff3300)
         catEmbed.set_author(name='Cat Bot')
         rarity = ''
-        if cat[100] == 0:
+        if cat[-5] == 0:
             rarity = 'Normal Rare'
-        elif cat[100] == 1:
+        elif cat[-5] == 1:
             rarity = 'Special Rare'
-        elif cat[100] == 2:
+        elif cat[-5] == 2:
             rarity = 'Rare'
-        elif cat[100] == 3:
+        elif cat[-5] == 3:
             rarity = 'Super Rare'
-        elif cat[100] == 4:
+        elif cat[-5] == 4:
             rarity = 'Uber Super Rare'
-        elif cat[100] == 5:
+        elif cat[-5] == 5:
             rarity = 'Legend Rare'
         catEmbed.add_field(name='Level - Rarity', value=str(level) + ' - ' + rarity, inline=isinline)
-        lvmult = float(self.levelMultiplier(cat[100], unitcode, level))
+        lvmult = float(self.levelMultiplier(cat[-5], unitcode, level))
         lives_once = ''
         if cat[58] > 0:
             lives_once = ' (hits once before dying)'
@@ -87,7 +87,7 @@ class Catunits:
         else:
             talent_atk = 1
         dmg = str(round(math.floor(math.floor(cat[3] * lvmult) * max(1, talent_atk))))
-        tba = round(int(cat[103]) / 30, 2)
+        tba = round(int(cat[-2]) / 30, 2)
         if int(cat[59]) > 0:
             dmg += '/' + str(round(math.floor(math.floor(cat[59] * lvmult) * max(1, talent_atk))))
         if int(cat[60]) > 0:
@@ -104,6 +104,8 @@ class Catunits:
                 damagekind += ', long range'
             elif cat[45] < 0:
                 damagekind += ', omnistrike'
+        if cat[99] > 0 or cat[102] > 0:  # multiarea attack
+            damagekind += ', multiarea'
         damagetype = 'Damage (' + damagekind + ') - DPS'
         catEmbed.add_field(name=damagetype, value=dmg + dps, inline=isinline)
         catEmbed.add_field(name='Speed - Attack Frequency', value=str(round(int(cat[2]), 0)) + ' - ' + str(tba) + 's',
@@ -112,9 +114,32 @@ class Catunits:
             round(max(((cat[7] * 2 - 264) / 30), 2), 2)) + 's', inline=isinline)
         rangestr = ''
         if ',' in damagekind:  # it's long range or omni
-            leftrange = str(max(round(int(cat[44]), 0), round(int(cat[44] + cat[45]))))
-            rightrange = str(min(round(int(cat[44]), 0), round(int(cat[44] + cat[45]))))
-            rangestr += leftrange + ' to ' + rightrange + '; stands at ' + str(round(int(cat[5])))
+            if cat[99] > 0 and cat[102] == 0:  # multiarea 1, gods this stuff is a mess
+                second_range_begin = str(int(cat[100]))
+                second_range_end = str(int(cat[100] + cat[101]))
+
+                leftrange = str(min(round(int(cat[44]), 0), round(int(cat[44] + cat[45]))))
+                rightrange = str(max(round(int(cat[44]), 0), round(int(cat[44] + cat[45]))))
+                rangestr += leftrange + ' to ' + rightrange + ' | ' + second_range_begin + ' to ' + second_range_end + '; stands at ' + str(
+                    round(int(cat[5])))
+
+            elif cat[99] > 0 and cat[102] > 0:  # multiarea 2
+                second_range_begin = str(int(cat[100]))
+                second_range_end = str(int(cat[100] + cat[101]))
+
+                third_range_begin = str(int(cat[103]))
+                third_range_end = str(int(cat[103] + cat[104]))
+
+                leftrange = str(min(round(int(cat[44]), 0), round(int(cat[44] + cat[45]))))
+                rightrange =  str(max(round(int(cat[44]), 0), round(int(cat[44] + cat[45]))))
+                rangestr += leftrange + ' to ' + rightrange + ' | ' + second_range_begin + ' to ' + second_range_end + ' | ' + third_range_begin + ' to ' + third_range_end + '; stands at ' + str(
+                    round(int(cat[5])))
+
+            else:
+
+                leftrange = str(max(round(int(cat[44]), 0), round(int(cat[44] + cat[45]))))
+                rightrange = str(min(round(int(cat[44]), 0), round(int(cat[44] + cat[45]))))
+                rangestr += leftrange + ' to ' + rightrange + '; stands at ' + str(round(int(cat[5])))
         else:  # otherwise only range is needed
             rangestr += str(round(int(cat[5])))
         catEmbed.add_field(name='Range', value=rangestr, inline=isinline)
@@ -172,8 +197,8 @@ class Catunits:
             offensivestr += 'Curses ' + str(round(int(cat[92]))) + '% for ' + str(round(cat[93] / 30, 2)) + 's, '
         if cat[95] > 0:  # shield breaks
             offensivestr += 'Shield Piercing '+str(int(cat[95]))+'%, '
-        if cat[97] > 0:  # strong versus barons
-            offensivestr += 'Strong versus barons, '
+        if cat[98] > 0:  # corpse killer
+            offensivestr += 'Soulstrike, '
         offensivestr = offensivestr[:-2]
         if len(offensivestr) > 3:
             catEmbed.add_field(name='Offensive abilities', value=offensivestr, inline=isinline)
@@ -228,6 +253,19 @@ class Catunits:
         defensivestr = defensivestr[:-2]
         if len(defensivestr) > 3:
             catEmbed.add_field(name='Defensive abilities', value=defensivestr, inline=isinline)
+        misc_abilities = ''
+        if cat[97] > 0:  # colossus killer
+            misc_abilities += 'Colossus Killer, '
+        if cat[77] > 0:  # eva killer
+            misc_abilities += 'Eva Killer, '
+        if cat[54] > 0:  # witch killer
+            misc_abilities += 'Witch Killer, '
+        if cat[105] > 0:  # target Behemoth
+            misc_abilities += 'Behemoth Slayer, '
+        if cat[106] > 0:  # Behemoth dodge
+            misc_abilities += 'Behemoth dodge ' + str(round(int(cat[106]))) + '% (' + str(round(int(cat[107]) / 30, 2)) + 's), '
+
+        misc_abilities = misc_abilities[:-2]
         atkroutine = str(round(int(cat[13])))
         if cat[63] > 0:  # first attack applies effects
             atkroutine = '__**' + atkroutine + '**__'
@@ -241,8 +279,10 @@ class Catunits:
                 atkroutine += 'f / __**' + str(round(int(cat[62]))) + '**__'
             else:
                 atkroutine += 'f / ' + str(round(int(cat[62])))
-        atkroutine += 'f / ' + str(round(int(cat[102]))) + 'f'  # backswing
+        atkroutine += 'f / ' + str(round(int(cat[-3]))) + 'f'  # backswing
         catEmbed.add_field(name='Attack timings', value=atkroutine, inline=isinline)
+        if len(misc_abilities) > 3:
+            catEmbed.add_field(name='Miscellaneous abilities', value=misc_abilities, inline=isinline)
         return catEmbed
 
     def closeEnough(self, strToCmp, errors):
@@ -580,14 +620,19 @@ class Catunits:
         elif talent_to_apply == 75:  # knockback alien
             unit[24] += first_param
             unit[21] |= 1
-        elif talent_to_apply == 76:
+        elif talent_to_apply == 76:  # freeze metal
             unit[25] += first_param
             unit[26] += second_param
             unit[18] |= 1
-        elif talent_to_apply == 77:
+        elif talent_to_apply == 77:  # target aku
             unit[96] |= 1
-        elif talent_to_apply == 78:
+        elif talent_to_apply == 78:  # shield pierce
             unit[95] += first_param
+        elif talent_to_apply == 79:  # maybe soul killer
+            unit[98] |= 1
+        elif talent_to_apply == 80:  # curse
+            unit[92] += first_param
+            unit[93] += second_param
         return [unit, extra_param]
 
     def get_talents_by_id(self, unit_id):
@@ -598,7 +643,7 @@ class Catunits:
         except sqlite3.OperationalError:  # database not found
             return "Database for cat comboes not found."
         if len(results) == 0:
-            return str(self.getnamebycode(unit_id+2)) + " doesn't have talents."
+            return "The given unit doesn't have talents."
             
         return results
 
