@@ -79,21 +79,20 @@ class Catunits:
         lvmult = float(self.levelMultiplier(cat[-5], unitcode, level))
         lives_once = ''
         if cat[58] > 0:
-            lives_once = ' (hits once before dying)'
+            lives_once = ' (hits once then dies)'
         hpv = str(math.ceil(int(cat[0]) * lvmult)) + ' HP' + lives_once + ' - ' + str(round(int(cat[1]), 0)) + ' KB'
         catEmbed.add_field(name='HP - Knockbacks', value=hpv, inline=isinline)
         if len(extraparam) > 0:
             talent_atk = extraparam[8]
         else:
             talent_atk = 1
-        dmg = str(round(math.floor(math.floor(cat[3] * lvmult) * max(1, talent_atk))))
+        dmg = str(round(math.floor(math.floor(round(cat[3] * (self.levelMultiplierv2(cat[-5],unitcode,level)/100) * 2.5)) * max(1, talent_atk))))
         tba = round(int(cat[-2]) / 30, 2)
         if int(cat[59]) > 0:
-            dmg += '/' + str(round(math.floor(math.floor(cat[59] * lvmult) * max(1, talent_atk))))
+            dmg += '/' + str(round(math.floor(math.floor(round(cat[59] * self.levelMultiplierv2(cat[-5],unitcode,level)/100) * 2.5) * max(1, talent_atk))))
         if int(cat[60]) > 0:
-            dmg += '/' + str(round(math.floor(math.floor(cat[60] * lvmult) * max(1, talent_atk))))
-        dps = ' Damage - ' + str(round(math.floor(math.floor((cat[3]+cat[59]+cat[60]) * lvmult) *
-                                                  max(1, talent_atk))/tba)) + ' DPS'
+            dmg += '/' + str(round(math.floor(math.floor(round(cat[60] * self.levelMultiplierv2(cat[-5],unitcode,level)/100) * 2.5) * max(1, talent_atk))))
+        dps = ' Damage - ' + str(round(30*math.floor(round(int(cat[3]+cat[59]+cat[60]) * self.levelMultiplierv2(cat[-5],unitcode,level)/100) * 2.5 * max(1, talent_atk))/int(cat[-2]))) + ' DPS'
         damagekind = ''
         if cat[12] == 1:
             damagekind += 'area'
@@ -360,6 +359,65 @@ class Catunits:
             if rarity not in [5, 4, 3] and level > 80:
                 toret += float((level - 80) * 0.125)
         return 2 + toret * 2
+
+    def levelMultiplierv2(self, rarity, unitkind, level=0):
+        if unitkind in range(273, 300):
+            isCrazed = True  # this is a crazed/manic unit
+        else:
+            isCrazed = False
+        if unitkind in [75, 76, 77]:
+            isBahamut = True  # this is bahamut cat
+        else:
+            isBahamut = False
+        if unitkind in [1674, 1675, 1676]:
+            isgatyacat = True
+        else:
+            isgatyacat = False
+        multiplier = 20*min(level,20)
+        if level > 20:
+            if isgatyacat:
+                multiplier += 60*min(level-20,10)
+            elif isCrazed:
+                multiplier += 10*min(level-20,10)
+            else:
+                multiplier += 20*min(level-20,10)
+        if level > 30:
+            if isgatyacat:
+                multiplier += 120*min(level-30,10)
+            elif isCrazed:
+                multiplier += 10*min(level-30,10)
+            elif isBahamut:
+                multiplier += 10*min(level-30,10)
+            else:
+                multiplier += 20*min(level-30,10)
+        if level > 40:
+            if isgatyacat:
+                multiplier += 180*min(level-40,10)
+            elif isCrazed:
+                multiplier += 10*min(level-40,10)
+            else:
+                multiplier += 20*min(level-40,10)
+        if level > 50:
+            multiplier += 20*min(level-50,10)
+        if level > 60:
+            if rarity in [5, 4, 3]:
+                multiplier += 5*min(level-60,10)
+            else:
+                multiplier += 10*min(level-60,10)
+        if level > 70:
+            multiplier += 10*min(level-70,10)
+        if level > 80:
+            if rarity in [5, 4, 3]:
+                multiplier += 5*min(level-80,10)
+            else:
+                multiplier += 10*min(level-80,10)
+        if level > 90:
+            if rarity in [5, 4, 3, 2]:
+                multiplier += 5*min(level-90,40)
+            else:
+                multiplier += 10*min(level-90,40)
+        return multiplier+80
+
 
     def cattotriaitpics(self, cat):  # for each trait, add '1' to the string if it has the trait, '0' otherwise
         fstr = ''

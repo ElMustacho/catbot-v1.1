@@ -850,7 +850,7 @@ async def on_message(message):
             pass
         return
 
-    elif message.content.startswith('!whereis '):
+    elif message.content.startswith('!whereis ') or message.content.startswith('!ws ') or message.content.startswith('!wst '):
         if not canSend(1, privilegelevel(message.author), message):
             return
         if privilegelevel(message.author) < 3 and message.channel.id not in catbotdata.requireddata[
@@ -925,7 +925,8 @@ async def on_message(message):
                     log_event(message.content, message.author.id, datetime.now(), -1)
                     return
                 nameunit3 = enemyculator.namefromcode(enemystats3[0][0])
-        list_of_stages=stagedata.whereistheenemy(enemystats1, enemystats2, enemystats3)
+        teleport=message.content.startswith('!wst ')
+        list_of_stages=stagedata.whereistheenemy(enemystats1, enemystats2, enemystats3,teleport)
         if isinstance(list_of_stages, tuple):  #teleport to best result
             stage_id=list_of_stages[3]
             stageinfo = stagedata.idtostage(stage_id)
@@ -945,7 +946,11 @@ async def on_message(message):
             else:
                 sending = "All enemies / " + str(embedtosend.footer.text)
                 embedtosend.set_footer(text=sending)
-            sent_message = await message.channel.send("Only one stage matches the request, here it is.", embed=embedtosend)
+            if teleport:
+                msg_to_send = "Teleport to first result."
+            else:
+                msg_to_send = "Only one stage matches the request, here it is."
+            sent_message = await message.channel.send(msg_to_send, embed=embedtosend)
             if len(stageenemies) < 26:  # no point in showing more enemies, can't react in dms
                 return
             await sent_message.add_reaction('▶')
@@ -1471,10 +1476,14 @@ async def on_message(message):
 - Ask as many questions as you'd like, provided it's about your mute 
 - Ping a moderator (ideally the one who muted you, if you know who it is) to get their attention 
 **Don't:** 
+- Talk to other __muted__ people.
 - Spam ping or mass ping moderators 
 - Ramble about things that aren’t connected to your mute, or shitpost / spam 
 - Uselessly and/or aggressively argue with moderators 
-- Attempt to bypass the mute by leaving and rejoining, using alternative accounts, etc. **This will result in a permanent and unappealable ban.**'''
+- Attempt to bypass the mute by leaving and rejoining, using alternative accounts, etc. **This will result in a permanent and unappealable ban.**
+
+If you misuse the channel, your mute will be **extended**. 
+If you continue to misuse the channel after a mute extension, you will be **banned**.'''
         await message.channel.send(msgtosend)
         await message.delete()
         return
@@ -1619,16 +1628,17 @@ async def on_message(message):
         untrusted = untrusting.get_data()
         old_level = 0
         for line in untrusted:
-            if line[0] == str(user_id.id):
+            if int(line[0]) == user_id.id:
                 old_level = int(line[4])
         time_of_untrust = untrusting.level_to_time(level + old_level)
+        duration='{:} day(s) and {:} hour(s).'.format(time_of_untrust // 86400,time_of_untrust % 86400 // 3600)
         untrusting.add_entry(user_id.id, message.author.id, reason, datetime.now(), level + old_level)
         await serveruser(user_id).add_roles(
             discord.utils.get(client.get_guild(catbotdata.requireddata['server-id']).roles,
                               id=catbotdata.requireddata['untrust-role']))
         await user_id.send(
-            'You have been untrusted for ' + reason + ", you'll receive a message when this action is reversed.")
-        sent_message = await message.channel.send("Told the user about it. React with given button to end now. It's level "+str(level+old_level)+".")
+            'You have been untrusted for `' + reason + "`, with a duration of "+duration)
+        sent_message = await message.channel.send("Told the user about it. React with given button to end now. It's level "+str(level+old_level)+". Lasts "+duration)
 
         await sent_message.add_reaction('❌')
 

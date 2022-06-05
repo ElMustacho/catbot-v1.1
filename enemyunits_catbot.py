@@ -133,7 +133,7 @@ class Enemyunits:
             dmg += '/' + str(math.ceil(int(enemy[55]) * mag2))
         if int(enemy[56]) > 0:
             dmg += '/' + str(math.ceil(int(enemy[56]) * mag2))
-        dps = ' Damage - ' + str(math.ceil(int(enemy[3]+enemy[55]+enemy[56])*mag2*30/real_tba)) + ' DPS'
+        dps = ' Damage - ' + str(math.ceil(((enemy[3]+enemy[55]+enemy[56])*mag2*30/real_tba))) + ' DPS'
         damagekind = ''
         if enemy[11] == 1:
             damagekind += 'area'

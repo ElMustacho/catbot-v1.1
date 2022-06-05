@@ -194,7 +194,7 @@ class Stagedata:
             conn.close()
             return results
 
-    def whereistheenemy(self, enemycode, enemycode1=None, enemycode2=None):
+    def whereistheenemy(self, enemycode, enemycode1=None, enemycode2=None, teleport=False):
         with sqlite3.connect('stages.db') as conn:
             cursor = conn.cursor()
             if enemycode1 is not None:
@@ -221,7 +221,7 @@ SELECT DISTINCT stages.stage, stages.category, stages.level, stages.stageid from
 
             if len(results) == 0:
                 return "No stages found."
-            elif len(results) == 1:  # teleport to best result by using sbid function
+            elif len(results) == 1 or teleport:  # teleport to best result by using sbid function
                 return results[0]
             answer = "Stages found: "  #todo make this nicer, text wise, in respect to the number of units
             category = ''
@@ -264,7 +264,6 @@ SELECT DISTINCT stages.stage, stages.category, stages.level, stages.stageid from
                     break
             answer = answer[:-3]
             answer += '.'
-            print(answer, '\n',len(answer))
             return answer
 
     def whereisthenemymonthly(self, enemycode, name, name2="", name3="", enemycode1="", enemycode2=""): # todo refactor to ignore name
