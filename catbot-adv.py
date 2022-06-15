@@ -310,7 +310,7 @@ async def on_message(message):
         log_event(message.content, message.author.id, datetime.now(), 1)
         return
 
-    elif message.content.startswith('!renamecat'):
+    elif message.content.startswith('!renamecat '):
         if not canSend(4, privilegelevel(message.author), message):
             return
 
@@ -349,6 +349,7 @@ async def on_message(message):
             if response:
                 await message.channel.send('The name ' + message.content[limit + 2:] + ' is now assigned.')
                 log_event(message.content, message.author.id, datetime.now(), 1)
+                return
             else:
                 await message.channel.send('Name was already used.')
                 log_event(message.content, message.author.id, datetime.now(), -1)
@@ -361,7 +362,7 @@ async def on_message(message):
         log_event(message.content, message.author.id, datetime.now(), -1)
         return
 
-    elif message.content.startswith('!renameenemy'):
+    elif message.content.startswith('!renameenemy '):
         if not canSend(4, privilegelevel(message.author), message):
             return
         limit = message.content.find(';')
@@ -1506,10 +1507,10 @@ If you continue to misuse the channel after a mute extension, you will be **bann
             try:
                 await message.delete()
                 await client.get_channel(catbotdata.requireddata['log-channel-id']).send(
-                    message.author.mention + ' failed to use the password. They tried this: ' + textsent)
+                    message.author.mention + ' failed to use the password. They tried this: `' + textsent + '`')
             except discord.errors.NotFound:
                 await client.get_channel(catbotdata.requireddata['log-channel-id']).send(
-                    message.author.mention + ' failed to use the password, but yag deleted the message faster. They tried this: ' + textsent)
+                    message.author.mention + ' failed to use the password, but yag deleted the message faster. They tried this: `' + textsent + '`')
 
     elif message.content.startswith('!thin_ice '):
         if not canSend(5, privilegelevel(message.author), message):

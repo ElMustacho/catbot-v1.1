@@ -1001,7 +1001,7 @@ async def on_message(message):
                 101] + '''**\nhttps://thanksfeanor.pythonanywhere.com/UDP/''' + code_unit.zfill(3))
         return
 
-    elif message.content.startswith('!cst '):  # todo needs stats multiplication reordering
+    elif message.content.startswith('!cst '):
         if not canSend(2, privilegelevel(message.author), message):
             return
         if privilegelevel(message.author) < 3 and message.channel.id not in catbotdata.requireddata[

@@ -47,7 +47,7 @@ class Catunits:
             locator[0] = locator[0][0]
         return locator
 
-    def getstatsEmbed(self, cat, level, unitcode, extraparam = []):  #todo made up stats should be accessed from right
+    def getstatsEmbed(self, cat, level, unitcode, extraparam = []):
         isinline = True
         title = 'Stats of ' + cat[-6]
         if len(cat[-6]) > 1:
