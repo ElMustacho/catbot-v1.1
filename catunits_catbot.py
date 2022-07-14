@@ -400,12 +400,7 @@ class Catunits:
         if level > 50:
             multiplier += 20*min(level-50,10)
         if level > 60:
-            if rarity in [5, 4, 3]:
-                multiplier += 5*min(level-60,10)
-            else:
-                multiplier += 10*min(level-60,10)
-        if level > 70:
-            multiplier += 10*min(level-70,10)
+            multiplier += 10*min(level-60,20)
         if level > 80:
             if rarity in [5, 4, 3]:
                 multiplier += 5*min(level-80,10)

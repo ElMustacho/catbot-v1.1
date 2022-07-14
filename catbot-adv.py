@@ -4,7 +4,7 @@
 # review all code and check if you can code stuff appearing multiple times only once
 import asyncio
 import sqlite3
-
+import io
 import discord
 from datetime import datetime, timedelta
 from data_catbot import Data_catbot
@@ -1472,25 +1472,52 @@ async def on_message(message):
     elif message.content == '!muted':
         if not canSend(5, privilegelevel(message.author), message):
             return
-        msgtosend = '''This channel is here so you can talk about the specifics of your mute with moderators. Follow the server's rules as if you were in any other channel, being here doesn’t exempt you from them. 
-**You may:** 
-- Ask as many questions as you'd like, provided it's about your mute 
-- Ping a moderator (ideally the one who muted you, if you know who it is) to get their attention 
-**Don't:** 
+        msgtosend = '''This channel is here so you can talk about the specifics of your mute with moderators. Follow the server's rules as if you were in any other channel, being here doesn’t exempt you from them.
+**You may:**
+- Ask as many questions as you'd like, provided it's about your mute
+- Ping a moderator (ideally the one who muted you, if you know who it is) to get their attention
+**Don't:**
 - Talk to other __muted__ people.
-- Spam ping or mass ping moderators 
-- Ramble about things that aren’t connected to your mute, or shitpost / spam 
-- Uselessly and/or aggressively argue with moderators 
+- Spam ping or mass ping moderators
+- Ramble about things that aren’t connected to your mute, or shitpost / spam
+- Uselessly and/or aggressively argue with moderators
 - Attempt to bypass the mute by leaving and rejoining, using alternative accounts, etc. **This will result in a permanent and unappealable ban.**
 
-If you misuse the channel, your mute will be **extended**. 
+If you misuse the channel, your mute will be **extended**.
 If you continue to misuse the channel after a mute extension, you will be **banned**.'''
         await message.channel.send(msgtosend)
         await message.delete()
         return
 
+    elif message.content == '!archive':
+        if not canSend(5, privilegelevel(message.author), message):
+            return
+        #if message.channel.id == catbotdata.requireddata['muted-channel']:
+        #    print('wrong channel!')
+        messages = [message async for message in client.get_channel(catbotdata.requireddata['mute-channel']).history()]
+        archive_channel = client.get_channel(994707512844632064)
+        await archive_channel.send('Beginning logging.')
+        for message in reversed(messages[:-1]):
+            color_used = None
+            if privilegelevel(message.author) > 4:  # is a mod
+                color_used = 0xff0000
+            else:  # othereise they were muted
+                color_used = 0x82361a
+            tobesent=discord.Embed(description=str(message.author) + ' (' + str(message.author.id) + ')', color=color_used, inline=True)
+            tobesent.add_field(name='Message', value=message.content)  #todo deal with string too long
+            #await archive_channel.send(message.author.mention + ' ' + str(message.content), allowed_mentions = discord.AllowedMentions(users = False))
+            await archive_channel.send(embed=tobesent)
+            for att in enumerate(message.attachments):
+                obtained = await att[1].read()
+                arr = io.BytesIO(obtained)
+                file = discord.File(arr, filename=att[1].filename)
+                #await att[1].save(str(att[0])+'.png')
+                await archive_channel.send('There was this attachement: ', file=file)
+        await archive_channel.send('End of logging.')
+        return
+
     elif message.channel.id == catbotdata.requireddata['welcome-channel']:
-        if message.content == '$password siege walker diabolosa':  #TODO get this from the json
+        if message.content == '$password mighty kristul muu':  #TODO get this from the json
             member = serveruser(message.author)
             await member.add_roles(discord.utils.get(client.get_guild(catbotdata.requireddata['server-id']).roles,
                                                      id=catbotdata.requireddata['tier-2-roles'][0]),

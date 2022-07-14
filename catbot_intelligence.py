@@ -96,19 +96,27 @@ names = catunits_catbot.Catunits()
 #                 units_mentioned.append(names.getnamebycode(name[0]))
 #    return units_mentioned
 
+helper_regexes = {
+    "name": r"(?P<name>[\w\s'-]+)",
+    "is": r"(is|are)",
+    "preposition": r"(on|at|in|as|vs|if|for|with|when|against|compared)",
+    "rolled": r"(got|rolled|pulled)",
+    "pronoun_singular": r"(he|she|it|that)",
+    "pronoun_plural": r"(they)",
+    "good": r"(good|any good|a good (cat|unit|cat unit|form|tf|true form))",
+}
+question_regexes = [
+    r"how good {is} {name}(?! {preposition}\b)",
+    r"{rolled} (?!.*{rolled}){name}\W? (is {pronoun_singular}|are {pronoun_plural}) {good}",
+    r"{is} {name} {good}",
+]
+question_regexes = [re.compile((r"\b" + r.replace(" ",r"\s+") + r"(\?|$)").format(**helper_regexes), re.IGNORECASE) for r in question_regexes]
 def is_unit_question_regex(message, errors=0):
-    regex_extracted = re.sub(r"^.*(just )?(got|rolled|pulled)\s+([\w ',+]+)\W((is|are)\s+(he|she|it|that|they)|are\s+they)\s+good$",
-                            r'\3', message, flags=re.IGNORECASE)
-    unit_to_search = names.getUnitCode(regex_extracted, errors)
-    if unit_to_search[0] == 'no result' or unit_to_search[0] == 'name not unique' or len(message) == len(
-            regex_extracted):
-        regex_extracted = re.sub(
-            r"^.*how\s+good\s+(are|is)\s+([\w '-]+)\s(on|at|in|as|vs|if|for|with|when|against|compared|versus)[\w '-]+$", r'\1', message, flags=re.IGNORECASE)
-        unit_to_search = names.getUnitCode(regex_extracted, errors)
-        if unit_to_search[0] == 'no result' or unit_to_search[0] == 'name not unique' or len(message) == len(
-                regex_extracted):
-            return ''
-        else:
-            return names.getnamebycode(unit_to_search[0])
-    else:
-        return names.getnamebycode(unit_to_search[0])
+    for regex in question_regexes:
+        regex_extracted = regex.search(message)
+        if regex_extracted is None: continue
+        unit_to_search = names.getUnitCode(regex_extracted.group('name'), errors)[0]
+        if unit_to_search == 'no result' or unit_to_search == 'name not unique':
+            continue
+        return names.getnamebycode(unit_to_search)
+    return ''
