@@ -1458,7 +1458,10 @@ async def on_message(message):
     unit_if_question = catbot_intelligence.is_unit_question_regex(message.content)
     if len(unit_if_question) > 0:
         brainchannel = client.get_channel(946509102434111578)
-        await brainchannel.send('I think that ' + message.author.mention + ' asked a stupid regex(v3) question about `'+unit_if_question+'`.\nOriginal message: `'+message.content+'`')
+        await brainchannel.send('I think that ' + message.author.mention + ' asked a stupid regex(v6) question about `'+unit_if_question+'`.\nOriginal message: `'+message.content+'`')
+    if catbot_intelligence.is_unit_question_regex(message.content):
+        brainchannel = client.get_channel(946509102434111578)
+        await brainchannel.send('I think that ' + message.author.mention + ' asked a stupid regex(v6) question about tier lists.\nOriginal message: `'+message.content+'`')
 
     if not catbotdata.requireddata['moderation']:
         return
@@ -1497,7 +1500,9 @@ If you continue to misuse the channel after a mute extension, you will be **bann
         messages = [message async for message in client.get_channel(catbotdata.requireddata['mute-channel']).history()]
         archive_channel = client.get_channel(994707512844632064)
         await archive_channel.send('Beginning logging.')
+        users = set()
         for message in reversed(messages[:-1]):
+            users.add(message.author)
             color_used = None
             if privilegelevel(message.author) > 4:  # is a mod
                 color_used = 0xff0000
@@ -1505,15 +1510,20 @@ If you continue to misuse the channel after a mute extension, you will be **bann
                 color_used = 0x82361a
             tobesent=discord.Embed(description=str(message.author) + ' (' + str(message.author.id) + ')', color=color_used, inline=True)
             tobesent.add_field(name='Message', value=message.content)  #todo deal with string too long
+            print(tobesent)
             #await archive_channel.send(message.author.mention + ' ' + str(message.content), allowed_mentions = discord.AllowedMentions(users = False))
             await archive_channel.send(embed=tobesent)
             for att in enumerate(message.attachments):
                 obtained = await att[1].read()
                 arr = io.BytesIO(obtained)
+                print(obtained, '\nEndfile')
                 file = discord.File(arr, filename=att[1].filename)
-                #await att[1].save(str(att[0])+'.png')
                 await archive_channel.send('There was this attachement: ', file=file)
-        await archive_channel.send('End of logging.')
+        mentions = ""
+        for user in users:
+            if privilegelevel(user) < 5:
+                mentions += user.mention + ', '
+        await archive_channel.send('End of logging.' + mentions)
         return
 
     elif message.channel.id == catbotdata.requireddata['welcome-channel']:
