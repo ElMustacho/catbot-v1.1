@@ -1510,20 +1510,21 @@ If you continue to misuse the channel after a mute extension, you will be **bann
                 color_used = 0x82361a
             tobesent=discord.Embed(description=str(message.author) + ' (' + str(message.author.id) + ')', color=color_used, inline=True)
             tobesent.add_field(name='Message', value=message.content)  #todo deal with string too long
-            print(tobesent)
             #await archive_channel.send(message.author.mention + ' ' + str(message.content), allowed_mentions = discord.AllowedMentions(users = False))
-            await archive_channel.send(embed=tobesent)
+            if len(message.content) > 0:
+                await archive_channel.send(embed=tobesent)
             for att in enumerate(message.attachments):
                 obtained = await att[1].read()
                 arr = io.BytesIO(obtained)
-                print(obtained, '\nEndfile')
                 file = discord.File(arr, filename=att[1].filename)
                 await archive_channel.send('There was this attachement: ', file=file)
         mentions = ""
         for user in users:
             if privilegelevel(user) < 5:
                 mentions += user.mention + ', '
-        await archive_channel.send('End of logging.' + mentions)
+        if len(mentions) > 0:
+            mentions=mentions[:-2]
+        await archive_channel.send('End of logging.\n' + mentions)
         return
 
     elif message.channel.id == catbotdata.requireddata['welcome-channel']:
