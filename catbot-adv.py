@@ -1517,7 +1517,7 @@ If you continue to misuse the channel after a mute extension, you will be **bann
                 obtained = await att[1].read()
                 arr = io.BytesIO(obtained)
                 file = discord.File(arr, filename=att[1].filename)
-                await archive_channel.send('There was this attachement: ', file=file)
+                await archive_channel.send('There was this attachement:', file=file)
         mentions = ""
         for user in users:
             if privilegelevel(user) < 5:
