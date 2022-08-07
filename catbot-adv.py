@@ -299,12 +299,12 @@ async def on_message(message):
                 log_event(message.content, message.author.id, datetime.now(), -1)
                 return
         except:
-            magnification = 1
+            magnification = 100
             mag2 = magnification
         if magnification < 0 or magnification > 1000000:
-            magnification = 1
+            magnification = 100
         if mag2 < 0 or mag2 > 1000000:
-            mag2 = 1
+            mag2 = 100
         embedsend = enemyculator.getstatsembed(enemy, magnification, mag2)
         await message.channel.send(embed=embedsend)
         log_event(message.content, message.author.id, datetime.now(), 1)
