@@ -11,11 +11,13 @@ from collections import defaultdict
 class Catunits:
     def __init__(self):
         self._cats = pd.read_csv('auto_units.tsv', sep='\t')
-        self._customnames = None
+        self._customnames = []
         try:
-            self._customnames = pickle.load(open('catCustomUnits.pkl', 'rb'))  # this is a dictionary
-        except FileNotFoundError:
-            self._customnames = {}
+            conn = sqlite3.connect('file:custom_names_all.db?mode=rw', uri=True)
+            cursor = conn.cursor()
+            self._customnames = cursor.execute("select * from cats").fetchall()
+        except Exception:
+            pass
 
     def getrow(self, row):
         if row < 0:
@@ -296,7 +298,7 @@ class Catunits:
         # from dictionary
         distancedict = defaultdict(list)
         for i in self._customnames:
-            distancedict[edit_distance_fast(strToCmp, i.lower(),errors)].append(self._customnames[i])
+            distancedict[edit_distance_fast(strToCmp, i[1].lower(),errors)].append(i[0])
         customnames = []
         try:
             customnames = min(distancedict.items())
@@ -400,7 +402,12 @@ class Catunits:
         if level > 50:
             multiplier += 20*min(level-50,10)
         if level > 60:
-            multiplier += 10*min(level-60,20)
+            if rarity==2:
+                multiplier += 20*min(level-60,10)
+            else:
+                multiplier += 10*min(level-60,10)
+        if level > 70:
+            multiplier += 10*min(level-70,10)
         if level > 80:
             if rarity in [5, 4, 3]:
                 multiplier += 5*min(level-80,10)
@@ -461,30 +468,63 @@ class Catunits:
     def getnames(self, cat, catcode):
         name = cat[-3]
         allnames = 'The custom names of ' + name + ' are: '
-        for key, value in self._customnames.items():
-            if value == catcode:
-                allnames += key + '; '
+        for value in self._customnames:
+            if value[0] == catcode:
+                allnames += value[1] + '; '
         if allnames[-2:] == ': ':
-            allnames = name + ' has no custom name. '
-        return allnames[:-1]
+            allnames = name + ' has no custom names. '
+        return allnames[:-2]+'.'
 
     def removename(self, catcode, nametoremove):
-        for key, value in self._customnames.items():
-            if value == catcode and nametoremove == key:
-                del self._customnames[nametoremove]
-                self.storedict()
+        for line in self._customnames:
+            if line[0] == catcode and line[1] == nametoremove:
+                self.delete_name_from_db(nametoremove)
                 return True
         return False
 
     def givenewname(self, unitcode, newname):
-        lowernames = {k.lower(): v for k, v in self._customnames.items()}
+        lowernames = [k[1].lower() for k in self._customnames]
         if newname.lower() in lowernames:  # can't have a name refer to 2 different units
             return False
-        self._customnames[newname] = unitcode
-        self.storedict()
+        return self.add_name_to_db(unitcode, newname)
+
+    def reload_db(self):
+        try:
+            conn = sqlite3.connect('file:custom_names_all.db?mode=rw', uri=True)
+            cursor = conn.cursor()
+            self._customnames = cursor.execute("select * from cats").fetchall()
+        except Exception:
+            print(Exception)
+        return
+
+    def add_name_to_db(self, id, name):
+        try:
+            conn = sqlite3.connect('custom_names_all.db')
+            cursor = conn.cursor()
+            cursor.execute('''insert into cats values (?,?);''', (id, name))
+            conn.commit()
+        except Exception as E:
+            return E
+        self.reload_db()
         return True
 
+    def delete_name_from_db(self, name):
+        try:
+            conn = sqlite3.connect('custom_names_all.db')
+            cursor = conn.cursor()
+            if cursor.execute('''select count(unit_id) from cats where unit_name = ?''', (name,)).fetchone()[0]:
+                cursor.execute('''delete from cats where unit_name=?;''', (name,))
+                conn.commit()
+                self.reload_db()
+                return True
+            else:
+                return False
+        except Exception as E:
+            print('Error deleting',name,'because',E)
+            return E
+
     def storedict(self):
+        return
         with open('catCustomUnits.pkl', 'wb') as f:
             pickle.dump(self._customnames, f, pickle.DEFAULT_PROTOCOL)
 
@@ -697,7 +737,7 @@ class Catunits:
             return "Database for cat comboes not found."
         if len(results) == 0:
             return "The given unit doesn't have talents."
-            
+
         return results
 
     def get_talent_explanation(self, unit_id):
@@ -709,7 +749,7 @@ class Catunits:
             return "Database for cat comboes not found."
         if len(results) == 0:
             return str(self.getnamebycode(unit_id)) + " doesn't have talents."
-            
+
         return results
 
 def edit_distance_fast(s1, s2, errors):

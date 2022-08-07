@@ -290,10 +290,10 @@ async def on_message(message):
                 border = find_nth(str(message.content), ';', 2)
                 if border == -1:
                     border = len(message.content)
-            magnification = float(int(message.content[message.content.find(';') + 1:border]) / 100)
+            magnification = int(message.content[message.content.find(';') + 1:border])
             mag2 = magnification
             if message.content.count(';') == 2:
-                mag2 = float(int(message.content[find_nth(str(message.content), ';', 2) + 1:]) / 100)
+                mag2 = int(message.content[find_nth(str(message.content), ';', 2) + 1:])
             elif message.content.count(';') > 2:
                 await message.channel.send("Wrong syntax, you passed too many arguments.")
                 log_event(message.content, message.author.id, datetime.now(), -1)
@@ -321,7 +321,7 @@ async def on_message(message):
             return
         realnameunit = message.content[11: limit]
         catcode = catculator.getUnitCode(realnameunit.lower(), 0)
-        if catcode == "no result":  # too many errors
+        if catcode[0] == "no result":  # too many errors
             await message.channel.send('That was gibberish.')
             log_event(message.content, message.author.id, datetime.now(), -1)
             return
@@ -1458,10 +1458,12 @@ async def on_message(message):
     unit_if_question = catbot_intelligence.is_unit_question_regex(message.content)
     if len(unit_if_question) > 0:
         brainchannel = client.get_channel(946509102434111578)
-        await brainchannel.send('I think that ' + message.author.mention + ' asked a stupid regex(v6) question about `'+unit_if_question+'`.\nOriginal message: `'+message.content+'`')
+        if canSend(3, privilegelevel(message.author), message) or str(message.categrory)=="Other Text":
+            await brainchannel.send('I think that ' + message.author.mention + ' asked a stupid regex(v6) question about `'+unit_if_question+'`.\nOriginal message: `'+message.content+'`')
     if catbot_intelligence.is_unit_question_regex(message.content):
         brainchannel = client.get_channel(946509102434111578)
-        await brainchannel.send('I think that ' + message.author.mention + ' asked a stupid regex(v6) question about tier lists.\nOriginal message: `'+message.content+'`')
+        if canSend(3, privilegelevel(message.author), message) or str(message.categrory)=="Other Text":
+            await brainchannel.send('I think that ' + message.author.mention + ' asked a stupid regex(v6) question about tier lists.\nOriginal message: `'+message.content+'`')
 
     if not catbotdata.requireddata['moderation']:
         return

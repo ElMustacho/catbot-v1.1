@@ -4,15 +4,18 @@ from discord import Embed as emb
 import math
 import pickle
 from collections import defaultdict
+import sqlite3
 
 class Enemyunits:
     def __init__(self):
         self._enemies = pd.read_csv('enemyunits.tsv', sep='\t')
         self._customnames = None
         try:
-            self._customnames = pickle.load(open('enemyCustomUnits.pkl', 'rb'))  # this is a dictionary
-        except FileNotFoundError:
-            self._customnames = {}
+            conn = sqlite3.connect('file:custom_names_all.db?mode=rw', uri=True)
+            cursor = conn.cursor()
+            self._customnames = cursor.execute("select * from enemies").fetchall()
+        except Exception:
+            pass
 
     def namefromcode(self, enemycode):
         returnthis = self._enemies.iloc[enemycode]
@@ -40,7 +43,7 @@ class Enemyunits:
         # from dictionary
         distancedict = defaultdict(list)
         for i in self._customnames:
-            distancedict[edit_distance_fast(strToCmp, i.lower(), errors)].append(self._customnames[i])
+            distancedict[edit_distance_fast(strToCmp, i[1].lower(),errors)].append(i[0])
         customnames = []
         try:
             customnames = min(distancedict.items())
@@ -120,20 +123,20 @@ class Enemyunits:
         title = 'Stats of ' + str(enemy[-2])
         enemyEmbed = emb(description=title, color=0x00ff00)
         enemyEmbed.set_author(name='Cat Bot')
-        magstring = str(int(magnification*100)) + '%'
+        magstring = str(magnification) + '%'
         if mag2 != magnification:
-            magstring = magstring + ' HP, ' + str(int(round(mag2*100,0))) + '% Damage'
+            magstring = magstring + ' HP, ' + str(mag2*100) + '% Damage'
         enemyEmbed.add_field(name='Magnification', value=magstring, inline=True)
-        hpv = str(math.ceil(int(enemy[0]) * magnification)) + ' HP - ' + str(round(int(enemy[1]), 0)) + ' KB'
+        hpv = str(math.ceil(int(enemy[0]) * magnification/100)) + ' HP - ' + str(enemy[1]) + ' KB'
         if enemy[52]==2:
             hpv+=' (suicides on hit)'
         enemyEmbed.add_field(name='HP - Knockbacks', value=hpv, inline=True)
-        dmg = str(math.ceil(int(enemy[3]) * mag2))
+        dmg = str(math.ceil(int(enemy[3]) * mag2/100))
         if int(enemy[55]) > 0:
             dmg += '/' + str(math.ceil(int(enemy[55]) * mag2))
         if int(enemy[56]) > 0:
             dmg += '/' + str(math.ceil(int(enemy[56]) * mag2))
-        dps = ' Damage - ' + str(math.ceil(((enemy[3]+enemy[55]+enemy[56])*mag2*30/real_tba))) + ' DPS'
+        dps = ' Damage - ' + str(math.ceil(((enemy[3]+enemy[55]+enemy[56])*mag2*30/(real_tba*100)))) + ' DPS'
         damagekind = ''
         if enemy[11] == 1:
             damagekind += 'area'
@@ -297,34 +300,69 @@ class Enemyunits:
         return enemyEmbed
 
     def givenewname(self, enemycode, newname):
-        lowernames = {k.lower(): v for k, v in self._customnames.items()}
+        lowernames = [k[1].lower() for k in self._customnames]
         if newname.lower() in lowernames:  # can't have a name refer to 2 different units
             return False
-        self._customnames[newname] = enemycode
-        self.storedict()
-        return True
+        return self.add_name_to_db(enemycode, newname)
+
 
     def storedict(self):
+        return
         with open('enemyCustomUnits.pkl', 'wb') as f:
             pickle.dump(self._customnames, f, pickle.DEFAULT_PROTOCOL)
 
     def getnames(self, enemy, enemycode):
         name = enemy[-2]
         allnames = 'The custom names of ' + name + ' are: '
-        for key, value in self._customnames.items():
-            if value == enemycode:
-                allnames += key + '; '
+        for value in self._customnames:
+            if value[0] == enemycode:
+                allnames += value[1] + '; '
         if allnames[-2:] == ': ':
-            allnames = name + ' has no custom name.'
-        return allnames
+            allnames = name + ' has no custom name. '
+        return allnames[:-2]+'.'
 
     def removename(self, enemy, nametoremove):
-        for key, value in self._customnames.items():
-            if value == enemy and nametoremove == key:
-                del self._customnames[nametoremove]
-                self.storedict()
+        for value in self._customnames:
+            if value[0] == enemy and nametoremove == value[1]:
+                self.delete_name_from_db(nametoremove)
                 return True
         return False
+
+    def reload_db(self):
+        try:
+            conn = sqlite3.connect('file:custom_names_all.db?mode=rw', uri=True)
+            cursor = conn.cursor()
+            self._customnames = cursor.execute("select * from enemies").fetchall()
+        except Exception:
+            print(Exception)
+        return
+
+    def add_name_to_db(self, id, name):
+        try:
+            conn = sqlite3.connect('custom_names_all.db')
+            cursor = conn.cursor()
+            cursor.execute('''insert into enemies values (?,?);''', (id, name))
+            conn.commit()
+        except Exception as E:
+            return E
+        self.reload_db()
+        return True
+
+    def delete_name_from_db(self, name):
+        try:
+            conn = sqlite3.connect('custom_names_all.db')
+            cursor = conn.cursor()
+            if cursor.execute('''select count(enemy_id) from enemies where enemy_name = ?''', (name,)).fetchone()[0]:
+                cursor.execute('''delete from enemies where enemy_name=?;''', (name,))
+                conn.commit()
+                self.reload_db()
+                return True
+            else:
+                return False
+
+        except Exception as E:
+            print('Error deleting',name,'because',E)
+            return E
 
 def edit_distance_fast(s1, s2, errors):
     '''

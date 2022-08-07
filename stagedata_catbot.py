@@ -17,16 +17,20 @@ class Stagedata:
         enemystring = ''
         for enemyline in enemylines:
             title = ''
-            if enemyline[10] == 1:
+            if enemyline[10] > 0:
                 title = '**'
             title += self._enemydata.namefromcode(enemyline[2]) + ', ' + str(round(enemyline[4] * magnification)) + '%'
-            if enemyline[10] == 1:
+            if enemyline[10] > 0:
                 title += '**'
+
             if enemyline[3] < 1:
                 enemystring += '∞'
             else:
                 enemystring += str(enemyline[3])
-            enemystring += ' | ' + str(enemyline[11] * 2) + 'f'
+            if enemyline[8]==1:  # wait time after reaching % base hp
+                enemystring += ' | **' + str(enemyline[11] * 2) + 'f**'
+            else:
+                enemystring += ' | ' + str(enemyline[11] * 2) + 'f'
             if enemyline[3] != 1:
                 if enemyline[5] == enemyline[6]:
                     enemystring += ' *(' + str(enemyline[5] * 2) + 'f)*'
@@ -150,14 +154,21 @@ class Stagedata:
             title += self._enemydata.namefromcode(enemyline[2]) + ', ' + magstring
             if enemyline[1] == 1:
                 title += '**__'
+            elif enemyline[1]==2:
+                title += ' (shakes screen)**__'
             if enemyline[4] < 1:
                 enemystring += '∞'
             else:
                 enemystring += str(enemyline[4])
-            enemystring += ' | ' + str(enemyline[6]) + 'f'
+            if enemyline[8]==1:  # wait time after reaching % base hp
+                enemystring += ' | **' + str(enemyline[6]) + 'f**'
+            else:
+                enemystring += ' | ' + str(enemyline[6]) + 'f'
             if enemyline[4] != 1:
                 enemystring += ' *(' + str(enemyline[7]) + 'f)*'
             enemystring += ' | ' + str(enemyline[5])
+            if enemyline[9]>0:
+                enemystring += ' | ' + str(enemyline[9]) + 'k'
             stageEmbed.add_field(name=title, value=enemystring, inline=True)
             enemystring = ''
         try:
@@ -201,16 +212,16 @@ class Stagedata:
                 if enemycode2 is not None:
                     tuple = (str(enemycode[0][0]), str(enemycode1[0][0]), str(enemycode2[0][0]))
                     results = cursor.execute(
-                        '''SELECT DISTINCT stages.stage, stages.category, stages.level, stages.stageid from units join stages on units.stageid = stages.stageid where enemycode=? 
+                        '''SELECT DISTINCT stages.stage, stages.category, stages.level, stages.stageid from units join stages on units.stageid = stages.stageid where enemycode=?
 INTERSECT
-SELECT DISTINCT stages.stage, stages.category, stages.level, stages.stageid from units join stages on units.stageid = stages.stageid where enemycode=? 
+SELECT DISTINCT stages.stage, stages.category, stages.level, stages.stageid from units join stages on units.stageid = stages.stageid where enemycode=?
 INTERSECT
 SELECT DISTINCT stages.stage, stages.category, stages.level, stages.stageid from units join stages on units.stageid = stages.stageid where enemycode=? order by stages.category''',
                         tuple).fetchall()
                 else:
                     tuple=(str(enemycode[0][0]), str(enemycode1[0][0]))
                     results = cursor.execute(
-                        '''SELECT DISTINCT stages.stage, stages.category, stages.level, stages.stageid from units join stages on units.stageid = stages.stageid where enemycode=? 
+                        '''SELECT DISTINCT stages.stage, stages.category, stages.level, stages.stageid from units join stages on units.stageid = stages.stageid where enemycode=?
 INTERSECT
 SELECT DISTINCT stages.stage, stages.category, stages.level, stages.stageid from units join stages on units.stageid = stages.stageid where enemycode=? order by stages.category''',
                         tuple).fetchall()
@@ -273,16 +284,16 @@ SELECT DISTINCT stages.stage, stages.category, stages.level, stages.stageid from
                 if name3 != '':
                     tuple = (str(enemycode[0][0]), str(enemycode1[0][0]), str(enemycode2[0][0]))
                     results = cursor.execute(
-                        '''SELECT DISTINCT stages.stage, stages.category, stages.level, stages.energy from units join stages on units.stageid = stages.stageid where level not like '%Zombie%' and enemycode=? and category in ('SoL', 'Story Mode') 
+                        '''SELECT DISTINCT stages.stage, stages.category, stages.level, stages.energy from units join stages on units.stageid = stages.stageid where level not like '%Zombie%' and enemycode=? and category in ('SoL', 'Story Mode')
 INTERSECT
-SELECT DISTINCT stages.stage, stages.category, stages.level, stages.energy from units join stages on units.stageid = stages.stageid where level not like '%Zombie%' and enemycode=? and category in ('SoL', 'Story Mode') 
+SELECT DISTINCT stages.stage, stages.category, stages.level, stages.energy from units join stages on units.stageid = stages.stageid where level not like '%Zombie%' and enemycode=? and category in ('SoL', 'Story Mode')
 INTERSECT
 SELECT DISTINCT stages.stage, stages.category, stages.level, stages.energy from units join stages on units.stageid = stages.stageid where level not like '%Zombie%' and enemycode=? and category in ('SoL', 'Story Mode') order by stages.energy''',
                         tuple).fetchall()
                 else:
                     tuple = (str(enemycode[0][0]), str(enemycode1[0][0]))
                     results = cursor.execute(
-                        '''SELECT DISTINCT stages.stage, stages.category, stages.level, stages.energy from units join stages on units.stageid = stages.stageid where level not like '%Zombie%' and enemycode=? and category in ('SoL', 'Story Mode') 
+                        '''SELECT DISTINCT stages.stage, stages.category, stages.level, stages.energy from units join stages on units.stageid = stages.stageid where level not like '%Zombie%' and enemycode=? and category in ('SoL', 'Story Mode')
 INTERSECT
 SELECT DISTINCT stages.stage, stages.category, stages.level, stages.energy from units join stages on units.stageid = stages.stageid where level not like '%Zombie%' and enemycode=? and category in ('SoL', 'Story Mode') order by stages.energy''',
                         tuple).fetchall()
@@ -317,16 +328,16 @@ SELECT DISTINCT stages.stage, stages.category, stages.level, stages.energy from 
                 if name3 != '':
                     tuple = (str(enemycode[0][0]), str(enemycode1[0][0]), str(enemycode2[0][0]))
                     results = cursor.execute(
-                        '''SELECT DISTINCT stages.stage, stages.category, stages.level from units join stages on units.stageid = stages.stageid where enemycode=? 
+                        '''SELECT DISTINCT stages.stage, stages.category, stages.level from units join stages on units.stageid = stages.stageid where enemycode=?
 INTERSECT
-SELECT DISTINCT stages.stage, stages.category, stages.level from units join stages on units.stageid = stages.stageid where enemycode=? 
+SELECT DISTINCT stages.stage, stages.category, stages.level from units join stages on units.stageid = stages.stageid where enemycode=?
 INTERSECT
 SELECT DISTINCT stages.stage, stages.category, stages.level from units join stages on units.stageid = stages.stageid where enemycode=? order by stages.category''',
                         tuple).fetchall()
                 else:
                     tuple = (str(enemycode[0][0]), str(enemycode1[0][0]))
                     results = cursor.execute(
-                        '''SELECT DISTINCT stages.stage, stages.category, stages.level from units join stages on units.stageid = stages.stageid where enemycode=? 
+                        '''SELECT DISTINCT stages.stage, stages.category, stages.level from units join stages on units.stageid = stages.stageid where enemycode=?
 INTERSECT
 SELECT DISTINCT stages.stage, stages.category, stages.level from units join stages on units.stageid = stages.stageid where enemycode=? order by stages.category''',
                         tuple).fetchall()
