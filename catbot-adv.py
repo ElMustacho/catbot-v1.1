@@ -1458,11 +1458,13 @@ async def on_message(message):
     unit_if_question = catbot_intelligence.is_unit_question_regex(message.content)
     if len(unit_if_question) > 0:
         brainchannel = client.get_channel(946509102434111578)
-        if canSend(3, privilegelevel(message.author), message) or str(message.categrory)=="Other Text":
+        if not canSend(3, privilegelevel(message.author), message) and not str(message.channel.category)=="Other Text":
             await brainchannel.send('I think that ' + message.author.mention + ' asked a stupid regex(v6) question about `'+unit_if_question+'`.\nOriginal message: `'+message.content+'`')
-    if catbot_intelligence.is_unit_question_regex(message.content):
+            return
+
+    if catbot_intelligence.is_tier_list_question(message.content):
         brainchannel = client.get_channel(946509102434111578)
-        if canSend(3, privilegelevel(message.author), message) or str(message.categrory)=="Other Text":
+        if not canSend(3, privilegelevel(message.author), message) and not str(message.channel.category)=="Other Text":
             await brainchannel.send('I think that ' + message.author.mention + ' asked a stupid regex(v6) question about tier lists.\nOriginal message: `'+message.content+'`')
 
     if not catbotdata.requireddata['moderation']:

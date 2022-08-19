@@ -144,7 +144,7 @@ class Stagedata:
         enemystring = ''
         for enemyline in stageenemies:
             title = ''
-            if enemyline[1] == 1:
+            if enemyline[1] in [1, 2]:
                 title = '__**'
             magstring = enemyline[3]
             if magstring.count(magstring[1:magstring.find(',')]) > 1:
@@ -155,7 +155,7 @@ class Stagedata:
             if enemyline[1] == 1:
                 title += '**__'
             elif enemyline[1]==2:
-                title += ' (shakes screen)**__'
+                title += ' (shakes screen) **__'
             if enemyline[4] < 1:
                 enemystring += '∞'
             else:

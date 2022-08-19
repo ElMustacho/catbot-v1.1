@@ -133,9 +133,9 @@ class Enemyunits:
         enemyEmbed.add_field(name='HP - Knockbacks', value=hpv, inline=True)
         dmg = str(math.ceil(int(enemy[3]) * mag2/100))
         if int(enemy[55]) > 0:
-            dmg += '/' + str(math.ceil(int(enemy[55]) * mag2))
+            dmg += '/' + str(math.ceil(int(enemy[55]) * mag2/100))
         if int(enemy[56]) > 0:
-            dmg += '/' + str(math.ceil(int(enemy[56]) * mag2))
+            dmg += '/' + str(math.ceil(int(enemy[56]) * mag2/100))
         dps = ' Damage - ' + str(math.ceil(((enemy[3]+enemy[55]+enemy[56])*mag2*30/(real_tba*100)))) + ' DPS'
         damagekind = ''
         if enemy[11] == 1:
@@ -269,7 +269,7 @@ class Enemyunits:
         if enemy[77] > 0:  # dodge
             defensive += 'Dodge ' + str(round(int(enemy[77]))) + '% (' + str(round(int(enemy[78]) / 30, 2)) + 's), '
         if int(enemy[87]) > 0:  # shield
-            defensive += 'Shield ' + str(int(enemy[87]*magnification)) + ', resets at '+str(enemy[88])+'%, '
+            defensive += 'Shield ' + str(int(enemy[87]*magnification/100)) + ', resets at '+str(enemy[88])+'%, '
         defensive = defensive[:-2]
         if len(defensive) > 3:
             enemyEmbed.add_field(name='Defensive abilities', value=defensive, inline=True)
