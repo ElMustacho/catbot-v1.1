@@ -60,11 +60,16 @@ tier_regexes = [
 ]
 tier_regexes = [re.compile((r"(^|[^`'\x22])\b" + r + r"\b($|[^`'\x22])").replace(" ",r"(\s+({um}\s+)*)").format(**helper_regexes), re.IGNORECASE) for r in tier_regexes]
 
+
 def is_unit_question_regex(message, errors=0):
 	for regex in question_regexes:
 		regex_extracted = regex.search(message)
 		if regex_extracted is None: continue
 		name = regex_extracted.group('name').strip()
+
+		if name.isdigit(): continue
+		if name.lower() == "god": continue
+
 		for n in [name, f"the {name}"]:
 			unit_to_search = names.getUnitCode(n, errors)[0]
 			if unit_to_search not in ['no result', 'name not unique']:

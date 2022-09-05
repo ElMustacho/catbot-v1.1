@@ -892,9 +892,6 @@ async def on_message(message):
             await message.channel.send('I need a name, not a number.')
             log_event(message.content, message.author.id, datetime.now(), -1)
             return
-        nameunit1 = enemyculator.namefromcode(enemystats1[0][0])
-        nameunit2 = ''
-        nameunit3 = ''
         if unit2 != '':
             enemystats2 = enemyculator.getUnitCode(unit2.lower(), 4)
             if enemystats2 is None:  # too many errors
@@ -1358,7 +1355,7 @@ async def on_message(message):
         log_event(message.content, message.author.id, datetime.now(), 1)
         return
 
-    elif message.content.startswith('!cst '):  # todo needs stats multiplication reordering
+    elif message.content.startswith('!cst '):
         if not canSend(2, privilegelevel(message.author), message):
             return
         if privilegelevel(message.author) < 3 and message.channel.id not in catbotdata.requireddata[
@@ -1459,13 +1456,13 @@ async def on_message(message):
     if len(unit_if_question) > 0:
         brainchannel = client.get_channel(946509102434111578)
         if not canSend(3, privilegelevel(message.author), message) and not str(message.channel.category)=="Other Text":
-            await brainchannel.send('I think that ' + message.author.mention + ' asked a stupid regex(v6) question about `'+unit_if_question+'`.\nOriginal message: `'+message.content+'`')
+            await brainchannel.send('I think that ' + message.author.mention + ' asked a stupid regex(v8) question about `'+unit_if_question+'`.\nOriginal message: `'+message.content+'`\nLink here. '+message.jump_url)
             return
 
     if catbot_intelligence.is_tier_list_question(message.content):
         brainchannel = client.get_channel(946509102434111578)
         if not canSend(3, privilegelevel(message.author), message) and not str(message.channel.category)=="Other Text":
-            await brainchannel.send('I think that ' + message.author.mention + ' asked a stupid regex(v6) question about tier lists.\nOriginal message: `'+message.content+'`')
+            await brainchannel.send('I think that ' + message.author.mention + ' asked a stupid regex(v8) question about tier lists.\nOriginal message: `'+message.content+'`\nLink here. '+message.jump_url)
 
     if not catbotdata.requireddata['moderation']:
         return
@@ -1652,7 +1649,7 @@ If you continue to misuse the channel after a mute extension, you will be **bann
         await message.channel.send(embed=embedded_list)
         return
 
-    elif message.content.startswith('!untrust'):  # todo doesn't work yet
+    elif message.content.startswith('!untrust'):
         if not canSend(5, privilegelevel(message.author), message):
             return
         user_id = int(message.content[message.content.find(' ') + 1:find_nth(message.content, ' ', 2)])
@@ -1675,7 +1672,25 @@ If you continue to misuse the channel after a mute extension, you will be **bann
                 old_level = int(line[4])
         time_of_untrust = untrusting.level_to_time(level + old_level)
         duration='{:} day(s) and {:} hour(s).'.format(time_of_untrust // 86400,time_of_untrust % 86400 // 3600)
-        untrusting.add_entry(user_id.id, message.author.id, reason, datetime.now(), level + old_level)
+        sent_message = await message.channel.send(
+            '`' + str(user_id) + '` is going to be untrusted because: **`{:}`**, and it will last for {:}, is that okay?'.format(str(user_id),time_of_untrust))
+        await sent_message.add_reaction('✅')
+
+        def check(reaction_received, user_that_sent):
+            return user_that_sent == message.author and str(
+                reaction_received.emoji) == '✅' and reaction_received.message.id == sent_message.id
+
+        try:
+            reaction, user = await client.wait_for('reaction_add', timeout=15.0, check=check)
+        except asyncio.TimeoutError:
+            await message.channel.send('Action aborted.')
+            try:
+                await sent_message.clear_reactions()
+            except Exception:  # we can't remove reactions, not a big deal
+                pass
+            return
+        await message.channel.send("Action confirmed, don't forget to inform the user.")
+        await sent_message.clear_reactions()
         await serveruser(user_id).add_roles(
             discord.utils.get(client.get_guild(catbotdata.requireddata['server-id']).roles,
                               id=catbotdata.requireddata['untrust-role']))
