@@ -1562,7 +1562,6 @@ If you continue to misuse the channel after a mute extension, you will be **bann
         if len(user_id) < 10:
             await message.channel.send("User ID isn't correct.")
             return
-        #answer = icing.add_entry(user_id, message.author.id, reason, str(datetime.now()))
         checkthin = icing.is_on_thin_ice(user_id)
         if checkthin is None:
             sent_message = await message.channel.send('`'+str(user_id)+'` is going to be put on thin ice because of: **'+str(reason)+'**, is that okay?')
@@ -1673,7 +1672,7 @@ If you continue to misuse the channel after a mute extension, you will be **bann
         time_of_untrust = untrusting.level_to_time(level + old_level)
         duration='{:} day(s) and {:} hour(s).'.format(time_of_untrust // 86400,time_of_untrust % 86400 // 3600)
         sent_message = await message.channel.send(
-            '`' + str(user_id) + '` is going to be untrusted because: **`{:}`**, and it will last for {:}, is that okay?'.format(str(user_id),time_of_untrust))
+            '`' + str(user_id) + '` is going to be untrusted because: **`{:}`**, and it will last for {:}, is that okay?'.format(str(user_id),duration))
         await sent_message.add_reaction('✅')
 
         def check(reaction_received, user_that_sent):

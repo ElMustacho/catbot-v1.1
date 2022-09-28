@@ -1,7 +1,7 @@
 import csv
 files = []
 for i in range(0, 800):
-    files.append('C:\\Users\\fabri\\Desktop\\old\\Desktop\\battlecats data\\bcjp 11.8\\assets\\ImageDataLocal\\' + '{:0>3}'.format(i) + '_e02.maanim')
+    files.append('C:\\Users\\fabri\\Desktop\\old\\Desktop\\battlecats data\\bcjp 11.9\\assets\\ImageDataLocal\\' + '{:0>3}'.format(i) + '_e02.maanim')
 fullswingsvalues = []
 for fls in files:
     section = []
@@ -9,8 +9,8 @@ for fls in files:
         with open(fls, "r", encoding="utf-8") as f:
             f.readline()
             f.readline()
-
-            ns = int(f.readline())
+            v = f.readline()
+            ns = int(v)
 
             for n in range(0, ns):
                 data = f.readline().split(",")
@@ -46,9 +46,11 @@ for fls in files:
         animlenght = duration + 1
     except FileNotFoundError:
         animlenght = "form doesn't exists"
+    except ValueError:
+        animlenght = "placeholder"
     fullswingsvalues.append(animlenght)
 en_names = []
-with open('C:\\Users\\fabri\\Desktop\\old\\Desktop\\battlecats data\\bcen 11.7\\assets\\resLocal\\Enemyname.tsv', 'r', encoding="utf-8") as en_names_file:
+with open('C:\\Users\\fabri\\Desktop\\old\\Desktop\\battlecats data\\bcen 11.8\\assets\\resLocal\\Enemyname.tsv', 'r', encoding="utf-8") as en_names_file:
     line = en_names_file.readline()
     #todo fix me
     while line:
@@ -59,14 +61,14 @@ with open('C:\\Users\\fabri\\Desktop\\old\\Desktop\\battlecats data\\bcen 11.7\\
         line = en_names_file.readline()
 
 jp_names = []
-with open('C:\\Users\\fabri\\Desktop\\old\\Desktop\\battlecats data\\bcjp 11.8\\assets\\resLocal\\Enemyname.tsv', 'r', encoding="utf-8") as jp_names_file:
+with open('C:\\Users\\fabri\\Desktop\\old\\Desktop\\battlecats data\\bcjp 11.9\\assets\\resLocal\\Enemyname.tsv', 'r', encoding="utf-8") as jp_names_file:
     line = jp_names_file.readline()
     while line:
         jp_names.append(line[:-1])
         line = jp_names_file.readline()
 
 enemystats = []
-with open('C:\\Users\\fabri\\Desktop\\old\\Desktop\\battlecats data\\bcjp 11.8\\assets\\DataLocal\\t_unit.csv','r', encoding="utf-8") as enemystatsfile:
+with open('C:\\Users\\fabri\\Desktop\\old\\Desktop\\battlecats data\\bcjp 11.9\\assets\\DataLocal\\t_unit.csv','r', encoding="utf-8") as enemystatsfile:
     enemystatsfile.readline()  # first 2 lines are useless
     enemystatsfile.readline()
     line = enemystatsfile.readline()
