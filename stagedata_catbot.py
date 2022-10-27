@@ -46,7 +46,7 @@ class Stagedata:
         try:
             conn = sqlite3.connect('stages.db')
             cursor = conn.cursor()
-            query = '''select stages.stage, stages.level, stages.category, stages.stageid from stages;'''
+            query = '''select stages.stage, stages.level, stages.category, stages.stageid from stages where category is not "Catamin Stages";'''
             stage = cursor.execute(query).fetchall()
             custom_stages_for_reference = custom_stages.Custom_stages.get_all_names()
             stagenames_nodiff = [x[0].lower() for x in stage]

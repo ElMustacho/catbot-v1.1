@@ -125,7 +125,7 @@ class Enemyunits:
         enemyEmbed.set_author(name='Cat Bot')
         magstring = str(magnification) + '%'
         if mag2 != magnification:
-            magstring = magstring + ' HP, ' + str(mag2*100) + '% Damage'
+            magstring = magstring + ' HP, ' + str(mag2) + '% Damage'
         enemyEmbed.add_field(name='Magnification', value=magstring, inline=True)
         hpv = str(math.ceil(int(enemy[0]) * magnification/100)) + ' HP - ' + str(enemy[1]) + ' KB'
         if enemy[52]==2:
