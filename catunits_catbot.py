@@ -466,7 +466,7 @@ class Catunits:
         return 'https://raw.githubusercontent.com/ElMustacho/catbot-v1.1/master/new_pics/' + fstr + '.png'
 
     def getnames(self, cat, catcode):
-        name = cat[-3]
+        name = cat[-4]
         allnames = 'The custom names of ' + name + ' are: '
         for value in self._customnames:
             if value[0] == catcode:
