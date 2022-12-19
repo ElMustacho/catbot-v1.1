@@ -452,8 +452,10 @@ def edit_distance_fast(s1, s2, errors):
         return errors + 1
     prev_row = [*range(len2 + 1)]
     for i, c1 in enumerate(s1):
+        print('here')
         cur_row = [i + 1, *([errors + 1] * len2)]
         # only need to check the interval [i-errors,i+errors]
+        print(range(max(0, i - errors), min(len2, i + errors + 1)))
         for j in range(max(0, i - errors), min(len2, i + errors + 1)):
             cur_row[j + 1] = min(
                 prev_row[j + 1] + 1,  # skip char in s1
@@ -461,4 +463,7 @@ def edit_distance_fast(s1, s2, errors):
                 prev_row[j] + (c1 != s2[j])  # substitution
             )
         prev_row = cur_row
-    return cur_row[len2]
+    if 'cur_row' in locals():
+        return cur_row[len2]
+    else:
+        return errors+1
