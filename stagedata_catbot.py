@@ -205,6 +205,22 @@ class Stagedata:
             conn.close()
             return results
 
+    def stages_of_map(self, map_name, errors):
+        try:
+            conn = sqlite3.connect('stages.db')
+            cursor = conn.cursor()
+            query = '''select distinct level from stages'''
+            stage = cursor.execute(query).fetchall()
+            stagenames_nodiff = [x[0].lower() for x in stage]
+            dss = list(map(lambda x: edit_distance_fast(x, map_name, errors), stagenames_nodiff))
+            minimum = min(dss)
+            nearestmatch = [i for i, x in enumerate(dss) if x == minimum and x < errors]
+        except Exception as e:
+            print(e)
+            return "error"
+        finally:
+            conn.close()
+            return nearestmatch, stage
     def whereistheenemy(self, enemycode, enemycode1=None, enemycode2=None, teleport=False):
         with sqlite3.connect('stages.db') as conn:
             cursor = conn.cursor()
@@ -422,6 +438,14 @@ SELECT DISTINCT stages.stage, stages.category, stages.level from units join stag
                 [id_f]).fetchall()
             return results
 
+    def getmap(self, map_name):
+        with sqlite3.connect('stages.db') as conn:
+            cursor = conn.cursor()
+            results = cursor.execute(
+                'select stage from stages where level = ? and category is not "Catamin Stages"',
+                [map_name]).fetchall()
+            return results
+        return results
 
 
 
@@ -452,10 +476,8 @@ def edit_distance_fast(s1, s2, errors):
         return errors + 1
     prev_row = [*range(len2 + 1)]
     for i, c1 in enumerate(s1):
-        print('here')
         cur_row = [i + 1, *([errors + 1] * len2)]
         # only need to check the interval [i-errors,i+errors]
-        print(range(max(0, i - errors), min(len2, i + errors + 1)))
         for j in range(max(0, i - errors), min(len2, i + errors + 1)):
             cur_row[j + 1] = min(
                 prev_row[j + 1] + 1,  # skip char in s1
@@ -466,4 +488,5 @@ def edit_distance_fast(s1, s2, errors):
     if 'cur_row' in locals():
         return cur_row[len2]
     else:
+        print('whoopsie')
         return errors+1

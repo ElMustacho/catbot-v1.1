@@ -624,6 +624,33 @@ async def on_message(message):
         log_event(message.content, message.author.id, datetime.now(), 1)
         return
 
+    elif message.content.startswith('!map '):
+        if not canSend(1, privilegelevel(message.author), message):
+            return
+        if privilegelevel(message.author) < 3 and message.channel.id not in catbotdata.requireddata[
+            'freeforall-channels']:
+            if not isokayifnotclog(message, isADM(message)):
+                return
+        map_searched = message.content[5:]
+        result_of_search, all_maps = stagedata.stages_of_map(map_searched,5)
+        if result_of_search == "error":
+            await message.channel.send("An error occurred.")
+            log_event(message.content, message.author.id, datetime.now(), -1)
+        if len(result_of_search) == 0:
+            await message.channel.send("I didn't understand your stage. Perhaps that's not how is it supposed to be written?")
+            log_event(message.content, message.author.id, datetime.now(), -1)
+        if len(result_of_search) > 1:
+            await message.channel.send("I couldn't find a perfect match. Perhaps you meant any of these?\n" + ''.join(
+                ["**" + x[0] + "**\n" for x in list([x for i, x in enumerate(all_maps) if i in result_of_search])]))
+            log_event(message.content, message.author.id, datetime.now(), -1)
+
+        else:
+            await message.channel.send(all_maps[result_of_search[0]][0] + " has the following stages:\n" + ''.join(
+                ["**" + i[0] + "**\n" for i in stagedata.getmap(all_maps[result_of_search[0]][0])]))
+            log_event(message.content, message.author.id, datetime.now(), 1)
+        return
+
+
     elif message.content.startswith('!renamestage '):
         if not canSend(4, privilegelevel(message.author), message):
             return
