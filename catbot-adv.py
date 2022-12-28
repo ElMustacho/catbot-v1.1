@@ -645,8 +645,11 @@ async def on_message(message):
             log_event(message.content, message.author.id, datetime.now(), -1)
 
         else:
-            await message.channel.send(all_maps[result_of_search[0]][0] + " has the following stages:\n" + ''.join(
-                ["**" + i[0] + "**\n" for i in stagedata.getmap(all_maps[result_of_search[0]][0])]))
+            spacing = '\n' if len(all_maps[result_of_search[0]][0])<10 else ', '
+            msg = all_maps[result_of_search[0]][0] + " has the following stages:\n" + spacing.join(
+                ["**" + i[0] + "**" for i in stagedata.getmap(all_maps[result_of_search[0]][0])]) if len(all_maps[result_of_search[0]][0] + " has the following stages:\n" + spacing.join(
+                ["**" + i[0] + "**" for i in stagedata.getmap(all_maps[result_of_search[0]][0])])) < 2000 else "Can't print that many stages."
+            await message.channel.send(msg)
             log_event(message.content, message.author.id, datetime.now(), 1)
         return
 
