@@ -1529,7 +1529,7 @@ If you continue to misuse the channel after a mute extension, you will be **bann
         #if message.channel.id == catbotdata.requireddata['muted-channel']:
         #    print('wrong channel!')
         messages = [message async for message in client.get_channel(catbotdata.requireddata['mute-channel']).history()]
-        archive_channel = client.get_channel(994707512844632064)
+        archive_channel = client.get_channel(713964900556341278)
         await archive_channel.send('Beginning logging.')
         users = set()
         for message in reversed(messages[:-1]):
