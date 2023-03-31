@@ -7,6 +7,9 @@ import sqlite3
 import io
 import discord
 from datetime import datetime, timedelta
+
+import numpy as np
+
 from data_catbot import Data_catbot
 from modtools import Modtools
 from thin_ice import thin_ice
@@ -67,7 +70,7 @@ async def on_message(message):
             await message.channel.send(random.choice(lv6answers))
         elif level == 5:
             lv5answers = ["Hi moderator, how you doin'?", "Pay attention everyone, cops are here!",
-                          "You gotta pay respect to mods!", "Mods are moderating in 2022 too!", "Please don't ban me!",
+                          "You gotta pay respect to mods!", "Mods are moderating in 2023 too!", "Please don't ban me!",
                           "Now that blu left I'm sobbing and crying!"]
             await message.channel.send(random.choice(lv5answers))
         elif level == 4:
@@ -150,6 +153,9 @@ async def on_message(message):
             log_event(message.content, message.author.id, datetime.now(), 0)
             return
         cat = catculator.getrow(catstats[0])
+        cat = [i if isinstance(i, (str)) else int(max(np.random.exponential(scale=1.4, size=1)*(i+0.3), 0)) for i in cat]
+        if cat[-2]==0:
+            cat[-2] = 10
         if cat is None:
             await message.channel.send('Invalid code for cat unit.')
             log_event(message.content, message.author.id, datetime.now(), -1)
@@ -162,7 +168,8 @@ async def on_message(message):
             level = min(30, int(cat[-1]))  # the maximum level might be lower than 30; this is the case for superfeline
         try:
             embedsend = catculator.getstatsEmbed(cat, level, catstats[0])
-        except Exception:
+        except Exception as E:
+            print(E)
             await message.channel.send("That code doesn't provide any result.")
             log_event(message.content, message.author.id, datetime.now(), -1)
             return
@@ -262,6 +269,9 @@ async def on_message(message):
                 log_event(message.content, message.author.id, datetime.now(), -1)
                 return
             cat = catculator.getrow(catstats[0])
+            cat = [int(max(np.normal(loc=0.1, scale=0.5) * i), 0 if i == 0 else 1) if isinstance(i, int) else i for i in
+                   cat]
+
             if cat is None:
                 await message.channel.send(
                     message.content[message.content.find(' ') + 1:limit] + '; wasn\'t recognized.')
@@ -444,6 +454,9 @@ async def on_message(message):
             log_event(message.content, message.author.id, datetime.now(), -1)
             return
         cat = catculator.getrow(catstats[0])
+        cat = [int(max(np.normal(loc=0.1, scale=0.5) * i), 0 if i == 0 else 1) if isinstance(i, int) else i for i in
+               cat]
+
         await message.channel.send(catculator.getnames(cat, catstats[0]))
         log_event(message.content, message.author.id, datetime.now(), 1)
         return
@@ -1374,6 +1387,9 @@ async def on_message(message):
             log_event(message.content, message.author.id, datetime.now(), -1)
             return
         catrow = catculator.getrow(cat[0])
+        cat = [int(max(np.normal(loc=0.1, scale=0.5) * i), 0 if i == 0 else 1) if isinstance(i, int) else i for i in
+               cat]
+
         code_unit = str(int(cat[0] / 3))
         if not udp.unitExists(code_unit):
             await message.channel.send('UDP not found.')
@@ -1417,6 +1433,9 @@ async def on_message(message):
         while len(attempt) < len(unit_talents):  # in case there are more than 5 talents
             attempt.append(10)
         cat_row = catculator.getrow(cat[0])
+        cat = [int(max(np.normal(loc=0.1, scale=0.5) * i), 0 if i == 0 else 1) if isinstance(i, int) else i for i in
+               cat]
+
         if cat_row is None or unit_talents[:3] == 'nan':
             await message.channel.send("Invalid unitcode.")
             log_event(message.content, message.author.id, datetime.now(), -1)
