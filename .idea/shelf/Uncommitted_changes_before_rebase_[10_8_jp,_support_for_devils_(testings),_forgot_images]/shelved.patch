@@ -1,0 +1,49 @@
+Index: .idea/misc.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n<project version=\"4\">\r\n  <component name=\"ProjectRootManager\" version=\"2\" project-jdk-name=\"Python 3.8\" project-jdk-type=\"Python SDK\" />\r\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/misc.xml b/.idea/misc.xml
+--- a/.idea/misc.xml	(revision d3d90ace9047fab2ff8c80ca039fb64670b2dceb)
++++ b/.idea/misc.xml	(date 1627318473848)
+@@ -1,4 +1,7 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <project version="4">
+   <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.8" project-jdk-type="Python SDK" />
++  <component name="PyCharmProfessionalAdvertiser">
++    <option name="shown" value="true" />
++  </component>
+ </project>
+\ No newline at end of file
+Index: thin_ice.csv
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/thin_ice.csv b/thin_ice.csv
+--- a/thin_ice.csv	(revision d3d90ace9047fab2ff8c80ca039fb64670b2dceb)
++++ b/thin_ice.csv	(date 1641135134647)
+@@ -1,0 +1,21 @@
++134384143499919361,271287311159787520,Recently unbanned. Large history of trolling in help channels. Was banned after receiving multiple warnings yet refusing to comply in quarantine-isles.,2021-03-31 14:25:50.896346
++222498016832126976,301847661181665280,Repetitive troll behavior by someone who should definitely know better.,2021-03-16 02:51:42.662047
++524308739394895882,271287311159787520, Posted a video that crashes Discord.,2021-05-08 21:49:15.703137
++361649556397752321,535075800878153728," multiple mutes and warnings for sexism, transphobia, sexualising minors, spam and bad advice. Ban if repeating any of first three offenses or similar (homophobia/racism etc).",2021-05-21 10:31:24.073229
++617460927884689408,271287311159787520," Long bad record, including: nword posts, NSFW posts, racist jokes and spam. Any next offense should lead to a ban.",2021-05-27 16:38:27.687614
++493904034659565592,535075800878153728, NSFW content + indicating that a 6h mute was not enough of a deterrent to make it not worth breaking rules again,2021-06-15 15:07:28.481535
++452332305323655168,548760440444944386, added to thin ice following recent unban. was banned for DM harassment.,2021-06-17 07:57:54.522747
++787166969937395782,535075800878153728, flexing cheats and causing disturbances multiple times including soon after a previous mute for it - ban upon any further 9b adjacent rule breaks,2021-07-03 11:45:55.864857
++828466173103702026,271287311159787520, Presenting toxic and troll behavior with a short history in the server. Any next offenses of this type should result in a ban.,2021-08-03 14:59:36.237241
++559875934807785492,252237532551577600, Do not continue asking for mutes. Any further will result in a ban.,2021-09-11 01:28:15.806862
++730499191666769981,301847661181665280,"!thin_ice 730499191666769981 multiple warns, mutes over 2 weeks",2021-09-15 14:23:44.189208
++695408472992514128,271287311159787520, DM Harassing with a known record of fueling arguments and toxicity. Any next offense should result in a ban.,2021-09-19 20:24:54.873559
++887641009863950337,755399543587078194," possible alt/new account that recently joined server, toxic, trolling and giving bad advice in help channels.",2021-09-20 13:43:30.286661
++486900362100473858,471875491951935490, Little to no history and has already been trolling in help. Feels like a troll,2021-09-22 23:15:24.087628
++770376708418306090,674072315511963659, History of breaking multiple rules,2021-09-23 06:36:23.371809
++875780381511675986,623046566353043466, multiple offenses regarding borderline NSFW comments and sexualizing the underage,2021-10-17 07:00:44.693594
++886408241041518634,535075800878153728," ""long history of many infractions"," this is AoE thin ice where any kind of noteworthy rule break can lead to ban""",2021-10-18 11:25:29.065900
++431004278203613187,535075800878153728, alt of 886408241041518634,2021-10-18 11:29:14.014341
++757965696675086398,755399543587078194, continuous rule 3 breaks,2021-11-02 06:11:42.977413
++329867442165907456,252237532551577600, no history,2021-12-04 07:07:14.702963
++462732352188317717,755399543587078194, recently unbanned user. was banned for continuing to post suspicious/hacked bc ss despite being on thin ice,2021-12-16 06:10:34.559126

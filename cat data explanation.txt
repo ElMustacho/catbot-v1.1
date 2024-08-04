@@ -1,0 +1,95 @@
+unit number
+idk, it's 345 forever
+rarity
+gatcha from where the unit comes from
+damage lv 30
+dps lv 30
+internal name
+actual name
+Base HP
+Knockback
+Movespeed
+BaseDmg
+Atk Recoil (x2)
+Range
+Cost
+Base Cost
+Respawn time no treasures (f)
+?1
+Hitbox size
+Red
+?2
+Area
+First frame atk
+?3
+?4
+Floating
+Black
+Metal
+White
+Angel
+Alien
+Zombie
+Strong against
+knockback %
+Freeze %
+Freeze by frames
+Slow Chance
+Slow Length
+Resistant
+Massive Dmg
+Critical %
+Only attacks?
+Extra Money
+Base Destroyer
+Wave chance
+Wave level
+Weaken chance %
+Weaken Length
+Weaken by %
+Strengthen at % health
+Increase damage by
+Survive chance %
+Metal
+Standing Distance
+LD width
+Resist shockwave
+Wave Blocker
+Resist  Knockback
+Resist Freeze
+Resist Slow
+Resist Weaken
+Zombie Killer
+Witch Killer
+Target Witch
+# of atks before not moving
+Suicide on hit
+1 multihit BaseDmg
+2 multihit BaseDmg
+1 multihit frame
+2 multihit frame
+Use ability 1st hit
+Use ability first multi hit
+Use Ability 2 multihit
+Spawn Animation
+Soul animation
+Unique Spawn Animation
+Marks Legend forms? + Moneko
+?5
+?6
+Barrier breaker % chance
+Warp Chance
+Warp duration
+Minimum Warp
+Maximum Warp
+Warp Blocker
+Target eva angels
+Eva killer?
+Target Relic
+Resist Curse
+Insanely Resistant
+Insanely Massive Dmg
+Savage blow %
+Savage blow dmgX
+Dodge Chance
+Dodge time

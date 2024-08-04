@@ -1,0 +1,132 @@
+Index: .idea/.name
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/.name b/.idea/.name
+new file mode 100644
+--- /dev/null	(date 1636032412940)
++++ b/.idea/.name	(date 1636032412940)
+@@ -0,0 +1,1 @@
++enemyunits_catbot.py
+\ No newline at end of file
+Index: testing.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import requests\r\nimport pandas as pd\r\n\r\nURL = 'https://battle-cats.fandom.com/wiki/Enemy_Release_Order'\r\nr = requests.get(URL)\r\ndf_list = pd.read_html(r.text) # this parses all the tables in webpages to a list\r\ndf = df_list[0]\r\ndf.head()\r\ndf = df['Enemy Release Order Table.1'].tolist()\r\nf = open(\"grabnamesenemies.txt\", \"a\", encoding=\"utf-8\")\r\nf.write(str(df[3:]))\r\nf.close()
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/testing.py b/testing.py
+--- a/testing.py	(revision d3d90ace9047fab2ff8c80ca039fb64670b2dceb)
++++ b/testing.py	(date 1641162202747)
+@@ -8,5 +8,4 @@
+ df.head()
+ df = df['Enemy Release Order Table.1'].tolist()
+ f = open("grabnamesenemies.txt", "a", encoding="utf-8")
+-f.write(str(df[3:]))
+-f.close()
+\ No newline at end of file
++print(df)
+\ No newline at end of file
+Index: .idea/csv-plugin.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/csv-plugin.xml b/.idea/csv-plugin.xml
+new file mode 100644
+--- /dev/null	(date 1640971807164)
++++ b/.idea/csv-plugin.xml	(date 1640971807164)
+@@ -0,0 +1,23 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<project version="4">
++  <component name="CsvFileAttributes">
++    <option name="attributeMap">
++      <map>
++        <entry key="\thin_ice.csv">
++          <value>
++            <Attribute>
++              <option name="separator" value="," />
++            </Attribute>
++          </value>
++        </entry>
++        <entry key="\untrust.csv">
++          <value>
++            <Attribute>
++              <option name="separator" value="," />
++            </Attribute>
++          </value>
++        </entry>
++      </map>
++    </option>
++  </component>
++</project>
+\ No newline at end of file
+Index: custom stage names test.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/custom stage names test.py b/custom stage names test.py
+new file mode 100644
+--- /dev/null	(date 1641164650508)
++++ b/custom stage names test.py	(date 1641164650508)
+@@ -0,0 +1,11 @@
++from custom_stages import Custom_stages
++cs = Custom_stages()
++print(cs.add_name(1,"f","b","c"))
++print(cs.add_name(2,"s","b","c"))
++print(cs.add_name(3,"l","b","c"))
++print(cs.does_name_exist('f'))
++print(cs.does_name_exist('a'))
++print(cs.get_all_names())
++print(cs.custom_name_to_id('s'))
++print(cs.remove_name_by_exact_name('f'))
++print(cs.remove_name_by_exact_name('g'))
+\ No newline at end of file
+Index: untrust.csv
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/untrust.csv b/untrust.csv
+new file mode 100644
+--- /dev/null	(date 1641053655535)
++++ b/untrust.csv	(date 1641053655535)
+@@ -0,0 +1,33 @@
++530074319167160320,623046566353043466,**!untrust 530074319167160320 3 bad advice with a pretty bad history in help channel**,2021-10-07 07:18:48.491822,3
++711342705741004821,535075800878153728,**recommending continues**,2021-10-09 15:36:52.322251,1
++763293152248463410,535075800878153728,**recommending continues**,2021-10-09 15:50:00.101539,1
++715219788695339118,535075800878153728,**saying madoka is confirmed for en**,2021-10-13 11:34:11.916998,1
++649847974314115072,535075800878153728,**'daring' people to waste catfood**,2021-10-13 11:42:11.901317,1
++875780381511675986,535075800878153728,**advising selling ubers for XP**,2021-10-13 15:34:10.307373,1
++271805554840698880,656159569810030633,**telling someone to use wiki strats in a help channel**,2021-10-13 18:09:19.562650,1
++888973583357968444,623046566353043466,**escalating from a verbal warn due to a previous history of giving poor advice on stages they themselves have not played and were warned the next offense would lead to an untrust**,2021-10-14 05:42:41.851701,1
++894058526689882182,535075800878153728,**suggesting cf on single rolls**,2021-10-14 14:53:05.039741,1
++804351577200656394,535075800878153728,**telling people it is ok to sell dupes for xp**,2021-10-14 15:36:36.484301,1
++272866613320220682,535075800878153728,**contradicting message to not sell dupes for xp because you 'need xp' **,2021-10-14 15:41:45.112249,1
++633666651602157568,656159569810030633,**telling someone to use giraffe against shyboys**,2021-10-15 14:56:04.263804,1
++888973583357968444,623046566353043466,"**escalating again. this your third offense of giving poor advice on stages you yourself have not played yet; giving advice on GS while at SoL 27, poor advice at it, saying shigong doesn't work well for GS. stop or otherwise face the possibility of 24h or perma untrust should this continue.**",2021-10-19 11:57:29.501622,3
++659851047845494794,535075800878153728,**continuing to say rich cats are needed / use leaderships to farm them after being told multiple times no**,2021-10-20 11:58:29.414097,1
++543697287008878594,535075800878153728,"**promoting cf on fests, and having a previous warn for telling people to sell units for xp**",2021-10-22 09:40:42.591327,2
++789551170342748180,535075800878153728,"**history of multiple bad advice warnings, so you will be untrusted for a further 5h after mute expires**",2021-10-22 12:56:06.154447,3
++462011079787282433,755399543587078194,**!untrust 462011079787282433 1 bad advice in help channels despite trusted+ users asking to stop**,2021-10-29 04:55:10.273517,1
++462011079787282433,755399543587078194,**!untrust 462011079787282433 3 correctio**,2021-10-29 04:55:58.575497,3
++864961161622847510,535075800878153728,"**disrupting help channel, giving poor conflicting advice and confusing the person being helped**",2021-10-29 23:20:26.672918,1
++773045839115452416,535075800878153728,"**repeatedly and persistently making false statements, you should stop trying to inform people as your views are seemingly all wrong**",2021-11-01 01:00:38.009623,2
++446609434073104386,623046566353043466,"**giving poor/joke advice in help channels, and when warned to stop, said will continue**",2021-11-06 11:30:19.718881,1
++517354859498962955,535075800878153728,**telling someone to roll non guaranteed**,2021-11-10 00:39:35.489301,1
++847932063592218684,535075800878153728,**telling someone to roll non guaranteed**,2021-11-10 00:39:47.206247,1
++594712853886533659,252237532551577600,**telling people to pull a certain uber or legend rare is not good advice. Untrusted for 3 hours.**,2021-11-16 01:46:25.936398,2
++591586713021710337,301847661181665280,**telling to roll lugas over madoka**,2021-11-21 15:30:46.232522,1
++471875491951935490,471875491951935490,**!untrust 471875491951935490 1 **,2021-11-21 19:52:22.515016,1
++471875491951935490,471875491951935490,**telling to roll lugas over madoka**,2021-11-21 19:52:54.041966,1
++281909423054520322,471875491951935490,"**!untrust 281909423054520322 2 You've been untrusted for 3 hours for telling someone that ushiwakamaru is placed next to artist cat while being UL 7, you know bette**",2021-11-21 19:54:00.048214,2
++694993864066465925,471875491951935490,**Catornado is better than space on cfish**,2021-11-21 20:25:02.961268,1
++909628962328698982,674072315511963659,**Being unhelpful and toxic in help channel after mod told them to stop.**,2021-12-11 10:51:48.008601,1
++723545801653223498,535075800878153728,**joke/bad advice in help channels**,2021-12-13 17:07:44.560099,1
++534213395629604895,623046566353043466,**!untrust 534213395629604895 1 shitposting and derailing discussion in help channels for a second tim**,2022-01-01 03:58:21.505734,1
++463409366360522769,535075800878153728,**!untrust 463409366360522769 1 promoting CF on fes**,2022-01-01 17:14:15.531663,1
+diff --git a/logging.txt b/logging.txt
+new file mode 100644
